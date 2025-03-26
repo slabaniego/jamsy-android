@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "975330099933",
+    "project_id": "jamsy-a5f85",
+    "storage_bucket": "jamsy-a5f85.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:975330099933:android:c38f276e28327f4b309134",
+        "android_client_info": {
+          "package_name": "ca.sheridancollege.jamsy"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB75-8V9Gtgr6IpZ3Vl0W28aV7QqiOLRBE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
