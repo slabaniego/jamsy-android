@@ -37,4 +37,10 @@ class ProfileViewModel : ViewModel() {
     fun resetUploadState() {
         _uploadState.value = null
     }
+
+    fun clearUserData() {
+        _profileState.value = Resource.Loading
+        _uploadState.value = null
+    }
+
 }

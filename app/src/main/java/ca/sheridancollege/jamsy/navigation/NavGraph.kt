@@ -1,6 +1,7 @@
 package ca.sheridancollege.jamsy.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -27,8 +28,35 @@ fun NavGraph(navController: NavHostController) {
     val profileViewModel: ProfileViewModel = viewModel()
     val homeViewModel: HomeViewModel = viewModel()
 
+    // Remember the initial destination based on authentication state
     val startDestination = remember {
         if (authViewModel.currentUser != null) Screen.Home.route else Screen.Login.route
+    }
+
+    // ADDED: Monitor auth state changes to force navigation when user logs out
+    LaunchedEffect(authViewModel.currentUser) {
+        if (authViewModel.currentUser == null && navController.currentDestination?.route != Screen.Login.route) {
+            // If user becomes null (logged out) and we're not already on login screen
+            navController.navigate(Screen.Login.route) {
+                // Clear the entire back stack
+                popUpTo(0) { inclusive = true }
+            }
+        }
+    }
+
+    // ADDED: Create a shared logout function to ensure consistent behavior
+    val handleLogout: () -> Unit = {
+        // First clear all view model state
+        authViewModel.logout() // This now internally resets login/signup states
+
+        // ADDED: Clear other viewmodels' states
+        profileViewModel.clearUserData() // Added method to ProfileViewModel
+        homeViewModel.clearData() // Added method to HomeViewModel
+
+        // Then navigate to login screen with back stack cleared
+        navController.navigate(Screen.Login.route) {
+            popUpTo(0) { inclusive = true }
+        }
     }
 
     NavHost(navController = navController, startDestination = startDestination) {
@@ -55,12 +83,8 @@ fun NavGraph(navController: NavHostController) {
         composable(Screen.Profile.route) {
             ProfileScreen(
                 onNavigateToHome = { navController.navigate(Screen.Home.route) },
-                onLogout = {
-                    authViewModel.logout()
-                    navController.navigate(Screen.Login.route) {
-                        popUpTo(0) { inclusive = true }
-                    }
-                },
+                // CHANGED: Use the shared logout handler
+                onLogout = handleLogout,
                 viewModel = profileViewModel
             )
         }
@@ -68,12 +92,8 @@ fun NavGraph(navController: NavHostController) {
         composable(Screen.Home.route) {
             HomeScreen(
                 onNavigateToProfile = { navController.navigate(Screen.Profile.route) },
-                onLogout = {
-                    authViewModel.logout()
-                    navController.navigate(Screen.Login.route) {
-                        popUpTo(0) { inclusive = true }
-                    }
-                },
+                // CHANGED: Use the shared logout handler
+                onLogout = handleLogout,
                 viewModel = homeViewModel
             )
         }

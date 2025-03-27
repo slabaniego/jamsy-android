@@ -38,10 +38,15 @@ class AuthViewModel : ViewModel() {
 
     fun logout() {
         repository.logout()
+        //Reset all view model states
+        _loginState.value = null
+        _signupState.value = null
     }
 
     fun resetState() {
         _loginState.value = null
         _signupState.value = null
     }
+
+
 }

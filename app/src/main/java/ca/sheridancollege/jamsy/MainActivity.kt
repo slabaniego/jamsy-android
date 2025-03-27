@@ -9,12 +9,16 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.core.app.ActivityCompat
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import ca.sheridancollege.jamsy.navigation.NavGraph
+import ca.sheridancollege.jamsy.navigation.Screen
 import ca.sheridancollege.jamsy.util.PermissionHandler
 import ca.sheridancollege.jamsy.ui.theme.JamsyTheme
+import ca.sheridancollege.jamsy.viewmodel.AuthViewModel
 
 class MainActivity : ComponentActivity() {
     private val TAG = "MainActivity"
@@ -33,6 +37,22 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     val navController = rememberNavController()
+                    val authViewModel: AuthViewModel = viewModel()
+
+
+                    LaunchedEffect(authViewModel.currentUser) {
+                        Log.d(TAG, "Auth state changed: user=${authViewModel.currentUser?.email ?: "null"}")
+
+                        if (authViewModel.currentUser == null &&
+                            navController.currentDestination?.route != Screen.Login.route) {
+                            Log.d(TAG, "Navigating to login due to auth state change")
+                            navController.navigate(Screen.Login.route) {
+
+                                popUpTo(0) { inclusive = true }
+                            }
+                        }
+                    }
+
                     NavGraph(navController = navController)
                 }
             }
@@ -70,7 +90,3 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-
-
-
-

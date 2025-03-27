@@ -16,6 +16,8 @@ class HomeViewModel : ViewModel() {
         loadSampleTracks()
     }
 
+
+
     private fun loadSampleTracks() {
         // In a real app, you would fetch this from a repository
         val sampleTracks = listOf(
@@ -57,6 +59,10 @@ class HomeViewModel : ViewModel() {
         )
 
         _tracksState.value = Resource.Success(sampleTracks)
+    }
+
+    fun clearData() {
+        _tracksState.value = Resource.Loading
     }
 
     // In a real app, you would implement functions to fetch tracks from a remote source
