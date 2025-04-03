@@ -10,6 +10,8 @@ android {
     compileSdk = 35
 
     defaultConfig {
+
+
         applicationId = "ca.sheridancollege.jamsy"
         minSdk = 33
         targetSdk = 35
@@ -69,6 +71,29 @@ dependencies {
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3")
 
+    // Retrofit for network requests
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.11.0")
+
+    // Browser for OAuth
+    implementation("androidx.browser:browser:1.4.0")
+
+    // Retrofit for network calls
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-moshi:2.9.0")
+    implementation("com.squareup.moshi:moshi-kotlin:1.14.0")
+
+    // Coil for image loading
+    implementation ("io.coil-kt:coil-compose:2.2.2")
+
+    //Icons
+    implementation("androidx.compose.material:material-icons-extended:1.6.1")
+
+    // ExoPlayer for audio preview
+    implementation ("androidx.media3:media3-exoplayer:1.1.0")
+    implementation(libs.androidx.storage)
+
     // Testing
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
@@ -77,5 +102,7 @@ dependencies {
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
+
+
 
 }

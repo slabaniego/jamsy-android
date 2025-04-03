@@ -1,7 +1,8 @@
 package ca.sheridancollege.jamsy.navigation
-
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -11,49 +12,67 @@ import ca.sheridancollege.jamsy.ui.screens.HomeScreen
 import ca.sheridancollege.jamsy.ui.screens.LoginScreen
 import ca.sheridancollege.jamsy.ui.screens.SignupScreen
 import ca.sheridancollege.jamsy.ui.screens.ProfileScreen
+import ca.sheridancollege.jamsy.ui.screens.TrackListScreen
+import ca.sheridancollege.jamsy.util.Resource
 import ca.sheridancollege.jamsy.viewmodel.AuthViewModel
 import ca.sheridancollege.jamsy.viewmodel.HomeViewModel
 import ca.sheridancollege.jamsy.viewmodel.ProfileViewModel
+import ca.sheridancollege.jamsy.viewmodel.TrackListViewModel
+import ca.sheridancollege.jamsy.viewmodel.ViewModelFactory
+
+import androidx.compose.runtime.compositionLocalOf
+import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 
 sealed class Screen(val route: String) {
     object Login : Screen("login")
     object Signup : Screen("signup")
     object Profile : Screen("profile")
     object Home : Screen("home")
+    object TrackList : Screen("tracklist")
 }
 
 @Composable
 fun NavGraph(navController: NavHostController) {
-    val authViewModel: AuthViewModel = viewModel()
-    val profileViewModel: ProfileViewModel = viewModel()
-    val homeViewModel: HomeViewModel = viewModel()
 
-    // Remember the initial destination based on authentication state
+    val factory = ViewModelFactory()
+
+    val authViewModel: AuthViewModel = viewModel(factory = factory, viewModelStoreOwner = LocalViewModelStoreOwner.current!!)
+    val profileViewModel: ProfileViewModel = viewModel(factory = factory, viewModelStoreOwner = LocalViewModelStoreOwner.current!!)
+    val homeViewModel: HomeViewModel = viewModel(factory = factory, viewModelStoreOwner = LocalViewModelStoreOwner.current!!)
+    val trackListViewModel: TrackListViewModel = viewModel(factory = factory, viewModelStoreOwner = LocalViewModelStoreOwner.current!!)
+
+    val authState by authViewModel.authState.collectAsState()
+
     val startDestination = remember {
         if (authViewModel.currentUser != null) Screen.Home.route else Screen.Login.route
     }
 
-    // ADDED: Monitor auth state changes to force navigation when user logs out
-    LaunchedEffect(authViewModel.currentUser) {
-        if (authViewModel.currentUser == null && navController.currentDestination?.route != Screen.Login.route) {
-            // If user becomes null (logged out) and we're not already on login screen
-            navController.navigate(Screen.Login.route) {
-                // Clear the entire back stack
-                popUpTo(0) { inclusive = true }
+    LaunchedEffect(authState) {
+        when (authState) {
+            is Resource.Success -> {
+                val user = (authState as Resource.Success).data
+                if (user == null) {
+
+                    if (navController.currentDestination?.route != Screen.Login.route &&
+                        navController.currentDestination?.route != Screen.Signup.route) {
+                        navController.navigate(Screen.Login.route) {
+                            popUpTo(0) { inclusive = true }
+                        }
+                    }
+                }
             }
+            else -> {}
         }
     }
 
-    // ADDED: Create a shared logout function to ensure consistent behavior
+
     val handleLogout: () -> Unit = {
-        // First clear all view model state
-        authViewModel.logout() // This now internally resets login/signup states
 
-        // ADDED: Clear other viewmodels' states
-        profileViewModel.clearUserData() // Added method to ProfileViewModel
-        homeViewModel.clearData() // Added method to HomeViewModel
+        authViewModel.logout()
+        profileViewModel.clearUserData()
+        homeViewModel.clearData()
+        trackListViewModel.clearData()
 
-        // Then navigate to login screen with back stack cleared
         navController.navigate(Screen.Login.route) {
             popUpTo(0) { inclusive = true }
         }
@@ -83,7 +102,6 @@ fun NavGraph(navController: NavHostController) {
         composable(Screen.Profile.route) {
             ProfileScreen(
                 onNavigateToHome = { navController.navigate(Screen.Home.route) },
-                // CHANGED: Use the shared logout handler
                 onLogout = handleLogout,
                 viewModel = profileViewModel
             )
@@ -92,9 +110,19 @@ fun NavGraph(navController: NavHostController) {
         composable(Screen.Home.route) {
             HomeScreen(
                 onNavigateToProfile = { navController.navigate(Screen.Profile.route) },
-                // CHANGED: Use the shared logout handler
+                onNavigateToTrackList = { navController.navigate(Screen.TrackList.route) },
                 onLogout = handleLogout,
                 viewModel = homeViewModel
+            )
+        }
+
+        composable(Screen.TrackList.route) {
+            TrackListScreen(
+                onNavigateToHome = { navController.navigate(Screen.Home.route) },
+                onNavigateToProfile = { navController.navigate(Screen.Profile.route) },
+                onLogout = handleLogout,
+                onTrackSelected = { trackId -> },
+                viewModel = trackListViewModel
             )
         }
     }

@@ -1,71 +1,68 @@
 package ca.sheridancollege.jamsy.viewmodel
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import ca.sheridancollege.jamsy.model.Track
+import ca.sheridancollege.jamsy.repository.TrackRepository
 import ca.sheridancollege.jamsy.util.Resource
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 
-class HomeViewModel : ViewModel() {
+class HomeViewModel(private val trackRepository: TrackRepository) : ViewModel() {
 
     private val _tracksState = MutableStateFlow<Resource<List<Track>>>(Resource.Loading)
     val tracksState: StateFlow<Resource<List<Track>>> = _tracksState
 
+    private val _currentTrackIndex = MutableStateFlow(0)
+    val currentTrackIndex: StateFlow<Int> = _currentTrackIndex
+
     init {
-        // Load sample tracks when ViewModel is initialized
-        loadSampleTracks()
+        fetchTracksFromBackend()
     }
 
+    fun fetchTracksFromBackend() {
+        _tracksState.value = Resource.Loading
+        viewModelScope.launch {
+            val result = trackRepository.getTracks()
+            _tracksState.value = result
+        }
+    }
 
+    fun likeCurrentTrack() {
+        val currentTracks = (_tracksState.value as? Resource.Success)?.data ?: return
+        val currentIndex = _currentTrackIndex.value
+        if (currentIndex < currentTracks.size) {
+            viewModelScope.launch {
+                val track = currentTracks[currentIndex]
+                trackRepository.likeTrack(track)
+                moveToNextTrack()
+            }
+        }
+    }
 
-    private fun loadSampleTracks() {
-        // In a real app, you would fetch this from a repository
-        val sampleTracks = listOf(
-            Track(
-                id = "1",
-                title = "Blinding Lights",
-                artist = "The Weeknd",
-                albumArt = "",
-                duration = 200000
-            ),
-            Track(
-                id = "2",
-                title = "Circles",
-                artist = "Post Malone",
-                albumArt = "",
-                duration = 215000
-            ),
-            Track(
-                id = "3",
-                title = "Don't Start Now",
-                artist = "Dua Lipa",
-                albumArt = "",
-                duration = 183000
-            ),
-            Track(
-                id = "4",
-                title = "Watermelon Sugar",
-                artist = "Harry Styles",
-                albumArt = "",
-                duration = 174000
-            ),
-            Track(
-                id = "5",
-                title = "Levitating",
-                artist = "Dua Lipa ft. DaBaby",
-                albumArt = "",
-                duration = 203000
-            )
-        )
+    fun unlikeCurrentTrack() {
+        val currentTracks = (_tracksState.value as? Resource.Success)?.data ?: return
+        val currentIndex = _currentTrackIndex.value
+        if (currentIndex < currentTracks.size) {
+            viewModelScope.launch {
+                val track = currentTracks[currentIndex]
+                trackRepository.unlikeTrack(track)
+                moveToNextTrack()
+            }
+        }
+    }
 
-        _tracksState.value = Resource.Success(sampleTracks)
+    fun moveToNextTrack() {
+        val currentTracks = (_tracksState.value as? Resource.Success)?.data ?: return
+        val newIndex = _currentTrackIndex.value + 1
+        if (newIndex < currentTracks.size) {
+            _currentTrackIndex.value = newIndex
+        }
     }
 
     fun clearData() {
         _tracksState.value = Resource.Loading
+        _currentTrackIndex.value = 0
     }
-
-    // In a real app, you would implement functions to fetch tracks from a remote source
-    // For example:
-    // fun fetchTracks() { ... }
 }
