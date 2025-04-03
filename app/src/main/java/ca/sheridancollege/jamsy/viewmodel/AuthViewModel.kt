@@ -1,7 +1,8 @@
 package ca.sheridancollege.jamsy.viewmodel
-
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -18,7 +19,27 @@ class AuthViewModel : ViewModel() {
     private val _signupState = MutableStateFlow<Resource<FirebaseUser>?>(null)
     val signupState: StateFlow<Resource<FirebaseUser>?> = _signupState
 
-    val currentUser = repository.currentUser
+    private val _authState = MutableStateFlow<Resource<FirebaseUser?>>(Resource.Loading)
+    val authState: StateFlow<Resource<FirebaseUser?>> = _authState
+
+    val currentUser get() = repository.currentUser
+
+    init {
+        updateAuthState()
+        FirebaseAuth.getInstance().addAuthStateListener { firebaseAuth ->
+            updateAuthState(firebaseAuth.currentUser)
+        }
+    }
+
+    private fun updateAuthState(user: FirebaseUser? = repository.currentUser) {
+        if (user != null) {
+            _authState.value = Resource.Success(user)
+            Log.d("AuthViewModel", "Auth state updated: User logged in ${user.email}")
+        } else {
+            _authState.value = Resource.Success(null)
+            Log.d("AuthViewModel", "Auth state updated: User logged out")
+        }
+    }
 
     fun login(email: String, password: String) {
         viewModelScope.launch {
@@ -38,9 +59,9 @@ class AuthViewModel : ViewModel() {
 
     fun logout() {
         repository.logout()
-        //Reset all view model states
         _loginState.value = null
         _signupState.value = null
+
     }
 
     fun resetState() {
@@ -48,5 +69,16 @@ class AuthViewModel : ViewModel() {
         _signupState.value = null
     }
 
-
+    fun handleSpotifyRedirect(code: String) {
+        viewModelScope.launch {
+            _loginState.value = Resource.Loading
+            try {
+                val result = repository.loginWithSpotify(code)
+                _loginState.value = result
+            } catch (e: Exception) {
+                _loginState.value = Resource.Error("Spotify authentication failed: ${e.message}")
+                Log.e("AuthViewModel", "Spotify auth error", e)
+            }
+        }
+    }
 }

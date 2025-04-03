@@ -16,11 +16,12 @@ import ca.sheridancollege.jamsy.model.Track
 @Composable
 fun TrackItem(
     track: Track,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Card(
         shape = RoundedCornerShape(8.dp),
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp)
             .clickable(onClick = onClick)
@@ -35,7 +36,7 @@ fun TrackItem(
                 modifier = Modifier.weight(1f)
             ) {
                 Text(
-                    text = track.title,
+                    text = track.name,
                     style = MaterialTheme.typography.titleMedium,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
@@ -44,7 +45,7 @@ fun TrackItem(
                 Spacer(modifier = Modifier.height(4.dp))
 
                 Text(
-                    text = track.artist,
+                    text = track.artists.joinToString(", "),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
                     maxLines = 1,
@@ -52,19 +53,15 @@ fun TrackItem(
                 )
             }
 
-            Text(
-                text = formatDuration(track.duration),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-            )
+
+            // Only show duration if it's available
+            track.popularity?.let { popularity ->
+                Text(
+                    text = "$popularity%",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                )
+            }
         }
     }
-}
-
-// Helper function to format milliseconds to mm:ss format
-private fun formatDuration(durationMs: Long): String {
-    val totalSeconds = durationMs / 1000
-    val minutes = totalSeconds / 60
-    val seconds = totalSeconds % 60
-    return String.format("%d:%02d", minutes, seconds)
 }

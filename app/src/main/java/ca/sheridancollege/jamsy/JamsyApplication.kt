@@ -1,11 +1,9 @@
 package ca.sheridancollege.jamsy
-
-
 import android.app.Application
 import android.util.Log
 import com.google.firebase.FirebaseApp
 import kotlinx.coroutines.CoroutineExceptionHandler
-
+    
 class JamsyApplication : Application() {
     companion object {
         private const val TAG = "JamsyApp"
