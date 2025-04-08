@@ -90,6 +90,23 @@ class TrackApiClient {
                 val body = response.body?.string() ?: ""
 
                 Log.d(TAG, "Raw response: $body")
+                // Debug: Extract and print a track sample from the raw JSON to check field names
+                try {
+                    val jsonObject = org.json.JSONObject(body)
+                    val tracksArray = jsonObject.getJSONArray("tracks")
+                    if (tracksArray.length() > 0) {
+                        val sampleTrack = tracksArray.getJSONObject(0)
+                        Log.d(TAG, "Sample track JSON: ${sampleTrack.toString(2)}")
+                        Log.d(TAG, "Has popularity field: ${sampleTrack.has("popularity")}")
+                        if (sampleTrack.has("popularity")) {
+                            Log.d(TAG, "Popularity value: ${sampleTrack.opt("popularity")}")
+                        }
+                    }
+                } catch (e: Exception) {
+                    Log.e(TAG, "Failed to parse sample track for debugging", e)
+                }
+
+
                 body
             }
 
@@ -129,6 +146,12 @@ class TrackApiClient {
                     Log.e(TAG, "Parsed response but tracks is null")
                     return Resource.Error("Server returned invalid data format. Please try again later.")
                 }
+
+                // Log the popularity of each track to debug
+                response.tracks.forEach { track ->
+                    Log.d(TAG, "Track: ${track.name}, Popularity: ${track.popularity}")
+                }
+
 
                 Log.d(TAG, "Successfully fetched ${response.tracks.size} tracks")
                 Resource.Success(response.tracks)
