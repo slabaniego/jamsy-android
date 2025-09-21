@@ -13,15 +13,23 @@ import ca.sheridancollege.jamsy.ui.screens.LoginScreen
 import ca.sheridancollege.jamsy.ui.screens.SignupScreen
 import ca.sheridancollege.jamsy.ui.screens.ProfileScreen
 import ca.sheridancollege.jamsy.ui.screens.TrackListScreen
+import ca.sheridancollege.jamsy.ui.screens.PlaylistTemplateScreen
+import ca.sheridancollege.jamsy.ui.screens.ArtistSelectionScreen
+import ca.sheridancollege.jamsy.ui.screens.DiscoveryScreen
+import ca.sheridancollege.jamsy.ui.screens.LikedTracksScreen
+import ca.sheridancollege.jamsy.ui.screens.SearchScreen
 import ca.sheridancollege.jamsy.util.Resource
 import ca.sheridancollege.jamsy.viewmodel.AuthViewModel
 import ca.sheridancollege.jamsy.viewmodel.HomeViewModel
 import ca.sheridancollege.jamsy.viewmodel.ProfileViewModel
 import ca.sheridancollege.jamsy.viewmodel.TrackListViewModel
 import ca.sheridancollege.jamsy.viewmodel.ViewModelFactory
-
-import androidx.compose.runtime.compositionLocalOf
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
+import ca.sheridancollege.jamsy.viewmodel.PlaylistTemplateViewModel
+import ca.sheridancollege.jamsy.viewmodel.ArtistSelectionViewModel
+import ca.sheridancollege.jamsy.viewmodel.DiscoveryViewModel
+import ca.sheridancollege.jamsy.viewmodel.LikedTracksViewModel
+import ca.sheridancollege.jamsy.viewmodel.SearchViewModel
 
 sealed class Screen(val route: String) {
     object Login : Screen("login")
@@ -29,6 +37,12 @@ sealed class Screen(val route: String) {
     object Profile : Screen("profile")
     object Home : Screen("home")
     object TrackList : Screen("tracklist")
+    object PlaylistTemplates : Screen("playlist_templates")
+    object ArtistSelection : Screen("artist_selection")
+    object Discovery : Screen("discovery")
+    object LikedTracks : Screen("liked_tracks")
+    object PlaylistPreview : Screen("playlist_preview")
+    object Search : Screen("search")
 }
 
 @Composable
@@ -40,6 +54,11 @@ fun NavGraph(navController: NavHostController) {
     val profileViewModel: ProfileViewModel = viewModel(factory = factory, viewModelStoreOwner = LocalViewModelStoreOwner.current!!)
     val homeViewModel: HomeViewModel = viewModel(factory = factory, viewModelStoreOwner = LocalViewModelStoreOwner.current!!)
     val trackListViewModel: TrackListViewModel = viewModel(factory = factory, viewModelStoreOwner = LocalViewModelStoreOwner.current!!)
+    val playlistTemplateViewModel: PlaylistTemplateViewModel = viewModel(factory = factory, viewModelStoreOwner = LocalViewModelStoreOwner.current!!)
+    val artistSelectionViewModel: ArtistSelectionViewModel = viewModel(factory = factory, viewModelStoreOwner = LocalViewModelStoreOwner.current!!)
+    val discoveryViewModel: DiscoveryViewModel = viewModel(factory = factory, viewModelStoreOwner = LocalViewModelStoreOwner.current!!)
+    val likedTracksViewModel: LikedTracksViewModel = viewModel(factory = factory, viewModelStoreOwner = LocalViewModelStoreOwner.current!!)
+    val searchViewModel: SearchViewModel = viewModel(factory = factory, viewModelStoreOwner = LocalViewModelStoreOwner.current!!)
 
     val authState by authViewModel.authState.collectAsState()
 
@@ -111,6 +130,8 @@ fun NavGraph(navController: NavHostController) {
             HomeScreen(
                 onNavigateToProfile = { navController.navigate(Screen.Profile.route) },
                 onNavigateToTrackList = { navController.navigate(Screen.TrackList.route) },
+                onNavigateToSearch = { navController.navigate(Screen.Search.route) },
+                onNavigateToPlaylistTemplates = { navController.navigate(Screen.PlaylistTemplates.route) },
                 onLogout = handleLogout,
                 viewModel = homeViewModel
             )
@@ -123,6 +144,54 @@ fun NavGraph(navController: NavHostController) {
                 onLogout = handleLogout,
                 onTrackSelected = { trackId -> },
                 viewModel = trackListViewModel
+            )
+        }
+
+        composable(Screen.PlaylistTemplates.route) {
+            PlaylistTemplateScreen(
+                onNavigateToHome = { navController.navigate(Screen.Home.route) },
+                onNavigateToArtistSelection = { workout, mood -> 
+                    navController.navigate("${Screen.ArtistSelection.route}/$workout/$mood")
+                },
+                onLogout = handleLogout,
+                viewModel = playlistTemplateViewModel
+            )
+        }
+
+        composable("${Screen.ArtistSelection.route}/{workout}/{mood}") { backStackEntry ->
+            val workout = backStackEntry.arguments?.getString("workout") ?: ""
+            val mood = backStackEntry.arguments?.getString("mood") ?: ""
+            
+            ArtistSelectionScreen(
+                workout = workout,
+                mood = mood,
+                onNavigateToDiscovery = { navController.navigate(Screen.Discovery.route) },
+                onBack = { navController.popBackStack() },
+                viewModel = artistSelectionViewModel
+            )
+        }
+
+        composable(Screen.Discovery.route) {
+            DiscoveryScreen(
+                onNavigateToLikedTracks = { navController.navigate(Screen.LikedTracks.route) },
+                onBack = { navController.popBackStack() },
+                viewModel = discoveryViewModel
+            )
+        }
+
+        composable(Screen.LikedTracks.route) {
+            LikedTracksScreen(
+                onBack = { navController.popBackStack() },
+                viewModel = likedTracksViewModel
+            )
+        }
+
+        composable(Screen.Search.route) {
+            SearchScreen(
+                onNavigateToHome = { navController.navigate(Screen.Home.route) },
+                onNavigateToProfile = { navController.navigate(Screen.Profile.route) },
+                onLogout = handleLogout,
+                viewModel = searchViewModel
             )
         }
     }

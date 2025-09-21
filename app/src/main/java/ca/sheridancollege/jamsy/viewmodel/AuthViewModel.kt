@@ -23,6 +23,9 @@ class AuthViewModel : ViewModel() {
     val authState: StateFlow<Resource<FirebaseUser?>> = _authState
 
     val currentUser get() = repository.currentUser
+    
+    // Get Spotify access token
+    fun getSpotifyAccessToken(): String? = repository.getSpotifyAccessToken()
 
     init {
         updateAuthState()

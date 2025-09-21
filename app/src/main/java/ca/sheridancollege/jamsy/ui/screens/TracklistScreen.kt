@@ -70,7 +70,7 @@ fun TrackListScreen(
                 }
 
                 is Resource.Success -> {
-                    val tracks = state.data ?: emptyList()
+                    val tracks = state.data
                     if (tracks.isEmpty()) {
                         Box(
                             contentAlignment = Alignment.Center,
@@ -87,7 +87,7 @@ fun TrackListScreen(
                             items(tracks) { track ->
                                 TrackItem(
                                     track = track,
-                                    onClick = { track.id?.let { id -> onTrackSelected(id) } },
+                                    onTrackSelected = { track.id?.let { id -> onTrackSelected(id) } },
                                     modifier = Modifier.padding(vertical = 4.dp)
                                 )
                             }

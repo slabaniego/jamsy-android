@@ -3,14 +3,14 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.tasks.await
 import ca.sheridancollege.jamsy.util.Resource
-import ca.sheridancollege.jamsy.network.SpotifyApiClient
+import ca.sheridancollege.jamsy.network.SpotifyAuthResponse
 import java.io.IOException
 import android.util.Log
-import ca.sheridancollege.jamsy.api.TrackApiClient
+import ca.sheridancollege.jamsy.repository.JamsyRepository
 
 class AuthRepository {
     private val firebaseAuth = FirebaseAuth.getInstance()
-    private val spotifyApiClient = SpotifyApiClient()
+    private val jamsyRepository = JamsyRepository()
     private val TAG = "AuthRepository"
     private var spotifyAccessToken: String? = null
 
@@ -28,9 +28,13 @@ class AuthRepository {
 
     suspend fun loginWithSpotify(code: String): Resource<FirebaseUser> {
         return try {
+            val result = jamsyRepository.exchangeCodeForToken(code, "jamsy://callback")
+            
+            if (result.isFailure) {
+                return Resource.Error("Authentication failed: ${result.exceptionOrNull()?.message}")
+            }
 
-            val response = spotifyApiClient.exchangeCodeForToken(code)
-
+            val response = result.getOrThrow()
             if (response.firebaseCustomToken.isNullOrEmpty()) {
                 return Resource.Error("Authentication failed: Server did not provide a valid token")
             }
@@ -38,20 +42,13 @@ class AuthRepository {
             spotifyAccessToken = response.accessToken
             Log.d(TAG, "Saved Spotify access token: ${spotifyAccessToken?.take(10)}...")
 
-            // Set the token in Track API client for future requests
-            TrackApiClient.instance.setAuthToken(spotifyAccessToken ?: "")
-
-
             val authResult = firebaseAuth.signInWithCustomToken(response.firebaseCustomToken).await()
-
             Resource.Success(authResult.user!!)
 
         } catch (e: IOException) {
-
             val errorMsg = e.message ?: "Unknown server error"
             Resource.Error("Server error: $errorMsg")
         } catch (e: Exception) {
-
             val errorMsg = e.message ?: "Unknown authentication error"
             Resource.Error("Authentication failed: $errorMsg")
         }
