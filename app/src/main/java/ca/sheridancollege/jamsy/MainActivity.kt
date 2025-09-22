@@ -31,7 +31,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         // Use the ViewModelFactory
-        val factory = ViewModelFactory()
+        val factory = ViewModelFactory(this)
         authViewModel = ViewModelProvider(this, factory)[AuthViewModel::class.java]
 
 
@@ -79,15 +79,7 @@ class MainActivity : ComponentActivity() {
         val data: Uri? = intent.data
         if (data != null && data.toString().startsWith("jamsy://callback")) {
             Log.d(TAG, "Received intent with data: $data")
-            val code = data.getQueryParameter("code")
-            val error = data.getQueryParameter("error")
-
-            if (code != null) {
-                Log.d(TAG, "Received Spotify auth code")
-                authViewModel.handleSpotifyRedirect(code)
-            } else if (error != null) {
-                Log.e(TAG, "Spotify auth error: $error")
-            }
+            authViewModel.handleOAuthRedirect(data)
         }
     }
 }

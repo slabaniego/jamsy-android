@@ -23,39 +23,36 @@ import ca.sheridancollege.jamsy.ui.components.ErrorScreen
 import ca.sheridancollege.jamsy.ui.components.AppTopBar
 import ca.sheridancollege.jamsy.util.Resource
 import ca.sheridancollege.jamsy.viewmodel.PlaylistTemplateViewModel
-import ca.sheridancollege.jamsy.viewmodel.AuthViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PlaylistTemplatesScreen(
+fun PlaylistTemplateScreen(
+    workout: String,
     onNavigateToHome: () -> Unit,
-    onNavigateToProfile: () -> Unit,
-    onNavigateToTrackList: () -> Unit,
     onNavigateToArtistSelection: (String, String) -> Unit,
     onLogout: () -> Unit,
     viewModel: PlaylistTemplateViewModel,
-    authViewModel: AuthViewModel
+    authToken: String?
 ) {
     val templatesState by viewModel.templatesState.collectAsState()
 
     // Load templates when screen is first shown
-    LaunchedEffect(Unit) {
-        val authToken = authViewModel.getSpotifyAccessToken()
-        if (authToken != null) {
-            viewModel.loadTemplates(authToken)
+    LaunchedEffect(authToken) {
+        authToken?.let { token ->
+            viewModel.loadTemplates(token)
         }
     }
 
     Scaffold(
         topBar = {
-            AppTopBar(title = "Choose Your Workout")
+            AppTopBar(title = "$workout Playlists")
         },
         bottomBar = {
             BottomBar(
                 selectedRoute = Screen.PlaylistTemplates.route,
                 onHomeSelected = onNavigateToHome,
-                onProfileSelected = onNavigateToProfile,
-                onTrackListSelected = onNavigateToTrackList,
+                onProfileSelected = { /* Not used in this screen */ },
+                onTrackListSelected = { /* Not used in this screen */ },
                 onLogoutSelected = onLogout
             )
         }
@@ -83,16 +80,23 @@ fun PlaylistTemplatesScreen(
                         title = "Failed to load templates",
                         message = state.message,
                         onRetry = {
-                            val authToken = authViewModel.getSpotifyAccessToken()
-                            if (authToken != null) {
-                                viewModel.loadTemplates(authToken)
+                            authToken?.let { token ->
+                                viewModel.loadTemplates(token)
                             }
                         }
                     )
                 }
 
                 is Resource.Success -> {
-                    val templates = state.data
+                    val allTemplates = state.data
+                    val filteredTemplates = allTemplates.filter { template ->
+                        template.name.equals(workout, ignoreCase = true) ||
+                        (workout == "Strength Training" && template.name.equals("Weight Lifting", ignoreCase = true)) ||
+                        (workout == "HIIT" && template.name.equals("HIIT", ignoreCase = true)) ||
+                        (workout == "Yoga" && template.name.equals("Yoga Session", ignoreCase = true)) ||
+                        (workout == "Cardio" && template.name.equals("Running", ignoreCase = true))
+                    }
+                    
                     LazyColumn(
                         modifier = Modifier
                             .fillMaxSize()
@@ -100,7 +104,7 @@ fun PlaylistTemplatesScreen(
                         verticalArrangement = Arrangement.spacedBy(12.dp),
                         contentPadding = PaddingValues(vertical = 16.dp)
                     ) {
-                        items(templates) { template ->
+                        items(filteredTemplates) { template ->
                             PlaylistTemplateCard(
                                 template = template,
                                 onClick = {
@@ -182,7 +186,7 @@ private fun PlaylistTemplateCard(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    template.seedGenres.take(3).forEach { genre ->
+                    template.genres.take(3).forEach { genre ->
                         Surface(
                             shape = RoundedCornerShape(12.dp),
                             color = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
@@ -197,10 +201,10 @@ private fun PlaylistTemplateCard(
                     }
                 }
                 
-                // Tempo and Energy info
+                // Tempo info
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "Tempo: ${template.targetTempo} BPM • Energy: ${template.targetEnergy}%",
+                    text = "Tempo: ${template.minTempo}-${template.maxTempo} BPM",
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
                 )

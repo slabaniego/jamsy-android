@@ -88,6 +88,7 @@ fun TrackListScreen(
                                 TrackItem(
                                     track = track,
                                     onTrackSelected = { track.id?.let { id -> onTrackSelected(id) } },
+                                    onTrackAction = { /* Handle track action if needed */ },
                                     modifier = Modifier.padding(vertical = 4.dp)
                                 )
                             }

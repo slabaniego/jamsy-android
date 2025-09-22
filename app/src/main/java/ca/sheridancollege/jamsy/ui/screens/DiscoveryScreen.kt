@@ -48,8 +48,9 @@ fun DiscoveryScreen(
 
     // Load discovery tracks when screen is shown
     LaunchedEffect(Unit) {
-        val authToken = "dummy_token" // Replace with actual token
-        viewModel.loadDiscoveryTracks(authToken)
+        // TODO: Get actual auth token from authentication system
+        // For now, this will show authentication required error
+        viewModel.loadDiscoveryTracks("")
     }
 
     Scaffold(
@@ -127,24 +128,23 @@ fun DiscoveryScreen(
                         verticalArrangement = Arrangement.Center
                     ) {
                         Text(
-                            text = "Failed to load tracks",
+                            text = "🎵 Ready to Discover Music?",
                             style = MaterialTheme.typography.headlineSmall,
-                            color = MaterialTheme.colorScheme.error
+                            color = MaterialTheme.colorScheme.primary,
+                            textAlign = TextAlign.Center
                         )
+                        Spacer(modifier = Modifier.height(16.dp))
                         Text(
-                            text = state.message,
+                            text = "To discover new tracks, please select your favorite artists first. This helps us recommend music you'll love!",
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             textAlign = TextAlign.Center
                         )
-                        Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(24.dp))
                         Button(
-                            onClick = {
-                                val authToken = "dummy_token" // Replace with actual token
-                                viewModel.loadDiscoveryTracks(authToken)
-                            }
+                            onClick = onBack
                         ) {
-                            Text("Retry")
+                            Text("Select Artists")
                         }
                     }
                 }
@@ -198,11 +198,11 @@ fun DiscoveryScreen(
                                             }
                                             
                                             if (action != null) {
-                                                val authToken = "dummy_token" // Replace with actual token
+                                                // TODO: Get actual auth token from authentication system
                                                 viewModel.handleTrackAction(
                                                     track = currentTrack,
                                                     action = action,
-                                                    authToken = authToken,
+                                                    authToken = "",
                                                     onComplete = {
                                                         isProcessingAction = false
                                                         dragOffset = 0f
@@ -232,11 +232,11 @@ fun DiscoveryScreen(
                                         onClick = {
                                             if (!isProcessingAction) {
                                                 isProcessingAction = true
-                                                val authToken = "dummy_token" // Replace with actual token
+                                                // TODO: Get actual auth token from authentication system
                                                 viewModel.handleTrackAction(
                                                     track = currentTrack,
                                                     action = "dislike",
-                                                    authToken = authToken,
+                                                    authToken = "",
                                                     onComplete = {
                                                         isProcessingAction = false
                                                     }
@@ -257,11 +257,11 @@ fun DiscoveryScreen(
                                         onClick = {
                                             if (!isProcessingAction) {
                                                 isProcessingAction = true
-                                                val authToken = "dummy_token" // Replace with actual token
+                                                // TODO: Get actual auth token from authentication system
                                                 viewModel.handleTrackAction(
                                                     track = currentTrack,
                                                     action = "like",
-                                                    authToken = authToken,
+                                                    authToken = "",
                                                     onComplete = {
                                                         isProcessingAction = false
                                                     }
@@ -414,7 +414,7 @@ private fun TrackCard(
                     overflow = TextOverflow.Ellipsis
                 )
 
-                if (!track.genres.isNullOrEmpty()) {
+                if (track.genres.isNotEmpty()) {
                     Spacer(modifier = Modifier.height(12.dp))
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),

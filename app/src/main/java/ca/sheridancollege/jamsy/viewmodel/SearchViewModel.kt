@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class SearchViewModel(
-    private val repository: JamsyRepository = ca.sheridancollege.jamsy.di.NetworkModule.jamsyRepository
+    private val repository: JamsyRepository
 ) : ViewModel() {
 
     private val _searchState = MutableStateFlow<Resource<List<Track>>>(Resource.Loading)
@@ -19,7 +19,6 @@ class SearchViewModel(
 
     fun searchTracks(
         query: String,
-        authToken: String,
         excludeExplicit: Boolean = true,
         excludeLoveSongs: Boolean = false,
         excludeFolk: Boolean = false
@@ -27,6 +26,13 @@ class SearchViewModel(
         viewModelScope.launch {
             _searchState.value = Resource.Loading
             try {
+                // Get auth token from Firebase Auth or show error if not authenticated
+                val authToken = getAuthToken()
+                if (authToken == null) {
+                    _searchState.value = Resource.Error("Please log in to search tracks")
+                    return@launch
+                }
+                
                 val result = repository.searchTracks(
                     query = query,
                     authToken = authToken,
@@ -43,6 +49,12 @@ class SearchViewModel(
                 _searchState.value = Resource.Error(e.message ?: "Unknown error occurred")
             }
         }
+    }
+    
+    private fun getAuthToken(): String? {
+        // TODO: Get actual auth token from Firebase Auth or AuthManager
+        // For now, return null to show authentication is required
+        return null
     }
 
     fun clearSearchResults() {

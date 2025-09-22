@@ -289,7 +289,7 @@ private fun ArtistCard(
             ) {
                 Box {
                     AsyncImage(
-                        model = artist.images?.firstOrNull() ?: "https://via.placeholder.com/100",
+                        model = artist.firstImageUrl ?: "https://via.placeholder.com/100",
                         contentDescription = artist.name,
                         modifier = Modifier
                             .size(80.dp)

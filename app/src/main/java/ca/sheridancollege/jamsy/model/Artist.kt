@@ -8,7 +8,7 @@ import com.squareup.moshi.JsonClass
 data class Artist(
     @Json(name = "id")
     @SerializedName("id")
-    val id: String,
+    val id: String? = null,
 
     @Json(name = "name")
     @SerializedName("name")
@@ -20,9 +20,18 @@ data class Artist(
 
     @Json(name = "genres")
     @SerializedName("genres")
-    val genres: List<String>,
+    val genres: List<String>? = null,
 
     @Json(name = "popularity")
     @SerializedName("popularity")
-    val popularity: Int
-)
+    val popularity: Int? = null,
+
+    // For compatibility with the UI that expects images list
+    @Json(name = "images")
+    @SerializedName("images")
+    val images: List<String>? = null
+) {
+    // Helper property to get the first image URL
+    val firstImageUrl: String?
+        get() = imageUrl ?: images?.firstOrNull()
+}

@@ -1,4 +1,5 @@
 package ca.sheridancollege.jamsy.navigation
+import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -8,15 +9,18 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.compose.ui.platform.LocalContext
 import ca.sheridancollege.jamsy.ui.screens.HomeScreen
 import ca.sheridancollege.jamsy.ui.screens.LoginScreen
 import ca.sheridancollege.jamsy.ui.screens.SignupScreen
 import ca.sheridancollege.jamsy.ui.screens.ProfileScreen
 import ca.sheridancollege.jamsy.ui.screens.TrackListScreen
+import ca.sheridancollege.jamsy.ui.screens.ChooseYourWorkoutScreen
 import ca.sheridancollege.jamsy.ui.screens.PlaylistTemplateScreen
 import ca.sheridancollege.jamsy.ui.screens.ArtistSelectionScreen
 import ca.sheridancollege.jamsy.ui.screens.DiscoveryScreen
 import ca.sheridancollege.jamsy.ui.screens.LikedTracksScreen
+import ca.sheridancollege.jamsy.ui.screens.PlaylistCreationScreen
 import ca.sheridancollege.jamsy.ui.screens.SearchScreen
 import ca.sheridancollege.jamsy.util.Resource
 import ca.sheridancollege.jamsy.viewmodel.AuthViewModel
@@ -25,30 +29,18 @@ import ca.sheridancollege.jamsy.viewmodel.ProfileViewModel
 import ca.sheridancollege.jamsy.viewmodel.TrackListViewModel
 import ca.sheridancollege.jamsy.viewmodel.ViewModelFactory
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
+import ca.sheridancollege.jamsy.ui.screens.PlaylistPreviewScreen
 import ca.sheridancollege.jamsy.viewmodel.PlaylistTemplateViewModel
 import ca.sheridancollege.jamsy.viewmodel.ArtistSelectionViewModel
 import ca.sheridancollege.jamsy.viewmodel.DiscoveryViewModel
 import ca.sheridancollege.jamsy.viewmodel.LikedTracksViewModel
 import ca.sheridancollege.jamsy.viewmodel.SearchViewModel
 
-sealed class Screen(val route: String) {
-    object Login : Screen("login")
-    object Signup : Screen("signup")
-    object Profile : Screen("profile")
-    object Home : Screen("home")
-    object TrackList : Screen("tracklist")
-    object PlaylistTemplates : Screen("playlist_templates")
-    object ArtistSelection : Screen("artist_selection")
-    object Discovery : Screen("discovery")
-    object LikedTracks : Screen("liked_tracks")
-    object PlaylistPreview : Screen("playlist_preview")
-    object Search : Screen("search")
-}
 
 @Composable
 fun NavGraph(navController: NavHostController) {
-
-    val factory = ViewModelFactory()
+    val context = LocalContext.current
+    val factory = ViewModelFactory(context)
 
     val authViewModel: AuthViewModel = viewModel(factory = factory, viewModelStoreOwner = LocalViewModelStoreOwner.current!!)
     val profileViewModel: ProfileViewModel = viewModel(factory = factory, viewModelStoreOwner = LocalViewModelStoreOwner.current!!)
@@ -131,9 +123,18 @@ fun NavGraph(navController: NavHostController) {
                 onNavigateToProfile = { navController.navigate(Screen.Profile.route) },
                 onNavigateToTrackList = { navController.navigate(Screen.TrackList.route) },
                 onNavigateToSearch = { navController.navigate(Screen.Search.route) },
-                onNavigateToPlaylistTemplates = { navController.navigate(Screen.PlaylistTemplates.route) },
+                onNavigateToChooseWorkout = { navController.navigate(Screen.ChooseYourWorkout.route) },
                 onLogout = handleLogout,
                 viewModel = homeViewModel
+            )
+        }
+
+        composable(Screen.ChooseYourWorkout.route) {
+            ChooseYourWorkoutScreen(
+                onWorkoutSelected = { workout ->
+                    navController.navigate("${Screen.PlaylistTemplates.route}/$workout")
+                },
+                onBack = { navController.popBackStack() }
             )
         }
 
@@ -147,14 +148,18 @@ fun NavGraph(navController: NavHostController) {
             )
         }
 
-        composable(Screen.PlaylistTemplates.route) {
+        composable("${Screen.PlaylistTemplates.route}/{workout}") { backStackEntry ->
+            val workout = backStackEntry.arguments?.getString("workout") ?: ""
+            
             PlaylistTemplateScreen(
+                workout = workout,
                 onNavigateToHome = { navController.navigate(Screen.Home.route) },
-                onNavigateToArtistSelection = { workout, mood -> 
-                    navController.navigate("${Screen.ArtistSelection.route}/$workout/$mood")
+                onNavigateToArtistSelection = { selectedWorkout, mood -> 
+                    navController.navigate("${Screen.ArtistSelection.route}/$selectedWorkout/$mood")
                 },
                 onLogout = handleLogout,
-                viewModel = playlistTemplateViewModel
+                viewModel = playlistTemplateViewModel,
+                authToken = authViewModel.getSpotifyAccessToken()
             )
         }
 
@@ -182,7 +187,26 @@ fun NavGraph(navController: NavHostController) {
         composable(Screen.LikedTracks.route) {
             LikedTracksScreen(
                 onBack = { navController.popBackStack() },
+                onPlaylistPreview = { navController.navigate(Screen.PlaylistPreview.route) },
+                onExtendedPlaylistPreview = { navController.navigate(Screen.PlaylistCreation.route) },
+                viewModel = likedTracksViewModel,
+                authToken = authViewModel.getSpotifyAccessToken()
+            )
+        }
+
+        composable(Screen.PlaylistPreview.route) {
+            PlaylistPreviewScreen(
+                onNavigateToPlaylistCreation = { navController.navigate(Screen.PlaylistCreation.route) },
+                onBack = { navController.popBackStack() },
                 viewModel = likedTracksViewModel
+            )
+        }
+
+        composable(Screen.PlaylistCreation.route) {
+            PlaylistCreationScreen(
+                onBack = { navController.popBackStack() },
+                viewModel = likedTracksViewModel,
+                authToken = authViewModel.getSpotifyAccessToken()
             )
         }
 

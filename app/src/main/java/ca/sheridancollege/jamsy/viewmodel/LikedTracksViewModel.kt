@@ -17,6 +17,12 @@ class LikedTracksViewModel(
     private val _likedTracksState = MutableStateFlow<Resource<List<Track>>>(Resource.Loading)
     val likedTracksState: StateFlow<Resource<List<Track>>> = _likedTracksState.asStateFlow()
 
+    private val _playlistPreviewState = MutableStateFlow<Resource<List<Track>>>(Resource.Loading)
+    val playlistPreviewState: StateFlow<Resource<List<Track>>> = _playlistPreviewState.asStateFlow()
+    
+    private val _playlistCreationState = MutableStateFlow<Resource<Map<String, String>>>(Resource.Loading)
+    val playlistCreationState: StateFlow<Resource<Map<String, String>>> = _playlistCreationState.asStateFlow()
+
     fun loadLikedTracks(authToken: String) {
         viewModelScope.launch {
             _likedTracksState.value = Resource.Loading
@@ -29,6 +35,38 @@ class LikedTracksViewModel(
                 }
             } catch (e: Exception) {
                 _likedTracksState.value = Resource.Error(e.message ?: "Unknown error occurred")
+            }
+        }
+    }
+
+    fun previewPlaylist(authToken: String) {
+        viewModelScope.launch {
+            _playlistPreviewState.value = Resource.Loading
+            try {
+                val result = repository.previewPlaylist(authToken)
+                _playlistPreviewState.value = if (result.isSuccess) {
+                    Resource.Success(result.getOrNull() ?: emptyList())
+                } else {
+                    Resource.Error(result.exceptionOrNull()?.message ?: "Failed to preview playlist")
+                }
+            } catch (e: Exception) {
+                _playlistPreviewState.value = Resource.Error(e.message ?: "Unknown error occurred")
+            }
+        }
+    }
+    
+    fun createPlaylist(authToken: String) {
+        viewModelScope.launch {
+            _playlistCreationState.value = Resource.Loading
+            try {
+                val result = repository.createPlaylist(authToken)
+                _playlistCreationState.value = if (result.isSuccess) {
+                    Resource.Success(result.getOrNull() ?: emptyMap())
+                } else {
+                    Resource.Error(result.exceptionOrNull()?.message ?: "Failed to create playlist")
+                }
+            } catch (e: Exception) {
+                _playlistCreationState.value = Resource.Error(e.message ?: "Unknown error occurred")
             }
         }
     }

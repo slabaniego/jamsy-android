@@ -1,7 +1,9 @@
 package ca.sheridancollege.jamsy.viewmodel
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import ca.sheridancollege.jamsy.auth.AuthManager
 import ca.sheridancollege.jamsy.di.NetworkModule
 import ca.sheridancollege.jamsy.repository.AuthRepository
 import ca.sheridancollege.jamsy.repository.JamsyRepository
@@ -11,7 +13,7 @@ import ca.sheridancollege.jamsy.services.PlaylistTemplateService
 import ca.sheridancollege.jamsy.services.DiscoveryService
 
 
-class ViewModelFactory : ViewModelProvider.Factory {
+class ViewModelFactory(private val context: Context) : ViewModelProvider.Factory {
 
     private val authRepository = AuthRepository()
     private val jamsyRepository = JamsyRepository()
@@ -19,20 +21,22 @@ class ViewModelFactory : ViewModelProvider.Factory {
     private val userRepository = UserRepository()
     private val playlistTemplateService = PlaylistTemplateService(jamsyRepository)
     private val discoveryService = DiscoveryService(jamsyRepository)
+    private val authManager = AuthManager(context)
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return when {
             modelClass.isAssignableFrom(HomeViewModel::class.java) -> {
-                HomeViewModel(trackRepository) as T
+                HomeViewModel(trackRepository, jamsyRepository, authManager) as T
             }
             modelClass.isAssignableFrom(ProfileViewModel::class.java) -> {
                 ProfileViewModel() as T
             }
             modelClass.isAssignableFrom(AuthViewModel::class.java) -> {
                 AuthViewModel(
-                    authRepository = AuthRepository(),
-                    jamsyRepository = NetworkModule.jamsyRepository
+                    AuthRepository(),
+                    NetworkModule.jamsyRepository,
+                    context
                 ) as T
             }
             modelClass.isAssignableFrom(TrackListViewModel::class.java) -> {
@@ -51,7 +55,7 @@ class ViewModelFactory : ViewModelProvider.Factory {
                 LikedTracksViewModel(jamsyRepository) as T
             }
             modelClass.isAssignableFrom(SearchViewModel::class.java) -> {
-                SearchViewModel(NetworkModule.jamsyRepository) as T
+                SearchViewModel(jamsyRepository) as T
             }
             else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
         }

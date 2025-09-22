@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import ca.sheridancollege.jamsy.model.PlaylistTemplate
 import ca.sheridancollege.jamsy.repository.JamsyRepository
 import ca.sheridancollege.jamsy.services.PlaylistTemplateService
+import ca.sheridancollege.jamsy.util.Resource
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -15,27 +16,22 @@ class PlaylistTemplateViewModel(
     private val playlistTemplateService: PlaylistTemplateService
 ) : ViewModel() {
 
-    private val _templates = MutableStateFlow<List<PlaylistTemplate>>(emptyList())
-    val templates: StateFlow<List<PlaylistTemplate>> = _templates.asStateFlow()
+    private val _templatesState = MutableStateFlow<Resource<List<PlaylistTemplate>>>(Resource.Loading)
+    val templatesState: StateFlow<Resource<List<PlaylistTemplate>>> = _templatesState.asStateFlow()
 
-    private val _isLoading = MutableStateFlow(false)
-    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
-
-    private val _error = MutableStateFlow<String?>(null)
-    val error: StateFlow<String?> = _error.asStateFlow()
-
-    fun loadTemplates() {
+    fun loadTemplates(authToken: String) {
         viewModelScope.launch {
-            _isLoading.value = true
-            _error.value = null
+            _templatesState.value = Resource.Loading
             
             try {
-                val result = playlistTemplateService.getDefaultTemplates()
-                _templates.value = result
+                val result = playlistTemplateService.getDefaultTemplates(authToken)
+                result.onSuccess { templates ->
+                    _templatesState.value = Resource.Success(templates)
+                }.onFailure { exception ->
+                    _templatesState.value = Resource.Error(exception.message ?: "Failed to load templates")
+                }
             } catch (e: Exception) {
-                _error.value = e.message ?: "Failed to load templates"
-            } finally {
-                _isLoading.value = false
+                _templatesState.value = Resource.Error(e.message ?: "Failed to load templates")
             }
         }
     }

@@ -20,7 +20,7 @@ fun HomeScreen(
     onNavigateToProfile: () -> Unit,
     onNavigateToTrackList: () -> Unit,
     onNavigateToSearch: () -> Unit,
-    onNavigateToPlaylistTemplates: () -> Unit,
+    onNavigateToChooseWorkout: () -> Unit,
     onLogout: () -> Unit,
     viewModel: HomeViewModel
 ) {
@@ -67,7 +67,7 @@ fun HomeScreen(
             Spacer(modifier = Modifier.height(32.dp))
             
             Button(
-                onClick = onNavigateToPlaylistTemplates,
+                onClick = onNavigateToChooseWorkout,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),

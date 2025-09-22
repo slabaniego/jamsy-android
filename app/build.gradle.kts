@@ -92,15 +92,19 @@ dependencies {
 
     // ExoPlayer for audio preview
     implementation ("androidx.media3:media3-exoplayer:1.1.0")
+    implementation ("androidx.media3:media3-ui:1.1.0")
+    implementation ("androidx.media3:media3-common:1.1.0")
+    implementation ("androidx.media3:media3-session:1.1.0")
     implementation(libs.androidx.storage)
+    implementation(libs.androidx.media3.exoplayer)
 
     // Testing
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
-    androidTestImplementation(platform("androidx.compose:compose-bom:2023.10.01"))
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
-    debugImplementation("androidx.compose.ui:ui-tooling")
+    androidTestImplementation(libs.compose.bom.v20231001)
+    androidTestImplementation(libs.androidx.compose.ui.test.junit4)
+    debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 
 

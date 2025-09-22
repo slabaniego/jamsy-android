@@ -1,4 +1,5 @@
 package ca.sheridancollege.jamsy.viewmodel
+import android.content.Context
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -8,10 +9,15 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import ca.sheridancollege.jamsy.repository.AuthRepository
+import ca.sheridancollege.jamsy.repository.JamsyRepository
 import ca.sheridancollege.jamsy.util.Resource
+import ca.sheridancollege.jamsy.auth.SpotifyOAuthHelper
 
-class AuthViewModel : ViewModel() {
-    private val repository = AuthRepository()
+class AuthViewModel(
+    private val authRepository: AuthRepository,
+    private val jamsyRepository: JamsyRepository,
+    private val context: Context
+) : ViewModel() {
 
     private val _loginState = MutableStateFlow<Resource<FirebaseUser>?>(null)
     val loginState: StateFlow<Resource<FirebaseUser>?> = _loginState
@@ -22,10 +28,13 @@ class AuthViewModel : ViewModel() {
     private val _authState = MutableStateFlow<Resource<FirebaseUser?>>(Resource.Loading)
     val authState: StateFlow<Resource<FirebaseUser?>> = _authState
 
-    val currentUser get() = repository.currentUser
+    val currentUser get() = authRepository.currentUser
     
     // Get Spotify access token
-    fun getSpotifyAccessToken(): String? = repository.getSpotifyAccessToken()
+    fun getSpotifyAccessToken(): String? = authRepository.getSpotifyAccessToken()
+    
+    // Spotify OAuth helper
+    private val spotifyOAuthHelper = SpotifyOAuthHelper(context)
 
     init {
         updateAuthState()
@@ -34,7 +43,7 @@ class AuthViewModel : ViewModel() {
         }
     }
 
-    private fun updateAuthState(user: FirebaseUser? = repository.currentUser) {
+    private fun updateAuthState(user: FirebaseUser? = authRepository.currentUser) {
         if (user != null) {
             _authState.value = Resource.Success(user)
             Log.d("AuthViewModel", "Auth state updated: User logged in ${user.email}")
@@ -47,7 +56,7 @@ class AuthViewModel : ViewModel() {
     fun login(email: String, password: String) {
         viewModelScope.launch {
             _loginState.value = Resource.Loading
-            val result = repository.login(email, password)
+            val result = authRepository.login(email, password)
             _loginState.value = result
         }
     }
@@ -55,16 +64,15 @@ class AuthViewModel : ViewModel() {
     fun signup(email: String, password: String) {
         viewModelScope.launch {
             _signupState.value = Resource.Loading
-            val result = repository.signup(email, password)
+            val result = authRepository.signup(email, password)
             _signupState.value = result
         }
     }
 
     fun logout() {
-        repository.logout()
+        authRepository.logout()
         _loginState.value = null
         _signupState.value = null
-
     }
 
     fun resetState() {
@@ -76,12 +84,36 @@ class AuthViewModel : ViewModel() {
         viewModelScope.launch {
             _loginState.value = Resource.Loading
             try {
-                val result = repository.loginWithSpotify(code)
+                val result = authRepository.loginWithSpotify(code)
                 _loginState.value = result
             } catch (e: Exception) {
                 _loginState.value = Resource.Error("Spotify authentication failed: ${e.message}")
                 Log.e("AuthViewModel", "Spotify auth error", e)
             }
+        }
+    }
+    
+    /**
+     * Launch Spotify OAuth flow
+     */
+    fun launchSpotifyAuth() {
+        try {
+            spotifyOAuthHelper.launchSpotifyAuth()
+        } catch (e: Exception) {
+            Log.e("AuthViewModel", "Failed to launch Spotify OAuth", e)
+            _loginState.value = Resource.Error("Failed to launch Spotify authentication: ${e.message}")
+        }
+    }
+    
+    /**
+     * Handle OAuth redirect from Spotify
+     */
+    fun handleOAuthRedirect(uri: android.net.Uri) {
+        val code = spotifyOAuthHelper.handleRedirect(uri)
+        if (code != null) {
+            handleSpotifyRedirect(code)
+        } else {
+            _loginState.value = Resource.Error("Invalid OAuth redirect")
         }
     }
 }

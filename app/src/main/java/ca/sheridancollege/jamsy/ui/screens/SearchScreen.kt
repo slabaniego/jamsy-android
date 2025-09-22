@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Search
@@ -29,13 +30,12 @@ import ca.sheridancollege.jamsy.viewmodel.ViewModelFactory
 fun SearchScreen(
     onNavigateToHome: () -> Unit,
     onNavigateToProfile: () -> Unit,
-    onLogout: () -> Unit
+    onLogout: () -> Unit,
+    viewModel: SearchViewModel
 ) {
     val context = LocalContext.current
-    val factory = ViewModelFactory()
-    val searchViewModel: SearchViewModel = viewModel(factory = factory)
     
-    val searchState by searchViewModel.searchState.collectAsState()
+    val searchState by viewModel.searchState.collectAsState()
     var searchQuery by remember { mutableStateOf("") }
     var excludeExplicit by remember { mutableStateOf(true) }
     var excludeLoveSongs by remember { mutableStateOf(false) }
@@ -99,7 +99,7 @@ fun SearchScreen(
                                 IconButton(
                                     onClick = { 
                                         searchQuery = ""
-                                        searchViewModel.clearSearchResults()
+                                        viewModel.clearSearchResults()
                                     }
                                 ) {
                                     Icon(Icons.Default.Clear, contentDescription = "Clear")
@@ -117,7 +117,7 @@ fun SearchScreen(
                     Button(
                         onClick = {
                             if (searchQuery.isNotEmpty()) {
-                                searchViewModel.searchTracks(
+                                viewModel.searchTracks(
                                     query = searchQuery,
                                     excludeExplicit = excludeExplicit,
                                     excludeLoveSongs = excludeLoveSongs,
@@ -194,7 +194,12 @@ fun SearchScreen(
                             Spacer(modifier = Modifier.height(8.dp))
                             Button(onClick = { 
                                 if (searchQuery.isNotBlank()) {
-                                    searchViewModel.searchTracks(searchQuery)
+                                    viewModel.searchTracks(
+                                        query = searchQuery,
+                                        excludeExplicit = excludeExplicit,
+                                        excludeLoveSongs = excludeLoveSongs,
+                                        excludeFolk = excludeFolk
+                                    )
                                 }
                             }) {
                                 Text("Retry")
@@ -246,7 +251,8 @@ fun SearchScreen(
                                 items(tracks) { track ->
                                     TrackItem(
                                         track = track,
-                                        onTrackSelected = { /* Handle track selection */ }
+                                        onTrackSelected = { /* Handle track selection */ },
+                                        onTrackAction = { /* Handle track action if needed */ }
                                     )
                                 }
                             }

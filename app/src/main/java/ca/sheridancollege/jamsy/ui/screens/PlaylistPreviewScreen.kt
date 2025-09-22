@@ -207,10 +207,12 @@ fun PlaylistPreviewScreen(
                                 contentPadding = PaddingValues(vertical = 8.dp),
                                 verticalArrangement = Arrangement.spacedBy(4.dp)
                             ) {
-                                items(tracks.withIndex().toList()) { (index, track) ->
+                                items(tracks.withIndex().toList()) { indexedTrack ->
+                                    val (index, track) = indexedTrack
                                     TrackItem(
                                         track = track,
                                         onTrackSelected = { /* Handle track selection if needed */ },
+                                        onTrackAction = { /* Handle track action if needed */ },
                                         modifier = Modifier.padding(horizontal = 8.dp),
                                         showIndex = true,
                                         index = index + 1

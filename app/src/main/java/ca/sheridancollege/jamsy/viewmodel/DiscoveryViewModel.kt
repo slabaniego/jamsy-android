@@ -5,6 +5,8 @@ import androidx.lifecycle.viewModelScope
 import ca.sheridancollege.jamsy.model.SongAction
 import ca.sheridancollege.jamsy.model.Track
 import ca.sheridancollege.jamsy.repository.JamsyRepository
+import ca.sheridancollege.jamsy.util.Resource
+import ca.sheridancollege.jamsy.data.DiscoveryDataStore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -14,37 +16,74 @@ class DiscoveryViewModel(
     private val jamsyRepository: JamsyRepository
 ) : ViewModel() {
 
-    private val _tracks = MutableStateFlow<List<Track>>(emptyList())
-    val tracks: StateFlow<List<Track>> = _tracks.asStateFlow()
-
-    private val _isLoading = MutableStateFlow(false)
-    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
-
-    private val _error = MutableStateFlow<String?>(null)
-    val error: StateFlow<String?> = _error.asStateFlow()
+    private val _tracksState = MutableStateFlow<Resource<List<Track>>>(Resource.Loading)
+    val tracksState: StateFlow<Resource<List<Track>>> = _tracksState.asStateFlow()
 
     private val _currentTrackIndex = MutableStateFlow(0)
-    val currentTrackIndex: StateFlow<Int> = _currentTrackIndex
+    val currentTrackIndex: StateFlow<Int> = _currentTrackIndex.asStateFlow()
 
     private val _likedTracks = MutableStateFlow<List<Track>>(emptyList())
-    val likedTracks: StateFlow<List<Track>> = _likedTracks
+    val likedTracks: StateFlow<List<Track>> = _likedTracks.asStateFlow()
 
     fun loadDiscoveryTracks(authToken: String) {
         viewModelScope.launch {
-            _isLoading.value = true
-            _error.value = null
+            _tracksState.value = Resource.Loading
 
             try {
-                val result = jamsyRepository.getDiscoveryTracks(authToken)
-                result.onSuccess { trackList ->
-                    _tracks.value = trackList
-                }.onFailure { exception ->
-                    _error.value = exception.message ?: "Failed to load discovery tracks"
+                // Check if auth token is provided
+                if (authToken.isBlank()) {
+                    _tracksState.value = Resource.Error("Please log in to discover tracks")
+                    return@launch
+                }
+
+                // Get tracks from data store
+                val tracks = DiscoveryDataStore.discoveryTracks.value
+                if (tracks.isNotEmpty()) {
+                    _tracksState.value = Resource.Success(tracks)
+                    _currentTrackIndex.value = 0
+                } else {
+                    _tracksState.value = Resource.Error("Please select artists first to discover tracks")
                 }
             } catch (e: Exception) {
-                _error.value = e.message ?: "Failed to load discovery tracks"
-            } finally {
-                _isLoading.value = false
+                _tracksState.value = Resource.Error(e.message ?: "Failed to load discovery tracks")
+            }
+        }
+    }
+
+    // New method to get discovery tracks through artist selection
+    fun getDiscoveryTracksFromArtists(
+        selectedArtistIds: List<String>,
+        artistNames: List<String>,
+        workout: String,
+        mood: String,
+        authToken: String
+    ) {
+        viewModelScope.launch {
+            _tracksState.value = Resource.Loading
+
+            try {
+                if (authToken.isBlank()) {
+                    _tracksState.value = Resource.Error("Please log in to discover tracks")
+                    return@launch
+                }
+
+                val artistNamesJson = artistNames.joinToString(",")
+                val result = jamsyRepository.submitArtistSelection(
+                    selectedArtistIds = selectedArtistIds,
+                    artistNamesJson = artistNamesJson,
+                    workout = workout,
+                    mood = mood,
+                    action = "discover",
+                    authToken = authToken
+                )
+
+                result.onSuccess { trackList ->
+                    _tracksState.value = Resource.Success(trackList)
+                }.onFailure { exception ->
+                    _tracksState.value = Resource.Error(exception.message ?: "Failed to get discovery tracks")
+                }
+            } catch (e: Exception) {
+                _tracksState.value = Resource.Error(e.message ?: "Failed to get discovery tracks")
             }
         }
     }
@@ -56,6 +95,14 @@ class DiscoveryViewModel(
         onComplete: () -> Unit
     ) {
         viewModelScope.launch {
+            // Check if auth token is provided
+            if (authToken.isBlank()) {
+                // Still proceed to next track even if not authenticated
+                nextTrack()
+                onComplete()
+                return@launch
+            }
+
             val songAction = SongAction(
                 isrc = track.isrc ?: "",
                 songName = track.name,
@@ -84,7 +131,7 @@ class DiscoveryViewModel(
     }
 
     private fun nextTrack() {
-        when (val currentState = _tracks.value) {
+        when (val currentState = _tracksState.value) {
             is Resource.Success -> {
                 val currentTracks = currentState.data
                 if (_currentTrackIndex.value < currentTracks.size - 1) {
@@ -96,7 +143,7 @@ class DiscoveryViewModel(
     }
 
     fun isLastTrack(): Boolean {
-        return when (val currentState = _tracks.value) {
+        return when (val currentState = _tracksState.value) {
             is Resource.Success -> {
                 val currentTracks = currentState.data
                 _currentTrackIndex.value >= currentTracks.size - 1
@@ -106,7 +153,7 @@ class DiscoveryViewModel(
     }
 
     fun getCurrentTrack(): Track? {
-        return when (val currentState = _tracks.value) {
+        return when (val currentState = _tracksState.value) {
             is Resource.Success -> {
                 val currentTracks = currentState.data
                 if (_currentTrackIndex.value < currentTracks.size) {
@@ -118,7 +165,7 @@ class DiscoveryViewModel(
     }
 
     fun clearData() {
-        _tracks.value = emptyList()
+        _tracksState.value = Resource.Loading
         _currentTrackIndex.value = 0
         _likedTracks.value = emptyList()
     }

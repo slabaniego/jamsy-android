@@ -1,11 +1,15 @@
 package ca.sheridancollege.jamsy.repository
 import ca.sheridancollege.jamsy.model.Track
 import ca.sheridancollege.jamsy.model.TrackActionRequest
+import ca.sheridancollege.jamsy.model.SongAction
 import ca.sheridancollege.jamsy.util.Resource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 class TrackRepository(private val jamsyRepository: JamsyRepository) {
+    
+    // Note: This class requires authentication token for track actions
+    // The authToken should be passed from the ViewModel layer
 
     suspend fun getTracks(): Resource<List<Track>> {
         return withContext(Dispatchers.IO) {
@@ -22,17 +26,17 @@ class TrackRepository(private val jamsyRepository: JamsyRepository) {
         }
     }
 
-    suspend fun likeTrack(track: Track): Resource<Boolean> {
+    suspend fun likeTrack(track: Track, authToken: String): Resource<Boolean> {
         return withContext(Dispatchers.IO) {
             try {
-                val request = TrackActionRequest(
-                    isrc = track.isrc,
+                val songAction = SongAction(
+                    isrc = track.isrc ?: "",
                     songName = track.name,
-                    artist = track.artists,
-                    genres = track.genres?.joinToString(","),
-                    action = "like"
+                    artist = track.artists.firstOrNull() ?: "",
+                    action = "like",
+                    genres = track.genres
                 )
-                val result = jamsyRepository.trackAction(request)
+                val result = jamsyRepository.handleTrackAction(songAction, authToken)
                 if (result.isSuccess) {
                     Resource.Success(true)
                 } else {
@@ -44,17 +48,17 @@ class TrackRepository(private val jamsyRepository: JamsyRepository) {
         }
     }
 
-    suspend fun unlikeTrack(track: Track): Resource<Boolean> {
+    suspend fun unlikeTrack(track: Track, authToken: String): Resource<Boolean> {
         return withContext(Dispatchers.IO) {
             try {
-                val request = TrackActionRequest(
-                    isrc = track.isrc,
+                val songAction = SongAction(
+                    isrc = track.isrc ?: "",
                     songName = track.name,
-                    artist = track.artists,
-                    genres = track.genres?.joinToString(","),
-                    action = "unlike"
+                    artist = track.artists.firstOrNull() ?: "",
+                    action = "dislike",
+                    genres = track.genres
                 )
-                val result = jamsyRepository.trackAction(request)
+                val result = jamsyRepository.handleTrackAction(songAction, authToken)
                 if (result.isSuccess) {
                     Resource.Success(true)
                 } else {

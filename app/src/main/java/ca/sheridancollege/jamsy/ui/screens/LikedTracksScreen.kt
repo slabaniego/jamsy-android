@@ -183,6 +183,7 @@ fun LikedTracksScreen(
                                     TrackItem(
                                         track = track,
                                         onTrackSelected = { /* Handle track selection if needed */ },
+                                        onTrackAction = { /* Handle track action if needed */ },
                                         modifier = Modifier.padding(horizontal = 8.dp)
                                     )
                                 }
