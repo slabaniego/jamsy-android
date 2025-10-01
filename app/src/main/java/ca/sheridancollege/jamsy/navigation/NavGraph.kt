@@ -163,7 +163,7 @@ fun NavGraph(navController: NavHostController) {
                 },
                 onLogout = handleLogout,
                 viewModel = playlistTemplateViewModel,
-                authToken = authViewModel.getSpotifyAccessToken()
+                authToken = authViewModel.getSpotifyAccessToken()?.takeIf { it.isNotBlank() }
             )
         }
 
@@ -182,10 +182,13 @@ fun NavGraph(navController: NavHostController) {
         }
 
         composable(Screen.Discovery.route) {
+            val authToken = authViewModel.getSpotifyAccessToken()?.takeIf { it.isNotBlank() } ?: ""
             DiscoveryScreen(
                 onNavigateToGeneratedPlaylist = { navController.navigate(Screen.GeneratedPlaylist.route) },
                 onBack = { navController.popBackStack() },
-                viewModel = discoveryViewModel
+                viewModel = discoveryViewModel,
+                likedTracksViewModel = likedTracksViewModel,
+                authToken = authToken
             )
         }
 
@@ -195,7 +198,7 @@ fun NavGraph(navController: NavHostController) {
                 onPlaylistPreview = { navController.navigate(Screen.PlaylistPreview.route) },
                 onExtendedPlaylistPreview = { navController.navigate(Screen.PlaylistCreation.route) },
                 viewModel = likedTracksViewModel,
-                authToken = authViewModel.getSpotifyAccessToken()
+                authToken = authViewModel.getSpotifyAccessToken()?.takeIf { it.isNotBlank() }
             )
         }
 
@@ -211,18 +214,20 @@ fun NavGraph(navController: NavHostController) {
             PlaylistCreationScreen(
                 onBack = { navController.popBackStack() },
                 viewModel = likedTracksViewModel,
-                authToken = authViewModel.getSpotifyAccessToken()
+                authToken = authViewModel.getSpotifyAccessToken()?.takeIf { it.isNotBlank() }
             )
         }
 
         composable(Screen.GeneratedPlaylist.route) {
+            val authToken = authViewModel.getSpotifyAccessToken()?.takeIf { it.isNotBlank() } ?: ""
             GeneratedPlaylistScreen(
                 onBack = { navController.popBackStack() },
                 onExportToSpotify = { 
                     // TODO: Handle export to Spotify success
                     navController.navigate(Screen.Home.route)
                 },
-                viewModel = generatedPlaylistViewModel
+                viewModel = generatedPlaylistViewModel,
+                authToken = authToken
             )
         }
 

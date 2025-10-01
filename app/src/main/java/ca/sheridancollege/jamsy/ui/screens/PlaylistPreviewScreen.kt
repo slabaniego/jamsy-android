@@ -32,7 +32,7 @@ fun PlaylistPreviewScreen(
 
     // Load playlist preview when screen is shown
     LaunchedEffect(Unit) {
-        val authToken = "dummy_token" // Replace with actual token
+        val authToken = "dummy_token" // TODO: Get actual token from AuthViewModel
         viewModel.previewPlaylist(authToken)
     }
 

@@ -22,13 +22,23 @@ class GeneratedPlaylistViewModel(
             _playlistState.value = Resource.Loading
             
             try {
-                println("GeneratedPlaylistViewModel: Loading generated playlist with authToken: ${if (authToken.isBlank()) "EMPTY" else "PRESENT"}")
+                println("GeneratedPlaylistViewModel: ===== LOADING GENERATED PLAYLIST =====")
+                println("GeneratedPlaylistViewModel: AuthToken length: ${authToken.length}")
+                println("GeneratedPlaylistViewModel: AuthToken is blank: ${authToken.isBlank()}")
                 
                 // Call the preview-playlist endpoint to get the expanded playlist
                 val result = jamsyRepository.getPreviewPlaylist(authToken)
+                println("GeneratedPlaylistViewModel: Repository call completed")
+                println("GeneratedPlaylistViewModel: Result isSuccess: ${result.isSuccess}")
+                
                 if (result.isSuccess) {
                     val tracks = result.getOrNull() ?: emptyList()
                     println("GeneratedPlaylistViewModel: Successfully loaded ${tracks.size} tracks for playlist")
+                    if (tracks.isNotEmpty()) {
+                        println("GeneratedPlaylistViewModel: Track names: ${tracks.take(3).map { "${it.name} by ${it.artists.firstOrNull()}" }}")
+                    } else {
+                        println("GeneratedPlaylistViewModel: WARNING - No tracks returned from API")
+                    }
                     _playlistState.value = Resource.Success(tracks)
                 } else {
                     val error = result.exceptionOrNull()?.message ?: "Unknown error"

@@ -89,11 +89,19 @@ class ArtistSelectionViewModel(
                 )
                 
                 result.onSuccess { tracks ->
+                    println("ArtistSelectionViewModel: Successfully received ${tracks.size} tracks from API")
+                    println("ArtistSelectionViewModel: Tracks: ${tracks.map { "${it.name} by ${it.artists.firstOrNull()}" }}")
+                    
                     // Store the discovery tracks in the data store
                     DiscoveryDataStore.setDiscoveryTracks(tracks)
                     DiscoveryDataStore.setWorkoutAndMood(workout, mood)
+                    
+                    println("ArtistSelectionViewModel: Stored tracks in DiscoveryDataStore")
+                    println("ArtistSelectionViewModel: Data store now contains: ${DiscoveryDataStore.discoveryTracks.value.size} tracks")
+                    
                     onSuccess()
                 }.onFailure { exception ->
+                    println("ArtistSelectionViewModel: Error submitting selection: ${exception.message}")
                     onError(exception.message ?: "Failed to submit selection")
                 }
             } catch (e: Exception) {

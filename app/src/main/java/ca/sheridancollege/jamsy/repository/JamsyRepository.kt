@@ -1,6 +1,7 @@
 package ca.sheridancollege.jamsy.repository
 import ca.sheridancollege.jamsy.api.ApiClient
 import ca.sheridancollege.jamsy.network.JamsyApiService
+import ca.sheridancollege.jamsy.network.DiscoveryRequest
 import ca.sheridancollege.jamsy.model.*
 import ca.sheridancollege.jamsy.network.SpotifyAuthResponse
 import kotlinx.coroutines.Dispatchers
@@ -102,7 +103,7 @@ class JamsyRepository {
     }
 
     /**
-     * Submit artist selection - matches /select-artists/submit
+     * Submit artist selection - uses mobile API /api/discover
      */
     suspend fun submitArtistSelection(
         selectedArtistIds: List<String>,
@@ -115,18 +116,33 @@ class JamsyRepository {
         return withContext(Dispatchers.IO) {
             try {
                 val authHeader = "Bearer $authToken"
+                
+                // Parse artist names from JSON string
+                val artistNames = artistNamesJson.split(",").map { it.trim() }
+                
+                // Create request body for mobile API
+                val requestBody = DiscoveryRequest(
+                    seedArtists = artistNames,
+                    workout = workout
+                )
+                
                 val response = apiService.submitArtistSelection(
-                    selectedArtistIds = selectedArtistIds,
-                    artistNamesJson = artistNamesJson,
-                    workout = workout,
-                    mood = mood,
-                    action = action,
+                    requestBody = requestBody,
                     authHeader = authHeader
                 )
+                println("JamsyRepository: API response successful: ${response.isSuccessful}")
+                println("JamsyRepository: API response body: ${response.body()}")
+                
                 if (response.isSuccessful && response.body() != null) {
-                    Result.success(response.body()!!)
+                    val responseBody = response.body()!!
+                    val tracks = responseBody["tracks"] ?: emptyList()
+                    println("JamsyRepository: Extracted ${tracks.size} tracks from API response")
+                    println("JamsyRepository: Track names: ${tracks.map { "${it.name} by ${it.artists.firstOrNull()}" }}")
+                    Result.success(tracks)
                 } else {
-                    Result.failure(Exception("Failed to submit selection: ${response.errorBody()?.string()}"))
+                    val errorBody = response.errorBody()?.string()
+                    println("JamsyRepository: API call failed - Error body: $errorBody")
+                    Result.failure(Exception("Failed to submit selection: $errorBody"))
                 }
             } catch (e: Exception) {
                 Result.failure(e)
@@ -180,10 +196,8 @@ class JamsyRepository {
                 val authHeader = "Bearer $authToken"
                 val response = apiService.getPreviewPlaylist(authHeader)
                 if (response.isSuccessful && response.body() != null) {
-                    val tracksMap = response.body()!!
-                    @Suppress("UNCHECKED_CAST")
-                    val tracks = tracksMap["tracks"] as? List<Track> ?: emptyList()
-                    Result.success(tracks)
+                    val responseBody = response.body()!!
+                    Result.success(responseBody.tracks)
                 } else {
                     Result.failure(Exception("Failed to preview playlist: ${response.errorBody()?.string()}"))
                 }
@@ -200,11 +214,18 @@ class JamsyRepository {
         return withContext(Dispatchers.IO) {
             try {
                 val authHeader = "Bearer $authToken"
-                val response = apiService.getDiscoveryTracks(authHeader)
+                
+                // Create empty request body for basic discovery
+                val requestBody = DiscoveryRequest(
+                    seedArtists = emptyList(),
+                    workout = "general"
+                )
+                
+                val response = apiService.getDiscoveryTracks(requestBody, authHeader)
                 if (response.isSuccessful && response.body() != null) {
                     val tracksMap = response.body()!!
                     @Suppress("UNCHECKED_CAST")
-                    val tracks = tracksMap["tracks"] as? List<Track> ?: emptyList()
+                    val tracks = tracksMap["tracks"] ?: emptyList()
                     Result.success(tracks)
                 } else {
                     Result.failure(Exception("Failed to get discovery tracks: ${response.errorBody()?.string()}"))
@@ -224,10 +245,8 @@ class JamsyRepository {
                 val authHeader = "Bearer $authToken"
                 val response = apiService.getPreviewPlaylist(authHeader)
                 if (response.isSuccessful && response.body() != null) {
-                    val tracksMap = response.body()!!
-                    @Suppress("UNCHECKED_CAST")
-                    val tracks = tracksMap["tracks"] as? List<Track> ?: emptyList()
-                    Result.success(tracks)
+                    val responseBody = response.body()!!
+                    Result.success(responseBody.tracks)
                 } else {
                     Result.failure(Exception("Failed to get preview playlist: ${response.errorBody()?.string()}"))
                 }
@@ -246,7 +265,7 @@ class JamsyRepository {
                 val authHeader = "Bearer $authToken"
                 val response = apiService.createPlaylist(authHeader, tracks)
                 if (response.isSuccessful && response.body() != null) {
-                    val playlistUrl = response.body()!!["playlistUrl"] as? String ?: ""
+                    val playlistUrl = response.body()!!["playlistUrl"] ?: ""
                     Result.success(playlistUrl)
                 } else {
                     Result.failure(Exception("Failed to create playlist: ${response.errorBody()?.string()}"))
@@ -263,25 +282,43 @@ class JamsyRepository {
     suspend fun handleTrackAction(songAction: SongAction, authToken: String): Result<String> {
         return withContext(Dispatchers.IO) {
             try {
-                val authHeader = "Bearer $authToken"
+                println("JamsyRepository: handleTrackAction called")
+                println("JamsyRepository: SongAction - ISRC: ${songAction.isrc}, Song: ${songAction.songName}, Artist: ${songAction.artist}, Action: ${songAction.action}")
+                println("JamsyRepository: AuthToken length: ${authToken.length}")
                 
-                // Convert SongAction to Map<String, Any> to match backend expectations
-                val payload = mapOf(
-                    "isrc" to (songAction.isrc ?: ""),
-                    "songName" to songAction.songName,
-                    "artist" to songAction.artist,
-                    "genres" to (songAction.genres?.joinToString(",") ?: ""),
-                    "action" to songAction.action
+                val authHeader = "Bearer $authToken"
+                println("JamsyRepository: AuthHeader: $authHeader")
+                
+                // Convert SongAction to TrackActionRequest to match backend expectations
+                val trackActionRequest = TrackActionRequest(
+                    isrc = songAction.isrc,
+                    songName = songAction.songName,
+                    artist = songAction.artist,
+                    genres = songAction.genres?.joinToString(",") ?: "",
+                    action = songAction.action
                 )
                 
-                val response = apiService.handleTrackAction(payload, authHeader)
+                println("JamsyRepository: TrackActionRequest: $trackActionRequest")
+                println("JamsyRepository: Calling apiService.handleTrackAction...")
+                
+                val response = apiService.handleTrackAction(trackActionRequest, authHeader)
+                println("JamsyRepository: Response received - Code: ${response.code()}, Success: ${response.isSuccessful}")
+                
                 if (response.isSuccessful && response.body() != null) {
-                    val message = response.body()?.get("message") ?: "Success"
+                    val responseBody = response.body()!!
+                    println("JamsyRepository: Response body: $responseBody")
+                    val message = responseBody["message"] ?: "Success"
+                    println("JamsyRepository: Track action successful! Message: $message")
                     Result.success(message)
                 } else {
-                    Result.failure(Exception("Failed to handle track action: ${response.errorBody()?.string()}"))
+                    val errorBody = response.errorBody()?.string()
+                    println("JamsyRepository: Track action failed - Error body: $errorBody")
+                    Result.failure(Exception("Failed to handle track action: $errorBody"))
                 }
             } catch (e: Exception) {
+                println("JamsyRepository: Exception in handleTrackAction: ${e.message}")
+                println("JamsyRepository: Exception type: ${e.javaClass.simpleName}")
+                e.printStackTrace()
                 Result.failure(e)
             }
         }
@@ -295,7 +332,11 @@ class JamsyRepository {
             try {
                 println("JamsyRepository: Calling /api/discover endpoint...")
                 // Use the /api/discover endpoint which doesn't require authentication
-                val response = apiService.getDiscoveryTracks("")
+                val requestBody = DiscoveryRequest(
+                    seedArtists = emptyList(),
+                    workout = "general"
+                )
+                val response = apiService.getDiscoveryTracks(requestBody, "")
                 println("JamsyRepository: Response code: ${response.code()}")
                 println("JamsyRepository: Response successful: ${response.isSuccessful}")
                 
@@ -303,7 +344,7 @@ class JamsyRepository {
                     val tracksMap = response.body()!!
                     println("JamsyRepository: Response body: $tracksMap")
                     @Suppress("UNCHECKED_CAST")
-                    val tracks = tracksMap["tracks"] as? List<Track> ?: emptyList()
+                    val tracks = tracksMap["tracks"] ?: emptyList()
                     println("JamsyRepository: Extracted ${tracks.size} tracks")
                     Result.success(tracks)
                 } else {

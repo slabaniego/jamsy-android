@@ -44,28 +44,24 @@ interface JamsyApiService {
         @Header("Authorization") authHeader: String
     ): Response<List<Artist>>
 
-    // Submit selected artists and get discovery tracks - FIXED: Match backend
-    @POST("select-artists/submit")
-    @FormUrlEncoded
+    // Submit selected artists and get discovery tracks - FIXED: Use mobile API
+    @POST("api/discover")
     suspend fun submitArtistSelection(
-        @Field("selectedArtists") selectedArtistIds: List<String>,
-        @Field("artistNames") artistNamesJson: String,
-        @Field("workout") workout: String,
-        @Field("mood") mood: String,
-        @Field("action") action: String,
+        @Body requestBody: DiscoveryRequest,
         @Header("Authorization") authHeader: String
-    ): Response<List<Track>>
+    ): Response<Map<String, List<Track>>>
 
     // Get discovery tracks - FIXED: Match backend endpoints
     @POST("api/discover")
     suspend fun getDiscoveryTracks(
+        @Body requestBody: DiscoveryRequest,
         @Header("Authorization") authHeader: String
     ): Response<Map<String, List<Track>>>
 
     // Handle track actions (like/dislike) - FIXED: Match backend endpoints
     @POST("api/track/action")
     suspend fun handleTrackAction(
-        @Body songAction: Map<String, Any>,
+        @Body songAction: TrackActionRequest,
         @Header("Authorization") authHeader: String
     ): Response<Map<String, String>>
 
@@ -89,7 +85,7 @@ interface JamsyApiService {
     @GET("api/preview-playlist")
     suspend fun getPreviewPlaylist(
         @Header("Authorization") authHeader: String
-    ): Response<Map<String, List<Track>>>
+    ): Response<PreviewPlaylistResponse>
 
     // Create playlist - FIXED: Match backend endpoints
     @POST("api/create-playlist")
