@@ -223,8 +223,10 @@ fun NavGraph(navController: NavHostController) {
             GeneratedPlaylistScreen(
                 onBack = { navController.popBackStack() },
                 onExportToSpotify = { 
-                    // TODO: Handle export to Spotify success
-                    navController.navigate(Screen.Home.route)
+                    // Navigate back to home after successful export
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(Screen.Home.route) { inclusive = false }
+                    }
                 },
                 viewModel = generatedPlaylistViewModel,
                 authToken = authToken

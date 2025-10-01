@@ -28,6 +28,10 @@ fun GeneratedPlaylistScreen(
 ) {
     val playlistState by viewModel.playlistState.collectAsState()
     var isExporting by remember { mutableStateOf(false) }
+    var showSuccessDialog by remember { mutableStateOf(false) }
+    var showErrorDialog by remember { mutableStateOf(false) }
+    var playlistUrl by remember { mutableStateOf("") }
+    var errorMessage by remember { mutableStateOf("") }
 
     // Load the generated playlist when the screen is composed
     LaunchedEffect(authToken) {
@@ -143,10 +147,10 @@ fun GeneratedPlaylistScreen(
                                 }
                             }
 
-                            // Track list
+                            // Track list with weight to take remaining space
                             LazyColumn(
                                 modifier = Modifier
-                                    .fillMaxSize()
+                                    .weight(1f)
                                     .padding(horizontal = 16.dp),
                                 verticalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
@@ -162,13 +166,30 @@ fun GeneratedPlaylistScreen(
                             // Export to Spotify button (fixed at bottom)
                             Button(
                                 onClick = {
-                                    isExporting = true
-                                    onExportToSpotify()
+                                    if (authToken.isNotBlank()) {
+                                        isExporting = true
+                                        viewModel.exportToSpotify(
+                                            authToken = authToken,
+                                            onSuccess = { url ->
+                                                isExporting = false
+                                                playlistUrl = url
+                                                showSuccessDialog = true
+                                            },
+                                            onError = { error ->
+                                                isExporting = false
+                                                errorMessage = error
+                                                showErrorDialog = true
+                                            }
+                                        )
+                                    } else {
+                                        errorMessage = "Authentication required to export playlist"
+                                        showErrorDialog = true
+                                    }
                                 },
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(16.dp),
-                                enabled = !isExporting,
+                                enabled = !isExporting && playlistState is Resource.Success,
                                 colors = ButtonDefaults.buttonColors(
                                     containerColor = MaterialTheme.colorScheme.primary
                                 )
@@ -214,5 +235,71 @@ fun GeneratedPlaylistScreen(
                 }
             }
         }
+    }
+    
+    // Success Dialog
+    if (showSuccessDialog) {
+        AlertDialog(
+            onDismissRequest = { showSuccessDialog = false },
+            title = {
+                Text(
+                    text = "Playlist Created Successfully!",
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Bold
+                )
+            },
+            text = {
+                Column {
+                    Text(
+                        text = "Your playlist has been exported to Spotify.",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = "You can find it in your Spotify library.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showSuccessDialog = false
+                        onExportToSpotify() // Navigate back or to home
+                    }
+                ) {
+                    Text("OK")
+                }
+            }
+        )
+    }
+    
+    // Error Dialog
+    if (showErrorDialog) {
+        AlertDialog(
+            onDismissRequest = { showErrorDialog = false },
+            title = {
+                Text(
+                    text = "Export Failed",
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.error
+                )
+            },
+            text = {
+                Text(
+                    text = errorMessage,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = { showErrorDialog = false }
+                ) {
+                    Text("OK")
+                }
+            }
+        )
     }
 }

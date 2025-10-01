@@ -58,7 +58,21 @@ class GeneratedPlaylistViewModel(
             try {
                 println("GeneratedPlaylistViewModel: Exporting playlist to Spotify...")
                 
-                val result = jamsyRepository.createPlaylist(authToken, emptyList())
+                // Get the current playlist tracks
+                val currentState = _playlistState.value
+                val tracks = when (currentState) {
+                    is Resource.Success -> currentState.data
+                    else -> emptyList()
+                }
+                
+                if (tracks.isEmpty()) {
+                    onError("No tracks available to export")
+                    return@launch
+                }
+                
+                println("GeneratedPlaylistViewModel: Exporting ${tracks.size} tracks to Spotify")
+                
+                val result = jamsyRepository.createPlaylist(authToken, tracks)
                 if (result.isSuccess) {
                     val playlistUrl = result.getOrNull() ?: ""
                     println("GeneratedPlaylistViewModel: Successfully created playlist: $playlistUrl")

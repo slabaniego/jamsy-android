@@ -2,6 +2,7 @@ package ca.sheridancollege.jamsy.repository
 import ca.sheridancollege.jamsy.api.ApiClient
 import ca.sheridancollege.jamsy.network.JamsyApiService
 import ca.sheridancollege.jamsy.network.DiscoveryRequest
+import ca.sheridancollege.jamsy.network.CreatePlaylistRequest
 import ca.sheridancollege.jamsy.model.*
 import ca.sheridancollege.jamsy.network.SpotifyAuthResponse
 import kotlinx.coroutines.Dispatchers
@@ -263,7 +264,8 @@ class JamsyRepository {
         return withContext(Dispatchers.IO) {
             try {
                 val authHeader = "Bearer $authToken"
-                val response = apiService.createPlaylist(authHeader, tracks)
+                val requestBody = CreatePlaylistRequest(tracks = tracks)
+                val response = apiService.createPlaylist(authHeader, requestBody)
                 if (response.isSuccessful && response.body() != null) {
                     val playlistUrl = response.body()!!["playlistUrl"] ?: ""
                     Result.success(playlistUrl)
@@ -386,7 +388,8 @@ class JamsyRepository {
         return withContext(Dispatchers.IO) {
             try {
                 val authHeader = "Bearer $authToken"
-                val response = apiService.createPlaylist(authHeader, emptyList())
+                val requestBody = CreatePlaylistRequest(tracks = emptyList())
+                val response = apiService.createPlaylist(authHeader, requestBody)
                 if (response.isSuccessful && response.body() != null) {
                     Result.success(response.body()!!)
                 } else {
