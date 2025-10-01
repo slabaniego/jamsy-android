@@ -51,7 +51,7 @@ fun ArtistSelectionScreen(
         println("ArtistSelectionScreen: currentUser = ${currentUser?.uid}")
         println("ArtistSelectionScreen: currentUser is null = ${currentUser == null}")
         
-        val authToken = authViewModel.getSpotifyAccessToken() ?: "dummy_token"
+        val authToken = authViewModel.getSpotifyAccessToken()?.takeIf { it.isNotBlank() } ?: "dummy_token"
         println("ArtistSelectionScreen: authToken = ${if (authToken == "dummy_token") "dummy_token (no real token)" else "real token: ${authToken.take(10)}..."}")
         println("ArtistSelectionScreen: authToken length = ${authToken.length}")
         println("ArtistSelectionScreen: authToken isBlank = ${authToken.isBlank()}")
@@ -98,7 +98,7 @@ fun ArtistSelectionScreen(
                     )
                     Button(
                         onClick = {
-                            val authToken = authViewModel.getSpotifyAccessToken() ?: "dummy_token"
+                            val authToken = authViewModel.getSpotifyAccessToken()?.takeIf { it.isNotBlank() } ?: "dummy_token"
                             viewModel.submitSelection(
                                 workout = workout,
                                 mood = mood,
@@ -175,7 +175,7 @@ fun ArtistSelectionScreen(
                         Spacer(modifier = Modifier.height(16.dp))
                         Button(
                             onClick = {
-                                val authToken = authViewModel.getSpotifyAccessToken() ?: "dummy_token"
+                                val authToken = authViewModel.getSpotifyAccessToken()?.takeIf { it.isNotBlank() } ?: "dummy_token"
                                 viewModel.loadArtists(workout, mood, authToken)
                             }
                         ) {

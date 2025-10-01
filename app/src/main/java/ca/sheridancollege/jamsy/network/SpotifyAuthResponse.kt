@@ -1,14 +1,16 @@
 package ca.sheridancollege.jamsy.network
 
-import com.google.gson.annotations.SerializedName
+import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
+@JsonClass(generateAdapter = true)
 data class SpotifyAuthResponse(
-    @SerializedName("access_token")
-    val accessToken: String = "",
+    @Json(name = "access_token")
+    val accessToken: String,
 
-    @SerializedName("token_type")
-    val tokenType: String = "",
+    @Json(name = "token_type")
+    val tokenType: String,
 
-    @SerializedName("firebaseCustomToken")
-    val firebaseCustomToken: String = ""
+    @Json(name = "firebaseCustomToken")
+    val firebaseCustomToken: String
 )

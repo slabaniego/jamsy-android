@@ -15,7 +15,7 @@ import ca.sheridancollege.jamsy.services.DiscoveryService
 
 class ViewModelFactory(private val context: Context) : ViewModelProvider.Factory {
 
-    private val authRepository = AuthRepository()
+    private val authRepository = AuthRepository(context)
     private val jamsyRepository = JamsyRepository()
     private val trackRepository = TrackRepository(jamsyRepository)
     private val userRepository = UserRepository()
@@ -34,7 +34,7 @@ class ViewModelFactory(private val context: Context) : ViewModelProvider.Factory
             }
             modelClass.isAssignableFrom(AuthViewModel::class.java) -> {
                 AuthViewModel(
-                    AuthRepository(),
+                    authRepository,
                     NetworkModule.jamsyRepository,
                     context
                 ) as T

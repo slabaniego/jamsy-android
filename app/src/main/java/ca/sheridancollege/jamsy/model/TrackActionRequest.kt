@@ -11,7 +11,7 @@ data class TrackActionRequest(
     val songName: String,
 
     @Json(name = "artist")
-    val artist: List<String>,
+    val artist: String,
 
     @Json(name = "genres")
     val genres: String?,

@@ -26,9 +26,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.media3.common.MediaItem
 import androidx.media3.exoplayer.ExoPlayer
+import ca.sheridancollege.jamsy.data.DiscoveryDataStore
 import ca.sheridancollege.jamsy.model.Track
 import ca.sheridancollege.jamsy.util.Resource
 import ca.sheridancollege.jamsy.viewmodel.DiscoveryViewModel
+import ca.sheridancollege.jamsy.viewmodel.LikedTracksViewModel
 import coil.compose.AsyncImage
 import kotlin.math.abs
 
@@ -37,19 +39,63 @@ import kotlin.math.abs
 fun DiscoveryScreen(
     onNavigateToGeneratedPlaylist: () -> Unit,
     onBack: () -> Unit,
-    viewModel: DiscoveryViewModel
+    viewModel: DiscoveryViewModel,
+    likedTracksViewModel: LikedTracksViewModel? = null,
+    authToken: String = ""
 ) {
+    println("DiscoveryScreen: ===== DISCOVERY SCREEN COMPOSED =====")
+    println("DiscoveryScreen: AuthToken length: ${authToken.length}")
+    
     val tracksState by viewModel.tracksState.collectAsState()
     val currentTrackIndex by viewModel.currentTrackIndex.collectAsState()
     val likedTracks by viewModel.likedTracks.collectAsState()
+    val isNewSession by DiscoveryDataStore.isNewSession.collectAsState()
     
     var dragOffset by remember { mutableFloatStateOf(0f) }
     var isProcessingAction by remember { mutableStateOf(false) }
-
-    // Load discovery tracks when screen is shown
-    LaunchedEffect(Unit) {
-        // Load basic discovery tracks without authentication (like Tracks screen)
-        viewModel.loadBasicDiscoveryTracks()
+    var lastActionTime by remember { mutableStateOf(0L) }
+    
+    // Initialize session and load tracks only once
+    LaunchedEffect(authToken) {
+        println("DiscoveryScreen: ===== LaunchedEffect triggered =====")
+        println("DiscoveryScreen: AuthToken length: ${authToken.length}")
+        println("DiscoveryScreen: Is new session: $isNewSession")
+        
+        if (isNewSession) {
+            println("DiscoveryScreen: New session detected - clearing liked tracks")
+            viewModel.startNewDiscoverySession()
+            DiscoveryDataStore.markSessionAsStarted()
+        } else {
+            println("DiscoveryScreen: Existing session - preserving liked tracks")
+            // Don't reset the viewModel for existing sessions to preserve state
+        }
+        
+        // Load tracks
+        if (authToken.isNotBlank()) {
+            println("DiscoveryScreen: Loading discovery tracks with auth token")
+            viewModel.loadDiscoveryTracks(authToken)
+        } else {
+            println("DiscoveryScreen: Loading basic discovery tracks without auth token")
+            viewModel.loadBasicDiscoveryTracks()
+        }
+    }
+    
+    // Debug logging for currentTrackIndex changes
+    LaunchedEffect(currentTrackIndex) {
+        println("DiscoveryScreen: currentTrackIndex changed to: $currentTrackIndex")
+    }
+    
+    // Debug logging for tracks state
+    LaunchedEffect(tracksState) {
+        val currentState = tracksState
+        when (currentState) {
+            is Resource.Loading -> println("DiscoveryScreen: Tracks state is Loading")
+            is Resource.Error -> println("DiscoveryScreen: Tracks state is Error: ${currentState.message}")
+            is Resource.Success -> {
+                println("DiscoveryScreen: Tracks state is Success with ${currentState.data.size} tracks")
+                println("DiscoveryScreen: Track names: ${currentState.data.map { "${it.name} by ${it.artists.firstOrNull()}" }}")
+            }
+        }
     }
 
     Scaffold(
@@ -76,7 +122,13 @@ fun DiscoveryScreen(
                 },
                 actions = {
                     TextButton(
-                        onClick = onNavigateToGeneratedPlaylist,
+                        onClick = {
+                            // Refresh liked tracks from server before navigating
+                            if (authToken.isNotBlank() && likedTracksViewModel != null) {
+                                likedTracksViewModel.loadLikedTracks(authToken)
+                            }
+                            onNavigateToGeneratedPlaylist()
+                        },
                         enabled = likedTracks.isNotEmpty()
                     ) {
                         Text("View Liked")
@@ -150,6 +202,9 @@ fun DiscoveryScreen(
 
                 is Resource.Success -> {
                     val tracks = state.data
+                    println("DiscoveryScreen: Resource.Success - tracks count: ${tracks.size}")
+                    println("DiscoveryScreen: currentTrackIndex: $currentTrackIndex")
+                    
                     if (tracks.isEmpty()) {
                         Column(
                             modifier = Modifier
@@ -179,7 +234,12 @@ fun DiscoveryScreen(
                         }
                     } else {
                         val currentTrack = viewModel.getCurrentTrack()
+                        val actualIndex = viewModel.currentTrackIndex.value
+                        println("DiscoveryScreen: getCurrentTrack() returned: $currentTrack")
                         if (currentTrack != null) {
+                            println("DiscoveryScreen: ✅ SUCCESS! Displaying track: ${currentTrack.name} by ${currentTrack.artists.firstOrNull()}")
+                            println("DiscoveryScreen: ✅ Track index: $actualIndex (should be 0)")
+                            println("DiscoveryScreen: About to render TrackCard with like/dislike buttons")
                             Box(
                                 modifier = Modifier.fillMaxSize(),
                                 contentAlignment = Alignment.Center
@@ -196,18 +256,22 @@ fun DiscoveryScreen(
                                                 else -> null
                                             }
                                             
+                                            println("DiscoveryScreen: Swipe action detected - offset: $offset, action: $action")
+                                            
                                             if (action != null) {
-                                                // TODO: Get actual auth token from authentication system
+                                                println("DiscoveryScreen: Processing $action for track: ${currentTrack.name} by ${currentTrack.artists.firstOrNull()}")
                                                 viewModel.handleTrackAction(
                                                     track = currentTrack,
                                                     action = action,
-                                                    authToken = "",
+                                                    authToken = authToken,
                                                     onComplete = {
+                                                        println("DiscoveryScreen: Track action completed for ${currentTrack.name}")
                                                         isProcessingAction = false
                                                         dragOffset = 0f
                                                     }
                                                 )
                                             } else {
+                                                println("DiscoveryScreen: No action triggered - offset not sufficient: $offset")
                                                 isProcessingAction = false
                                                 dragOffset = 0f
                                             }
@@ -229,19 +293,27 @@ fun DiscoveryScreen(
                                 ) {
                                     FloatingActionButton(
                                         onClick = {
-                                            if (!isProcessingAction) {
-                                                isProcessingAction = true
-                                                // TODO: Get actual auth token from authentication system
-                                                viewModel.handleTrackAction(
-                                                    track = currentTrack,
-                                                    action = "dislike",
-                                                    authToken = "",
-                                                    onComplete = {
-                                                        isProcessingAction = false
-                                                    }
-                                                )
-                                            }
+                                            val currentTime = System.currentTimeMillis()
+                                            println("DiscoveryScreen: ===== DISLIKE BUTTON CLICKED =====")
+                                            println("DiscoveryScreen: Track: ${currentTrack.name} by ${currentTrack.artists.firstOrNull()}")
+                                            println("DiscoveryScreen: Time since last action: ${currentTime - lastActionTime}ms")
+                                            
+                                            // Always process the action for now to debug
+                                            println("DiscoveryScreen: Processing dislike action for track: ${currentTrack.name}")
+                                            lastActionTime = currentTime
+                                            isProcessingAction = true
+                                            viewModel.handleTrackAction(
+                                                track = currentTrack,
+                                                action = "dislike",
+                                                authToken = authToken,
+                                                onComplete = {
+                                                    println("DiscoveryScreen: Dislike action completed for ${currentTrack.name}")
+                                                    isProcessingAction = false
+                                                }
+                                            )
                                         },
+                                        modifier = Modifier
+                                            .size(64.dp),
                                         containerColor = if (isProcessingAction) 
                                             MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.5f)
                                         else MaterialTheme.colorScheme.errorContainer,
@@ -254,19 +326,30 @@ fun DiscoveryScreen(
 
                                     FloatingActionButton(
                                         onClick = {
-                                            if (!isProcessingAction) {
-                                                isProcessingAction = true
-                                                // TODO: Get actual auth token from authentication system
-                                                viewModel.handleTrackAction(
-                                                    track = currentTrack,
-                                                    action = "like",
-                                                    authToken = "",
-                                                    onComplete = {
-                                                        isProcessingAction = false
-                                                    }
-                                                )
-                                            }
+                                            println("DiscoveryScreen: ===== LIKE BUTTON CLICKED =====")
+                                            val currentTime = System.currentTimeMillis()
+                                            println("DiscoveryScreen: Track: ${currentTrack.name} by ${currentTrack.artists.firstOrNull()}")
+                                            println("DiscoveryScreen: isProcessingAction: $isProcessingAction")
+                                            println("DiscoveryScreen: Current liked tracks count: ${likedTracks.size}")
+                                            println("DiscoveryScreen: Time since last action: ${currentTime - lastActionTime}ms")
+                                            println("DiscoveryScreen: AuthToken length: ${authToken.length}")
+                                            
+                                            // Always process the action for now to debug
+                                            println("DiscoveryScreen: Processing like action for track: ${currentTrack.name}")
+                                            lastActionTime = currentTime
+                                            isProcessingAction = true
+                                            viewModel.handleTrackAction(
+                                                track = currentTrack,
+                                                action = "like",
+                                                authToken = authToken,
+                                                onComplete = {
+                                                    println("DiscoveryScreen: Like action completed for ${currentTrack.name}")
+                                                    isProcessingAction = false
+                                                }
+                                            )
                                         },
+                                        modifier = Modifier
+                                            .size(64.dp),
                                         containerColor = if (isProcessingAction)
                                             MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f)
                                         else MaterialTheme.colorScheme.primaryContainer,
