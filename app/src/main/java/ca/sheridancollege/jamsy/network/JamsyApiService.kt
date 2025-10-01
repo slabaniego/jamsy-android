@@ -91,7 +91,7 @@ interface JamsyApiService {
     @POST("api/create-playlist")
     suspend fun createPlaylist(
         @Header("Authorization") authHeader: String,
-        @Body tracks: List<Track>
+        @Body requestBody: CreatePlaylistRequest
     ): Response<Map<String, String>>
 
     // Get recommendations - FIXED: Match backend endpoints
