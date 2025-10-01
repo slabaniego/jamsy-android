@@ -2,6 +2,7 @@ package ca.sheridancollege.jamsy.api
 
 
 import ca.sheridancollege.jamsy.config.AppConfig
+import ca.sheridancollege.jamsy.network.JamsyApiService
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import okhttp3.OkHttpClient

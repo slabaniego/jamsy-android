@@ -70,7 +70,12 @@ fun TrackListScreen(
                 }
 
                 is Resource.Success -> {
-                    val tracks = state.data ?: emptyList()
+                    val tracks = state.data
+                    println("TracklistScreen: Successfully loaded ${tracks.size} tracks")
+                    tracks.forEachIndexed { index, track ->
+                        println("TracklistScreen: Track $index - Name: ${track.name}, AlbumCover: ${track.albumCover}, ImageUrl: ${track.imageUrl}")
+                    }
+                    
                     if (tracks.isEmpty()) {
                         Box(
                             contentAlignment = Alignment.Center,
@@ -87,7 +92,8 @@ fun TrackListScreen(
                             items(tracks) { track ->
                                 TrackItem(
                                     track = track,
-                                    onClick = { track.id?.let { id -> onTrackSelected(id) } },
+                                    onTrackSelected = { onTrackSelected(track.id ?: "") },
+                                    onTrackAction = { /* Handle track action if needed */ },
                                     modifier = Modifier.padding(vertical = 4.dp)
                                 )
                             }
@@ -106,35 +112,26 @@ fun TrackListScreen(
                         ) {
                             val errorMessage = state.message
 
-                            // Display a more user-friendly message
-                            if (errorMessage.contains("Authentication required") ||
-                                errorMessage.contains("log in")) {
-                                Text(
-                                    "You need to log in to your Spotify account first",
-                                    style = MaterialTheme.typography.bodyLarge
-                                )
+                            Text(
+                                "Error loading tracks: $errorMessage",
+                                style = MaterialTheme.typography.bodyLarge
+                            )
 
-                                Spacer(modifier = Modifier.height(16.dp))
+                            Spacer(modifier = Modifier.height(16.dp))
 
-                                Button(
-                                    onClick = onLogout
-                                ) {
-                                    Text("Go to Login")
-                                }
-                            } else {
-                                Text(
-                                    "Error: $errorMessage",
-                                    style = MaterialTheme.typography.bodyLarge
-                                )
-
-                                Spacer(modifier = Modifier.height(16.dp))
-
-                                Button(
-                                    onClick = { viewModel.loadTracks() }
-                                ) {
-                                    Text("Retry")
-                                }
+                            Button(
+                                onClick = { viewModel.loadTracks() }
+                            ) {
+                                Text("Retry")
                             }
+                            
+                            Spacer(modifier = Modifier.height(8.dp))
+                            
+                            Text(
+                                "Make sure your backend is running on http://10.0.2.2:8080",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
                         }
                     }
                 }

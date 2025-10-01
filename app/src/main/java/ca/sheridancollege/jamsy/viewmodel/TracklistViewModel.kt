@@ -18,9 +18,29 @@ class TrackListViewModel(private val repository: TrackRepository) : ViewModel() 
         viewModelScope.launch {
             _tracksState.value = Resource.Loading
             try {
+                println("TrackListViewModel: Starting to load tracks...")
                 val result = repository.getTracks()
-                _tracksState.value = result
+                println("TrackListViewModel: Got result: $result")
+                
+                when (result) {
+                    is Resource.Success -> {
+                        val tracks = result.data
+                        println("TrackListViewModel: Successfully loaded ${tracks.size} tracks")
+                        _tracksState.value = Resource.Success(tracks)
+                    }
+                    is Resource.Error -> {
+                        val error = result.message
+                        println("TrackListViewModel: Error loading tracks: $error")
+                        _tracksState.value = Resource.Error("Failed to load tracks: $error")
+                    }
+                    is Resource.Loading -> {
+                        println("TrackListViewModel: Still loading...")
+                        _tracksState.value = Resource.Loading
+                    }
+                }
             } catch (e: Exception) {
+                println("TrackListViewModel: Exception loading tracks: ${e.message}")
+                e.printStackTrace()
                 _tracksState.value = Resource.Error("Failed to load tracks: ${e.message}")
             }
         }

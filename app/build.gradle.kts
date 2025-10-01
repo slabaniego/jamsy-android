@@ -1,3 +1,6 @@
+import java.util.Properties
+import java.io.FileInputStream
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -19,6 +22,15 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        
+        // Load Spotify Client ID from local.properties
+        val localProperties = Properties()
+        val localPropertiesFile = rootProject.file("local.properties")
+        if (localPropertiesFile.exists()) {
+            localProperties.load(FileInputStream(localPropertiesFile))
+        }
+        
+        buildConfigField("String", "SPOTIFY_CLIENT_ID", "\"${localProperties.getProperty("SPOTIFY_CLIENT_ID", "")}\"")
     }
 
     buildTypes {
@@ -39,6 +51,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -84,23 +97,24 @@ dependencies {
     implementation("com.squareup.retrofit2:converter-moshi:2.9.0")
     implementation("com.squareup.moshi:moshi-kotlin:1.14.0")
 
-    // Coil for image loading
-    implementation ("io.coil-kt:coil-compose:2.2.2")
-
     //Icons
     implementation("androidx.compose.material:material-icons-extended:1.6.1")
 
     // ExoPlayer for audio preview
     implementation ("androidx.media3:media3-exoplayer:1.1.0")
+    implementation ("androidx.media3:media3-ui:1.1.0")
+    implementation ("androidx.media3:media3-common:1.1.0")
+    implementation ("androidx.media3:media3-session:1.1.0")
     implementation(libs.androidx.storage)
+    implementation(libs.androidx.media3.exoplayer)
 
     // Testing
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
-    androidTestImplementation(platform("androidx.compose:compose-bom:2023.10.01"))
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
-    debugImplementation("androidx.compose.ui:ui-tooling")
+    androidTestImplementation(libs.compose.bom.v20231001)
+    androidTestImplementation(libs.androidx.compose.ui.test.junit4)
+    debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 
 

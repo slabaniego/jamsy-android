@@ -1,10 +1,11 @@
 package ca.sheridancollege.jamsy.ui.components
 
 import androidx.compose.material.icons.Icons
-//import androidx.compose.material.icons.filled.ExitToApp
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Home
-//import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -12,18 +13,15 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 
-import androidx.compose.material.icons.automirrored.filled.List
-import androidx.compose.material.icons.automirrored.filled.ExitToApp
-
 @Composable
 fun BottomBar(
     modifier: Modifier = Modifier,
     selectedRoute: String = "",
     onHomeSelected: () -> Unit,
-    onProfileSelected: () -> Unit = {},  // Already on profile
+    onProfileSelected: () -> Unit = {},
     onTrackListSelected: () -> Unit = {},
+    onSearchSelected: () -> Unit = {},
     onLogoutSelected: () -> Unit,
-
 ) {
     NavigationBar(modifier = modifier) {
         NavigationBarItem(
@@ -31,6 +29,13 @@ fun BottomBar(
             label = { Text("Home") },
             selected = selectedRoute == "home",
             onClick = onHomeSelected
+        )
+
+        NavigationBarItem(
+            icon = { Icon(Icons.Default.Search, contentDescription = "Search") },
+            label = { Text("Search") },
+            selected = selectedRoute == "search",
+            onClick = onSearchSelected
         )
 
         NavigationBarItem(
@@ -46,7 +51,7 @@ fun BottomBar(
             selected = selectedRoute == "profile",
             onClick = onProfileSelected
         )
-
+        
         NavigationBarItem(
             icon = { Icon(Icons.AutoMirrored.Filled.ExitToApp, contentDescription = "Logout") },
             label = { Text("Logout") },

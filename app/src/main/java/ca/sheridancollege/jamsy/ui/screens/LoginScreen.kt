@@ -151,7 +151,7 @@ fun LoginScreen(
             Button(
                 onClick = {
                     errorMessage = ""
-                    launchSpotifyLogin(context)
+                    viewModel.launchSpotifyAuth()
                 },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color(0xFF1DB954)
