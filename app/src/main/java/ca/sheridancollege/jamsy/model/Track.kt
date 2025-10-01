@@ -33,7 +33,7 @@ data class Track(
     val artists: List<String> = emptyList(),
 
     @Json(name = "genres")
-    val genres: List<String> = emptyList(),
+    val genres: List<String>? = null,
 
     @Json(name = "artistName")
     val artistName: String? = null,

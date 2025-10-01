@@ -30,22 +30,80 @@ class DiscoveryViewModel(
             _tracksState.value = Resource.Loading
 
             try {
-                // Check if auth token is provided
-                if (authToken.isBlank()) {
-                    _tracksState.value = Resource.Error("Please log in to discover tracks")
+                println("DiscoveryViewModel: Starting to load discovery tracks...")
+                
+                // First try to get tracks from data store
+                val dataStoreTracks = DiscoveryDataStore.discoveryTracks.value
+                if (dataStoreTracks.isNotEmpty()) {
+                    println("DiscoveryViewModel: Found ${dataStoreTracks.size} tracks in data store")
+                    _tracksState.value = Resource.Success(dataStoreTracks)
+                    _currentTrackIndex.value = 0
                     return@launch
                 }
 
-                // Get tracks from data store
-                val tracks = DiscoveryDataStore.discoveryTracks.value
-                if (tracks.isNotEmpty()) {
+                // If no tracks in data store, try to load from API (without auth for basic discovery)
+                println("DiscoveryViewModel: No tracks in data store, trying API...")
+                val result = jamsyRepository.getDiscoveryTracks("") // Use empty token for basic discovery
+                if (result.isSuccess) {
+                    val tracks = result.getOrNull() ?: emptyList()
+                    println("DiscoveryViewModel: Successfully loaded ${tracks.size} tracks from API")
+                    
+                    // Store tracks in data store for future use
+                    DiscoveryDataStore.setDiscoveryTracks(tracks)
+                    
                     _tracksState.value = Resource.Success(tracks)
                     _currentTrackIndex.value = 0
                 } else {
-                    _tracksState.value = Resource.Error("Please select artists first to discover tracks")
+                    val error = result.exceptionOrNull()?.message ?: "Unknown error"
+                    println("DiscoveryViewModel: Error loading tracks from API: $error")
+                    _tracksState.value = Resource.Error("Failed to load discovery tracks: $error")
                 }
             } catch (e: Exception) {
-                _tracksState.value = Resource.Error(e.message ?: "Failed to load discovery tracks")
+                println("DiscoveryViewModel: Exception loading discovery tracks: ${e.message}")
+                e.printStackTrace()
+                _tracksState.value = Resource.Error("Failed to load discovery tracks: ${e.message}")
+            }
+        }
+    }
+
+    // Load discovery tracks without authentication (for basic discovery)
+    fun loadBasicDiscoveryTracks() {
+        viewModelScope.launch {
+            _tracksState.value = Resource.Loading
+
+            try {
+                println("DiscoveryViewModel: Starting to load basic discovery tracks...")
+                
+                // First try to get tracks from data store
+                val dataStoreTracks = DiscoveryDataStore.discoveryTracks.value
+                if (dataStoreTracks.isNotEmpty()) {
+                    println("DiscoveryViewModel: Found ${dataStoreTracks.size} tracks in data store")
+                    _tracksState.value = Resource.Success(dataStoreTracks)
+                    _currentTrackIndex.value = 0
+                    return@launch
+                }
+
+                // Load from API without authentication
+                println("DiscoveryViewModel: Loading from API without authentication...")
+                val result = jamsyRepository.getDiscoveryTracks("")
+                if (result.isSuccess) {
+                    val tracks = result.getOrNull() ?: emptyList()
+                    println("DiscoveryViewModel: Successfully loaded ${tracks.size} tracks from API")
+                    
+                    // Store tracks in data store for future use
+                    DiscoveryDataStore.setDiscoveryTracks(tracks)
+                    
+                    _tracksState.value = Resource.Success(tracks)
+                    _currentTrackIndex.value = 0
+                } else {
+                    val error = result.exceptionOrNull()?.message ?: "Unknown error"
+                    println("DiscoveryViewModel: Error loading tracks from API: $error")
+                    _tracksState.value = Resource.Error("Failed to load discovery tracks: $error")
+                }
+            } catch (e: Exception) {
+                println("DiscoveryViewModel: Exception loading discovery tracks: ${e.message}")
+                e.printStackTrace()
+                _tracksState.value = Resource.Error("Failed to load discovery tracks: ${e.message}")
             }
         }
     }
@@ -108,7 +166,7 @@ class DiscoveryViewModel(
                 songName = track.name,
                 artist = track.artists.firstOrNull() ?: "",
                 action = action,
-                genres = track.genres
+                genres = track.genres ?: emptyList()
             )
 
             jamsyRepository.handleTrackAction(songAction, authToken).fold(

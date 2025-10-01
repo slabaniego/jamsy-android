@@ -35,12 +35,14 @@ class AuthRepository {
             }
 
             val response = result.getOrThrow()
+            Log.d(TAG, "Received response: accessToken='${response.accessToken}', tokenType='${response.tokenType}', firebaseToken='${response.firebaseCustomToken.take(10)}...'")
+            
             if (response.firebaseCustomToken.isNullOrEmpty()) {
                 return Resource.Error("Authentication failed: Server did not provide a valid token")
             }
 
             spotifyAccessToken = response.accessToken
-            Log.d(TAG, "Saved Spotify access token: ${spotifyAccessToken?.take(10)}...")
+            Log.d(TAG, "Saved Spotify access token: ${spotifyAccessToken?.take(10)}... (length: ${spotifyAccessToken?.length})")
 
             val authResult = firebaseAuth.signInWithCustomToken(response.firebaseCustomToken).await()
             Resource.Success(authResult.user!!)
@@ -84,6 +86,8 @@ class AuthRepository {
     }
     // Getter for the Spotify access token
     fun getSpotifyAccessToken(): String? {
+        println("AuthRepository: getSpotifyAccessToken() called, spotifyAccessToken = ${spotifyAccessToken?.take(10)}...")
+        println("AuthRepository: spotifyAccessToken is null: ${spotifyAccessToken == null}")
         return spotifyAccessToken
     }
 }

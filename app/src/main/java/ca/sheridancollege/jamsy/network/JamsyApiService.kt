@@ -37,10 +37,10 @@ interface JamsyApiService {
     ): Response<List<Track>>
 
     // Artists by workout and mood - FIXED: Match backend endpoints
-    @GET("more-artists")
+    @GET("spotify/artists/workout/{workout}/mood/{mood}")
     suspend fun getArtistsByWorkout(
-        @Query("workout") workout: String,
-        @Query("mood") mood: String,
+        @Path("workout") workout: String,
+        @Path("mood") mood: String,
         @Header("Authorization") authHeader: String
     ): Response<List<Artist>>
 
@@ -57,10 +57,10 @@ interface JamsyApiService {
     ): Response<List<Track>>
 
     // Get discovery tracks - FIXED: Match backend endpoints
-    @GET("discover")
+    @POST("api/discover")
     suspend fun getDiscoveryTracks(
         @Header("Authorization") authHeader: String
-    ): Response<List<Track>>
+    ): Response<Map<String, List<Track>>>
 
     // Handle track actions (like/dislike) - FIXED: Match backend endpoints
     @POST("api/track/action")
@@ -86,15 +86,16 @@ interface JamsyApiService {
     ): Response<Map<String, Any>>
 
     // Preview playlist - FIXED: Match backend endpoints
-    @GET("preview-playlist")
-    suspend fun previewPlaylist(
+    @GET("api/preview-playlist")
+    suspend fun getPreviewPlaylist(
         @Header("Authorization") authHeader: String
     ): Response<Map<String, List<Track>>>
 
     // Create playlist - FIXED: Match backend endpoints
-    @GET("create-playlist")
+    @POST("api/create-playlist")
     suspend fun createPlaylist(
-        @Header("Authorization") authHeader: String
+        @Header("Authorization") authHeader: String,
+        @Body tracks: List<Track>
     ): Response<Map<String, String>>
 
     // Get recommendations - FIXED: Match backend endpoints

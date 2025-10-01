@@ -35,7 +35,7 @@ import kotlin.math.abs
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DiscoveryScreen(
-    onNavigateToLikedTracks: () -> Unit,
+    onNavigateToGeneratedPlaylist: () -> Unit,
     onBack: () -> Unit,
     viewModel: DiscoveryViewModel
 ) {
@@ -48,9 +48,8 @@ fun DiscoveryScreen(
 
     // Load discovery tracks when screen is shown
     LaunchedEffect(Unit) {
-        // TODO: Get actual auth token from authentication system
-        // For now, this will show authentication required error
-        viewModel.loadDiscoveryTracks("")
+        // Load basic discovery tracks without authentication (like Tracks screen)
+        viewModel.loadBasicDiscoveryTracks()
     }
 
     Scaffold(
@@ -77,7 +76,7 @@ fun DiscoveryScreen(
                 },
                 actions = {
                     TextButton(
-                        onClick = onNavigateToLikedTracks,
+                        onClick = onNavigateToGeneratedPlaylist,
                         enabled = likedTracks.isNotEmpty()
                     ) {
                         Text("View Liked")
@@ -172,7 +171,7 @@ fun DiscoveryScreen(
                             )
                             Spacer(modifier = Modifier.height(24.dp))
                             Button(
-                                onClick = onNavigateToLikedTracks,
+                                onClick = onNavigateToGeneratedPlaylist,
                                 enabled = likedTracks.isNotEmpty()
                             ) {
                                 Text("View Your Liked Tracks")
@@ -288,6 +287,26 @@ fun DiscoveryScreen(
                                             .fillMaxWidth()
                                             .padding(horizontal = 16.dp, vertical = 8.dp)
                                     )
+                                }
+
+                                // View Generated Playlist button (appears after all tracks are processed)
+                                if (currentTrackIndex >= tracks.size - 1) {
+                                    Button(
+                                        onClick = onNavigateToGeneratedPlaylist,
+                                        modifier = Modifier
+                                            .align(Alignment.BottomCenter)
+                                            .padding(16.dp)
+                                            .fillMaxWidth(),
+                                        colors = ButtonDefaults.buttonColors(
+                                            containerColor = MaterialTheme.colorScheme.primary
+                                        )
+                                    ) {
+                                        Text(
+                                            "View Generated Playlist",
+                                            style = MaterialTheme.typography.titleMedium,
+                                            fontWeight = FontWeight.Bold
+                                        )
+                                    }
                                 }
                             }
                         }
@@ -414,7 +433,7 @@ private fun TrackCard(
                     overflow = TextOverflow.Ellipsis
                 )
 
-                if (track.genres.isNotEmpty()) {
+                if (!track.genres.isNullOrEmpty()) {
                     Spacer(modifier = Modifier.height(12.dp))
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),

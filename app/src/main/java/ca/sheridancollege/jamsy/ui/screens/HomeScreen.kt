@@ -21,6 +21,7 @@ fun HomeScreen(
     onNavigateToTrackList: () -> Unit,
     onNavigateToSearch: () -> Unit,
     onNavigateToChooseWorkout: () -> Unit,
+    onNavigateToDiscovery: () -> Unit,
     onLogout: () -> Unit,
     viewModel: HomeViewModel
 ) {
@@ -78,6 +79,18 @@ fun HomeScreen(
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Medium
                 )
+            }
+            
+            Spacer(modifier = Modifier.height(16.dp))
+            
+            OutlinedButton(
+                onClick = onNavigateToDiscovery,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(48.dp),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Text("Quick Discovery")
             }
             
             Spacer(modifier = Modifier.height(16.dp))

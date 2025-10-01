@@ -37,13 +37,17 @@ class ArtistSelectionViewModel(
             _mood.value = mood
             
             try {
+                println("ArtistSelectionViewModel: Loading artists for workout: $workout, mood: $mood, authToken: ${if (authToken.isBlank()) "EMPTY" else "PRESENT"}")
                 val result = jamsyRepository.getArtistsByWorkout(workout, mood, authToken)
                 result.onSuccess { artistList ->
+                    println("ArtistSelectionViewModel: Successfully loaded ${artistList.size} artists")
                     _artistsState.value = Resource.Success(artistList)
                 }.onFailure { exception ->
+                    println("ArtistSelectionViewModel: Error loading artists: ${exception.message}")
                     _artistsState.value = Resource.Error(exception.message ?: "Failed to load artists")
                 }
             } catch (e: Exception) {
+                println("ArtistSelectionViewModel: Exception loading artists: ${e.message}")
                 _artistsState.value = Resource.Error(e.message ?: "Failed to load artists")
             }
         }
@@ -54,7 +58,10 @@ class ArtistSelectionViewModel(
         if (currentSelection.contains(artist)) {
             currentSelection.remove(artist)
         } else {
-            currentSelection.add(artist)
+            // Only allow selection if less than 5 artists are selected
+            if (currentSelection.size < 5) {
+                currentSelection.add(artist)
+            }
         }
         _selectedArtists.value = currentSelection
     }

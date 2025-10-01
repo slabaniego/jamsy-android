@@ -6,6 +6,7 @@ import android.net.Uri
 import android.util.Log
 import java.security.SecureRandom
 import java.util.Base64
+import ca.sheridancollege.jamsy.BuildConfig
 
 /**
  * Helper class for Spotify OAuth authentication
@@ -14,11 +15,13 @@ class SpotifyOAuthHelper(private val context: Context) {
     
     companion object {
         private const val TAG = "SpotifyOAuthHelper"
-        private const val SPOTIFY_CLIENT_ID = "your_spotify_client_id" // Replace with actual client ID
         private const val REDIRECT_URI = "jamsy://callback"
         private const val SPOTIFY_AUTH_URL = "https://accounts.spotify.com/authorize"
         private const val SCOPES = "user-read-private user-read-email user-top-read user-read-recently-played playlist-modify-public playlist-modify-private"
     }
+    
+    private val spotifyClientId: String
+        get() = BuildConfig.SPOTIFY_CLIENT_ID
     
     /**
      * Generate Spotify OAuth URL
@@ -31,7 +34,7 @@ class SpotifyOAuthHelper(private val context: Context) {
             .scheme("https")
             .authority("accounts.spotify.com")
             .appendPath("authorize")
-            .appendQueryParameter("client_id", SPOTIFY_CLIENT_ID)
+            .appendQueryParameter("client_id", spotifyClientId)
             .appendQueryParameter("response_type", "code")
             .appendQueryParameter("redirect_uri", REDIRECT_URI)
             .appendQueryParameter("scope", SCOPES)

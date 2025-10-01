@@ -18,12 +18,8 @@ class JamsyRepository {
                 val response = apiService.exchangeCodeForToken(code, redirectUri)
                 if (response.isSuccessful && response.body() != null) {
                     val networkResponse = response.body()!!
-                    val modelResponse = SpotifyAuthResponse(
-                        accessToken = networkResponse.accessToken,
-                        tokenType = networkResponse.tokenType,
-                        firebaseCustomToken = networkResponse.firebaseCustomToken
-                    )
-                    Result.success(modelResponse)
+                    // The networkResponse is already deserialized by Retrofit using @SerializedName
+                    Result.success(networkResponse)
                 } else {
                     Result.failure(Exception("Failed to exchange code: ${response.errorBody()?.string()}"))
                 }
@@ -89,7 +85,10 @@ class JamsyRepository {
     suspend fun getArtistsByWorkout(workout: String, mood: String, authToken: String): Result<List<Artist>> {
         return withContext(Dispatchers.IO) {
             try {
+                println("JamsyRepository: getArtistsByWorkout called with authToken length: ${authToken.length}")
+                println("JamsyRepository: authToken isBlank: ${authToken.isBlank()}")
                 val authHeader = "Bearer $authToken"
+                println("JamsyRepository: authHeader = $authHeader")
                 val response = apiService.getArtistsByWorkout(workout, mood, authHeader)
                 if (response.isSuccessful && response.body() != null) {
                     Result.success(response.body()!!)
@@ -179,7 +178,7 @@ class JamsyRepository {
         return withContext(Dispatchers.IO) {
             try {
                 val authHeader = "Bearer $authToken"
-                val response = apiService.previewPlaylist(authHeader)
+                val response = apiService.getPreviewPlaylist(authHeader)
                 if (response.isSuccessful && response.body() != null) {
                     val tracksMap = response.body()!!
                     @Suppress("UNCHECKED_CAST")
@@ -195,7 +194,7 @@ class JamsyRepository {
     }
 
     /**
-     * Get discovery tracks - matches /discover
+     * Get discovery tracks - matches /api/discover
      */
     suspend fun getDiscoveryTracks(authToken: String): Result<List<Track>> {
         return withContext(Dispatchers.IO) {
@@ -203,9 +202,54 @@ class JamsyRepository {
                 val authHeader = "Bearer $authToken"
                 val response = apiService.getDiscoveryTracks(authHeader)
                 if (response.isSuccessful && response.body() != null) {
-                    Result.success(response.body()!!)
+                    val tracksMap = response.body()!!
+                    @Suppress("UNCHECKED_CAST")
+                    val tracks = tracksMap["tracks"] as? List<Track> ?: emptyList()
+                    Result.success(tracks)
                 } else {
                     Result.failure(Exception("Failed to get discovery tracks: ${response.errorBody()?.string()}"))
+                }
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
+        }
+    }
+
+    /**
+     * Get preview playlist - matches /api/preview-playlist
+     */
+    suspend fun getPreviewPlaylist(authToken: String): Result<List<Track>> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val authHeader = "Bearer $authToken"
+                val response = apiService.getPreviewPlaylist(authHeader)
+                if (response.isSuccessful && response.body() != null) {
+                    val tracksMap = response.body()!!
+                    @Suppress("UNCHECKED_CAST")
+                    val tracks = tracksMap["tracks"] as? List<Track> ?: emptyList()
+                    Result.success(tracks)
+                } else {
+                    Result.failure(Exception("Failed to get preview playlist: ${response.errorBody()?.string()}"))
+                }
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
+        }
+    }
+
+    /**
+     * Create playlist in Spotify - matches /api/create-playlist
+     */
+    suspend fun createPlaylist(authToken: String, tracks: List<Track>): Result<String> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val authHeader = "Bearer $authToken"
+                val response = apiService.createPlaylist(authHeader, tracks)
+                if (response.isSuccessful && response.body() != null) {
+                    val playlistUrl = response.body()!!["playlistUrl"] as? String ?: ""
+                    Result.success(playlistUrl)
+                } else {
+                    Result.failure(Exception("Failed to create playlist: ${response.errorBody()?.string()}"))
                 }
             } catch (e: Exception) {
                 Result.failure(e)
@@ -244,12 +288,34 @@ class JamsyRepository {
     }
 
     /**
-     * Get tracks - this endpoint doesn't exist in Java backend
-     * Use searchTracks() or other available endpoints instead
+     * Get discovery tracks - matches /api/discover
      */
     suspend fun getTracks(): Result<List<Track>> {
         return withContext(Dispatchers.IO) {
-            Result.failure(Exception("This endpoint is not available. Use searchTracks() or other available endpoints instead."))
+            try {
+                println("JamsyRepository: Calling /api/discover endpoint...")
+                // Use the /api/discover endpoint which doesn't require authentication
+                val response = apiService.getDiscoveryTracks("")
+                println("JamsyRepository: Response code: ${response.code()}")
+                println("JamsyRepository: Response successful: ${response.isSuccessful}")
+                
+                if (response.isSuccessful && response.body() != null) {
+                    val tracksMap = response.body()!!
+                    println("JamsyRepository: Response body: $tracksMap")
+                    @Suppress("UNCHECKED_CAST")
+                    val tracks = tracksMap["tracks"] as? List<Track> ?: emptyList()
+                    println("JamsyRepository: Extracted ${tracks.size} tracks")
+                    Result.success(tracks)
+                } else {
+                    val errorBody = response.errorBody()?.string()
+                    println("JamsyRepository: Error response: $errorBody")
+                    Result.failure(Exception("Failed to get discovery tracks: $errorBody"))
+                }
+            } catch (e: Exception) {
+                println("JamsyRepository: Exception in getTracks: ${e.message}")
+                e.printStackTrace()
+                Result.failure(e)
+            }
         }
     }
 
@@ -279,7 +345,7 @@ class JamsyRepository {
         return withContext(Dispatchers.IO) {
             try {
                 val authHeader = "Bearer $authToken"
-                val response = apiService.createPlaylist(authHeader)
+                val response = apiService.createPlaylist(authHeader, emptyList())
                 if (response.isSuccessful && response.body() != null) {
                     Result.success(response.body()!!)
                 } else {

@@ -1,5 +1,6 @@
 package ca.sheridancollege.jamsy.ui.components
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -47,14 +48,34 @@ fun TrackItem(
             verticalAlignment = Alignment.CenterVertically
         ) {
             // Album cover
-            AsyncImage(
-                model = track.albumCover ?: track.imageUrl,
-                contentDescription = "Album cover",
-                modifier = Modifier
-                    .size(56.dp)
-                    .clip(RoundedCornerShape(8.dp)),
-                contentScale = ContentScale.Crop
-            )
+            val imageUrl = track.albumCover ?: track.imageUrl
+            if (!imageUrl.isNullOrBlank()) {
+                println("TrackItem: Loading image for ${track.name}: $imageUrl")
+                
+                // Try a simple approach first
+                AsyncImage(
+                    model = imageUrl,
+                    contentDescription = "Album cover",
+                    modifier = Modifier
+                        .size(56.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                )
+            } else {
+                println("TrackItem: No image URL for ${track.name}")
+                // Placeholder when no image
+                Box(
+                    modifier = Modifier
+                        .size(56.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(MaterialTheme.colorScheme.surfaceVariant),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "🎵",
+                        style = MaterialTheme.typography.headlineMedium
+                    )
+                }
+            }
             
             Spacer(modifier = Modifier.width(12.dp))
             

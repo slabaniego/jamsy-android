@@ -21,12 +21,14 @@ import ca.sheridancollege.jamsy.ui.screens.ArtistSelectionScreen
 import ca.sheridancollege.jamsy.ui.screens.DiscoveryScreen
 import ca.sheridancollege.jamsy.ui.screens.LikedTracksScreen
 import ca.sheridancollege.jamsy.ui.screens.PlaylistCreationScreen
+import ca.sheridancollege.jamsy.ui.screens.GeneratedPlaylistScreen
 import ca.sheridancollege.jamsy.ui.screens.SearchScreen
 import ca.sheridancollege.jamsy.util.Resource
 import ca.sheridancollege.jamsy.viewmodel.AuthViewModel
 import ca.sheridancollege.jamsy.viewmodel.HomeViewModel
 import ca.sheridancollege.jamsy.viewmodel.ProfileViewModel
 import ca.sheridancollege.jamsy.viewmodel.TrackListViewModel
+import ca.sheridancollege.jamsy.viewmodel.GeneratedPlaylistViewModel
 import ca.sheridancollege.jamsy.viewmodel.ViewModelFactory
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import ca.sheridancollege.jamsy.ui.screens.PlaylistPreviewScreen
@@ -51,6 +53,7 @@ fun NavGraph(navController: NavHostController) {
     val discoveryViewModel: DiscoveryViewModel = viewModel(factory = factory, viewModelStoreOwner = LocalViewModelStoreOwner.current!!)
     val likedTracksViewModel: LikedTracksViewModel = viewModel(factory = factory, viewModelStoreOwner = LocalViewModelStoreOwner.current!!)
     val searchViewModel: SearchViewModel = viewModel(factory = factory, viewModelStoreOwner = LocalViewModelStoreOwner.current!!)
+    val generatedPlaylistViewModel: GeneratedPlaylistViewModel = viewModel(factory = factory, viewModelStoreOwner = LocalViewModelStoreOwner.current!!)
 
     val authState by authViewModel.authState.collectAsState()
 
@@ -124,6 +127,7 @@ fun NavGraph(navController: NavHostController) {
                 onNavigateToTrackList = { navController.navigate(Screen.TrackList.route) },
                 onNavigateToSearch = { navController.navigate(Screen.Search.route) },
                 onNavigateToChooseWorkout = { navController.navigate(Screen.ChooseYourWorkout.route) },
+                onNavigateToDiscovery = { navController.navigate(Screen.Discovery.route) },
                 onLogout = handleLogout,
                 viewModel = homeViewModel
             )
@@ -131,8 +135,8 @@ fun NavGraph(navController: NavHostController) {
 
         composable(Screen.ChooseYourWorkout.route) {
             ChooseYourWorkoutScreen(
-                onWorkoutSelected = { workout ->
-                    navController.navigate("${Screen.PlaylistTemplates.route}/$workout")
+                onWorkoutSelected = { workout, mood ->
+                    navController.navigate("${Screen.ArtistSelection.route}/$workout/$mood")
                 },
                 onBack = { navController.popBackStack() }
             )
@@ -172,13 +176,14 @@ fun NavGraph(navController: NavHostController) {
                 mood = mood,
                 onNavigateToDiscovery = { navController.navigate(Screen.Discovery.route) },
                 onBack = { navController.popBackStack() },
-                viewModel = artistSelectionViewModel
+                viewModel = artistSelectionViewModel,
+                authViewModel = authViewModel
             )
         }
 
         composable(Screen.Discovery.route) {
             DiscoveryScreen(
-                onNavigateToLikedTracks = { navController.navigate(Screen.LikedTracks.route) },
+                onNavigateToGeneratedPlaylist = { navController.navigate(Screen.GeneratedPlaylist.route) },
                 onBack = { navController.popBackStack() },
                 viewModel = discoveryViewModel
             )
@@ -207,6 +212,17 @@ fun NavGraph(navController: NavHostController) {
                 onBack = { navController.popBackStack() },
                 viewModel = likedTracksViewModel,
                 authToken = authViewModel.getSpotifyAccessToken()
+            )
+        }
+
+        composable(Screen.GeneratedPlaylist.route) {
+            GeneratedPlaylistScreen(
+                onBack = { navController.popBackStack() },
+                onExportToSpotify = { 
+                    // TODO: Handle export to Spotify success
+                    navController.navigate(Screen.Home.route)
+                },
+                viewModel = generatedPlaylistViewModel
             )
         }
 

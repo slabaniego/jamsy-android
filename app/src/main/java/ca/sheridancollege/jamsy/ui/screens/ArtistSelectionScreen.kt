@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.sp
 import ca.sheridancollege.jamsy.model.Artist
 import ca.sheridancollege.jamsy.util.Resource
 import ca.sheridancollege.jamsy.viewmodel.ArtistSelectionViewModel
+import ca.sheridancollege.jamsy.viewmodel.AuthViewModel
 import coil.compose.AsyncImage
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -36,7 +37,8 @@ fun ArtistSelectionScreen(
     mood: String,
     onNavigateToDiscovery: () -> Unit,
     onBack: () -> Unit,
-    viewModel: ArtistSelectionViewModel
+    viewModel: ArtistSelectionViewModel,
+    authViewModel: AuthViewModel
 ) {
     val artistsState by viewModel.artistsState.collectAsState()
     val selectedArtists by viewModel.selectedArtists.collectAsState()
@@ -45,7 +47,14 @@ fun ArtistSelectionScreen(
 
     // Load artists when screen is shown
     LaunchedEffect(workout, mood) {
-        val authToken = "dummy_token" // Replace with actual token
+        val currentUser = authViewModel.currentUser
+        println("ArtistSelectionScreen: currentUser = ${currentUser?.uid}")
+        println("ArtistSelectionScreen: currentUser is null = ${currentUser == null}")
+        
+        val authToken = authViewModel.getSpotifyAccessToken() ?: "dummy_token"
+        println("ArtistSelectionScreen: authToken = ${if (authToken == "dummy_token") "dummy_token (no real token)" else "real token: ${authToken.take(10)}..."}")
+        println("ArtistSelectionScreen: authToken length = ${authToken.length}")
+        println("ArtistSelectionScreen: authToken isBlank = ${authToken.isBlank()}")
         viewModel.loadArtists(workout, mood, authToken)
     }
 
@@ -82,14 +91,14 @@ fun ArtistSelectionScreen(
                     modifier = Modifier.padding(16.dp)
                 ) {
                     Text(
-                        text = "${selectedArtists.size} artists selected",
+                        text = "${selectedArtists.size}/5 artists selected",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        color = if (selectedArtists.size == 5) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.padding(bottom = 8.dp)
                     )
                     Button(
                         onClick = {
-                            val authToken = "dummy_token" // Replace with actual token
+                            val authToken = authViewModel.getSpotifyAccessToken() ?: "dummy_token"
                             viewModel.submitSelection(
                                 workout = workout,
                                 mood = mood,
@@ -103,9 +112,9 @@ fun ArtistSelectionScreen(
                             )
                         },
                         modifier = Modifier.fillMaxWidth(),
-                        enabled = selectedArtists.isNotEmpty()
+                        enabled = selectedArtists.size == 5
                     ) {
-                        Text("Continue to Discovery")
+                        Text("Start Discovering New Music")
                     }
                 }
             }
@@ -166,7 +175,7 @@ fun ArtistSelectionScreen(
                         Spacer(modifier = Modifier.height(16.dp))
                         Button(
                             onClick = {
-                                val authToken = "dummy_token" // Replace with actual token
+                                val authToken = authViewModel.getSpotifyAccessToken() ?: "dummy_token"
                                 viewModel.loadArtists(workout, mood, authToken)
                             }
                         ) {

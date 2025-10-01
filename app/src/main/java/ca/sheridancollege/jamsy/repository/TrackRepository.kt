@@ -34,7 +34,7 @@ class TrackRepository(private val jamsyRepository: JamsyRepository) {
                     songName = track.name,
                     artist = track.artists.firstOrNull() ?: "",
                     action = "like",
-                    genres = track.genres
+                    genres = track.genres ?: emptyList()
                 )
                 val result = jamsyRepository.handleTrackAction(songAction, authToken)
                 if (result.isSuccess) {
@@ -56,7 +56,7 @@ class TrackRepository(private val jamsyRepository: JamsyRepository) {
                     songName = track.name,
                     artist = track.artists.firstOrNull() ?: "",
                     action = "dislike",
-                    genres = track.genres
+                    genres = track.genres ?: emptyList()
                 )
                 val result = jamsyRepository.handleTrackAction(songAction, authToken)
                 if (result.isSuccess) {

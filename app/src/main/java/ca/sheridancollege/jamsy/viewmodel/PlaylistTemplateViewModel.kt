@@ -24,13 +24,17 @@ class PlaylistTemplateViewModel(
             _templatesState.value = Resource.Loading
             
             try {
+                println("PlaylistTemplateViewModel: Loading templates with authToken: ${if (authToken.isBlank()) "EMPTY" else "PRESENT"}")
                 val result = playlistTemplateService.getDefaultTemplates(authToken)
                 result.onSuccess { templates ->
+                    println("PlaylistTemplateViewModel: Successfully loaded ${templates.size} templates")
                     _templatesState.value = Resource.Success(templates)
                 }.onFailure { exception ->
+                    println("PlaylistTemplateViewModel: Error loading templates: ${exception.message}")
                     _templatesState.value = Resource.Error(exception.message ?: "Failed to load templates")
                 }
             } catch (e: Exception) {
+                println("PlaylistTemplateViewModel: Exception loading templates: ${e.message}")
                 _templatesState.value = Resource.Error(e.message ?: "Failed to load templates")
             }
         }

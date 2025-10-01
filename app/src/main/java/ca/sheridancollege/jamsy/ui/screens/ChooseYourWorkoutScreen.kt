@@ -23,14 +23,14 @@ import androidx.compose.ui.unit.sp
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChooseYourWorkoutScreen(
-    onWorkoutSelected: (String) -> Unit,
+    onWorkoutSelected: (String, String) -> Unit,
     onBack: () -> Unit
 ) {
     val workoutOptions = listOf(
-        WorkoutOption("Cardio", "💓", "High-energy cardio workouts"),
-        WorkoutOption("Strength Training", "💪", "Build muscle and strength"),
-        WorkoutOption("HIIT", "⚡", "High-intensity interval training"),
-        WorkoutOption("Yoga", "🧘", "Mindful movement and flexibility")
+        WorkoutOption("Cardio", "💓", "High-energy cardio workouts", "Energetic"),
+        WorkoutOption("Strength Training", "💪", "Build muscle and strength", "Powerful"),
+        WorkoutOption("HIIT", "⚡", "High-intensity interval training", "Intense"),
+        WorkoutOption("Yoga", "🧘", "Mindful movement and flexibility", "Calm")
     )
 
     Scaffold(
@@ -98,7 +98,7 @@ fun ChooseYourWorkoutScreen(
                     items(workoutOptions) { workout ->
                         WorkoutCard(
                             workout = workout,
-                            onClick = { onWorkoutSelected(workout.name) }
+                            onClick = { onWorkoutSelected(workout.name, workout.mood) }
                         )
                     }
                 }
@@ -161,5 +161,6 @@ private fun WorkoutCard(
 data class WorkoutOption(
     val name: String,
     val emoji: String,
-    val description: String
+    val description: String,
+    val mood: String
 )

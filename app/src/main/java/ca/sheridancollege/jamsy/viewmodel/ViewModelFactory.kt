@@ -57,6 +57,9 @@ class ViewModelFactory(private val context: Context) : ViewModelProvider.Factory
             modelClass.isAssignableFrom(SearchViewModel::class.java) -> {
                 SearchViewModel(jamsyRepository) as T
             }
+            modelClass.isAssignableFrom(GeneratedPlaylistViewModel::class.java) -> {
+                GeneratedPlaylistViewModel(jamsyRepository) as T
+            }
             else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
         }
     }

@@ -13,5 +13,6 @@ sealed class Screen(val route: String) {
     object LikedTracks : Screen("liked_tracks")
     object PlaylistPreview : Screen("playlist_preview")
     object PlaylistCreation : Screen("playlist_creation")
+    object GeneratedPlaylist : Screen("generated_playlist")
     object Search : Screen("search")
 }
