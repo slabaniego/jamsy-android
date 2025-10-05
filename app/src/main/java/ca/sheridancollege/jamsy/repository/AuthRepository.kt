@@ -1,4 +1,5 @@
 package ca.sheridancollege.jamsy.repository
+
 import android.content.Context
 import android.content.SharedPreferences
 import com.google.firebase.auth.FirebaseAuth
@@ -8,109 +9,168 @@ import ca.sheridancollege.jamsy.util.Resource
 import ca.sheridancollege.jamsy.network.SpotifyAuthResponse
 import java.io.IOException
 import android.util.Log
-import ca.sheridancollege.jamsy.repository.JamsyRepository
+import androidx.core.content.edit
+import com.google.firebase.auth.AuthResult
 
-class AuthRepository(private val context: Context) {
+
+class AuthRepository(context: Context) {
+
+    // Constants
+    companion object {
+        private const val TAG = "AuthRepository"
+        private const val PREFS_NAME = "auth_prefs"
+        private const val SPOTIFY_TOKEN_KEY = "spotify_access_token"
+        private const val SPOTIFY_CALLBACK_URL = "jamsy://callback"
+        private const val TOKEN_PREVIEW_LENGTH = 10
+    }
+
+    // Dependencies
     private val firebaseAuth = FirebaseAuth.getInstance()
     private val jamsyRepository = JamsyRepository()
-    private val TAG = "AuthRepository"
-    private val prefs: SharedPreferences = context.getSharedPreferences("auth_prefs", Context.MODE_PRIVATE)
+    private val prefs: SharedPreferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+
+    // State
     private var spotifyAccessToken: String? = null
-    
+
     init {
-        // Load saved token on initialization
-        spotifyAccessToken = prefs.getString("spotify_access_token", null)
-        Log.d(TAG, "Loaded saved token: ${spotifyAccessToken?.take(10)}...")
+        loadSavedSpotifyToken()
     }
 
     val currentUser: FirebaseUser?
         get() = firebaseAuth.currentUser
 
+    // Public Authentication Methods
+
+    /**
+     * Authenticates a user with email and password.
+     *
+     * @param email The user's email address
+     * @param password The user's password
+     * @return Resource containing the authenticated FirebaseUser or error message
+     */
     suspend fun login(email: String, password: String): Resource<FirebaseUser> {
-        return try {
-            val result = firebaseAuth.signInWithEmailAndPassword(email, password).await()
-            Resource.Success(result.user!!)
-        } catch (e: Exception) {
-            Resource.Error(e.message ?: "An unknown error occurred")
+        return executeAuthOperation {
+            firebaseAuth.signInWithEmailAndPassword(email, password).await()
         }
     }
 
+    /**
+     * Authenticates a user using Spotify OAuth code.
+     *
+     * @param code The authorization code received from Spotify
+     * @return Resource containing the authenticated FirebaseUser or error message
+     */
     suspend fun loginWithSpotify(code: String): Resource<FirebaseUser> {
         return try {
-            val result = jamsyRepository.exchangeCodeForToken(code, "jamsy://callback")
-            
-            if (result.isFailure) {
-                return Resource.Error("Authentication failed: ${result.exceptionOrNull()?.message}")
+            val tokenResponse = exchangeCodeForSpotifyToken(code)
+            if (tokenResponse.isFailure) {
+                return Resource.Error("Authentication failed: ${tokenResponse.exceptionOrNull()?.message}")
             }
 
-            val response = result.getOrThrow()
-            Log.d(TAG, "Received response: accessToken='${response.accessToken}', tokenType='${response.tokenType}', firebaseToken='${response.firebaseCustomToken.take(10)}...'")
-            
-            if (response.firebaseCustomToken.isNullOrEmpty()) {
-                return Resource.Error("Authentication failed: Server did not provide a valid Firebase token")
-            }
-
-            if (response.accessToken.isNullOrEmpty()) {
-                return Resource.Error("Authentication failed: Server did not provide a valid Spotify access token")
-            }
-
-            spotifyAccessToken = response.accessToken
-            // Save token to SharedPreferences for persistence
-            prefs.edit().putString("spotify_access_token", response.accessToken).apply()
-            Log.d(TAG, "Saved Spotify access token: ${spotifyAccessToken?.take(10)}... (length: ${spotifyAccessToken?.length})")
-
-            val authResult = firebaseAuth.signInWithCustomToken(response.firebaseCustomToken).await()
-            Resource.Success(authResult.user!!)
+            val response = tokenResponse.getOrThrow()
+            validateSpotifyResponse(response)
+            saveSpotifyToken(response.accessToken)
+            signInWithFirebaseToken(response.firebaseCustomToken)
 
         } catch (e: IOException) {
-            val errorMsg = e.message ?: "Unknown server error"
-            Resource.Error("Server error: $errorMsg")
+            Resource.Error("Server error: ${e.message ?: "Unknown server error"}")
         } catch (e: Exception) {
-            val errorMsg = e.message ?: "Unknown authentication error"
-            Resource.Error("Authentication failed: $errorMsg")
+            Resource.Error("Authentication failed: ${e.message ?: "Unknown authentication error"}")
         }
     }
 
+    /**
+     * Creates a new user account with email and password.
+     *
+     * @param email The user's email address
+     * @param password The user's password
+     * @return Resource containing the created FirebaseUser or error message
+     */
     suspend fun signup(email: String, password: String): Resource<FirebaseUser> {
-        return try {
-            val result = firebaseAuth.createUserWithEmailAndPassword(email, password).await()
-            Resource.Success(result.user!!)
-        } catch (e: Exception) {
-            Resource.Error(e.message ?: "An unknown error occurred")
+        return executeAuthOperation {
+            firebaseAuth.createUserWithEmailAndPassword(email, password).await()
         }
     }
 
+    /**
+     * Signs out the current user and clears stored tokens.
+     */
     fun logout() {
         firebaseAuth.signOut()
+        clearSpotifyToken()
+    }
+
+
+    /**
+     * Retrieves the current Spotify access token.
+     *
+     * @return The Spotify access token if available, null otherwise
+     */
+    fun getSpotifyAccessToken(): String? {
+        if (spotifyAccessToken == null) {
+            loadSavedSpotifyToken()
+        }
+        logTokenStatus()
+        return spotifyAccessToken
+    }
+
+    // Private Helper Methods
+
+    private fun loadSavedSpotifyToken() {
+        spotifyAccessToken = prefs.getString(SPOTIFY_TOKEN_KEY, null)
+        Log.d(TAG, "Loaded saved token: ${spotifyAccessToken?.take(TOKEN_PREVIEW_LENGTH)}...")
+    }
+
+    private suspend fun exchangeCodeForSpotifyToken(code: String): Result<SpotifyAuthResponse> {
+        return jamsyRepository.exchangeCodeForToken(code, SPOTIFY_CALLBACK_URL)
+    }
+
+    private fun validateSpotifyResponse(response: SpotifyAuthResponse) {
+        Log.d(TAG, """
+            Received response: accessToken='${response.accessToken}', 
+            tokenType='${response.tokenType}', 
+            firebaseToken='${response.firebaseCustomToken.take(TOKEN_PREVIEW_LENGTH)}...'
+        """.trimIndent())
+
+        require(response.firebaseCustomToken.isNotEmpty()) {
+            "Authentication failed: Server did not provide a valid Firebase token"
+        }
+
+        require(response.accessToken.isNotEmpty()) {
+            "Authentication failed: Server did not provide a valid Spotify access token"
+        }
+    }
+
+    private fun saveSpotifyToken(token: String) {
+        spotifyAccessToken = token
+        prefs.edit { putString(SPOTIFY_TOKEN_KEY, token) }
+        Log.d(TAG, "Saved Spotify access token: ${token.take(TOKEN_PREVIEW_LENGTH)}... (length: ${token.length})")
+    }
+
+    private suspend fun signInWithFirebaseToken(firebaseToken: String): Resource<FirebaseUser> {
+        val authResult = firebaseAuth.signInWithCustomToken(firebaseToken).await()
+        return Resource.Success(authResult.user!!)
+    }
+
+    private fun clearSpotifyToken() {
         spotifyAccessToken = null
-        // Clear saved token from SharedPreferences
-        prefs.edit().remove("spotify_access_token").apply()
+        prefs.edit { remove(SPOTIFY_TOKEN_KEY) }
         Log.d(TAG, "Cleared Spotify access token")
     }
 
-    suspend fun verifyAuth(): Resource<Boolean> {
-        return try {
-            val user = FirebaseAuth.getInstance().currentUser
-            if (user != null) {
-                // Force token refresh to verify auth
-                user.getIdToken(true).await()
-                Resource.Success(true)
-            } else {
-                Resource.Error("No user is signed in")
-            }
-        } catch (e: Exception) {
-            Resource.Error("Auth verification failed: ${e.message}")
-        }
+    private fun logTokenStatus() {
+        Log.d(TAG, "getSpotifyAccessToken() called, spotifyAccessToken = ${spotifyAccessToken?.take(TOKEN_PREVIEW_LENGTH)}...")
+        Log.d(TAG, "spotifyAccessToken is null: ${spotifyAccessToken == null}")
     }
-    // Getter for the Spotify access token
-    fun getSpotifyAccessToken(): String? {
-        // If token is not in memory, try to load from SharedPreferences
-        if (spotifyAccessToken == null) {
-            spotifyAccessToken = prefs.getString("spotify_access_token", null)
-            Log.d(TAG, "Loaded token from SharedPreferences: ${spotifyAccessToken?.take(10)}...")
+
+    private suspend fun executeAuthOperation(
+        operation: suspend () -> AuthResult
+    ): Resource<FirebaseUser> {
+        return try {
+            val result = operation()
+            Resource.Success(result.user!!)
+        } catch (e: Exception) {
+            Resource.Error(e.message ?: "An unknown error occurred")
         }
-        println("AuthRepository: getSpotifyAccessToken() called, spotifyAccessToken = ${spotifyAccessToken?.take(10)}...")
-        println("AuthRepository: spotifyAccessToken is null: ${spotifyAccessToken == null}")
-        return spotifyAccessToken
     }
 }

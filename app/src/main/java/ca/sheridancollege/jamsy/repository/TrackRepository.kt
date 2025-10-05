@@ -1,16 +1,22 @@
 package ca.sheridancollege.jamsy.repository
+
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+
 import ca.sheridancollege.jamsy.model.Track
 import ca.sheridancollege.jamsy.model.TrackActionRequest
 import ca.sheridancollege.jamsy.model.SongAction
 import ca.sheridancollege.jamsy.util.Resource
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 class TrackRepository(private val jamsyRepository: JamsyRepository) {
-    
     // Note: This class requires authentication token for track actions
     // The authToken should be passed from the ViewModel layer
 
+    /**
+     * Retrieves a list of tracks from the Jamsy API.
+     *
+     * @return Resource containing a list of Track objects or error message
+     */
     suspend fun getTracks(): Resource<List<Track>> {
         return withContext(Dispatchers.IO) {
             try {
@@ -26,6 +32,13 @@ class TrackRepository(private val jamsyRepository: JamsyRepository) {
         }
     }
 
+    /**
+     * Likes a track by sending a track action to the API.
+     *
+     * @param track The track to like
+     * @param authToken The authentication token for the API request
+     * @return Resource indicating success or failure of the like operation
+     */
     suspend fun likeTrack(track: Track, authToken: String): Resource<Boolean> {
         return withContext(Dispatchers.IO) {
             try {
@@ -48,6 +61,13 @@ class TrackRepository(private val jamsyRepository: JamsyRepository) {
         }
     }
 
+    /**
+     * Unlikes a track by sending a track action to the API.
+     *
+     * @param track The track to unlike
+     * @param authToken The authentication token for the API request
+     * @return Resource indicating success or failure of the unlike operation
+     */
     suspend fun unlikeTrack(track: Track, authToken: String): Resource<Boolean> {
         return withContext(Dispatchers.IO) {
             try {

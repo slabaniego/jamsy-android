@@ -27,8 +27,8 @@ class ArtistSelectionViewModel(
     val discoveryTracks: StateFlow<List<Track>> = _discoveryTracks.asStateFlow()
     
     // Store workout and mood for discovery
-    private val _workout = MutableStateFlow<String>("")
-    private val _mood = MutableStateFlow<String>("")
+    private val _workout = MutableStateFlow("")
+    private val _mood = MutableStateFlow("")
 
     fun loadArtists(workout: String, mood: String, authToken: String) {
         viewModelScope.launch {

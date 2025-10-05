@@ -16,11 +16,19 @@ import ca.sheridancollege.jamsy.util.Resource
 import java.io.ByteArrayOutputStream
 
 class UserRepository {
+    companion object {
+        private const val TAG = "UserRepository"
+    }
+
     private val firestore = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
 
-    private val TAG = "UserRepository"
-
+    /**
+     * Retrieves the current user's profile from Firestore.
+     * Creates a new user document if one doesn't exist.
+     *
+     * @return Resource containing the User object or error message
+     */
     suspend fun getUserProfile(): Resource<User> {
         return try {
             val currentUser = auth.currentUser ?: return Resource.Error("User not logged in")
@@ -39,6 +47,13 @@ class UserRepository {
         }
     }
 
+    /**
+     * Uploads and processes a profile image, converting it to Base64 format.
+     *
+     * @param context The Android context
+     * @param imageUri The URI of the image to upload
+     * @return Resource containing the Base64 encoded image string or error message
+     */
     suspend fun uploadProfileImage(context: Context, imageUri: Uri): Resource<String> {
         return try {
             Log.d(TAG, "Starting profile image encoding")
