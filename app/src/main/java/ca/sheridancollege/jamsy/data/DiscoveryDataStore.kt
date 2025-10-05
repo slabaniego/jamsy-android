@@ -1,9 +1,10 @@
 package ca.sheridancollege.jamsy.data
 
-import ca.sheridancollege.jamsy.model.Track
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+
+import ca.sheridancollege.jamsy.domain.models.Track
 
 /**
  * Simple data store for sharing discovery tracks between ViewModels

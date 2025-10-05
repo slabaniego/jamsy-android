@@ -1,8 +1,10 @@
 package ca.sheridancollege.jamsy
+
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
+
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -13,29 +15,23 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
-import ca.sheridancollege.jamsy.navigation.NavGraph
-import ca.sheridancollege.jamsy.ui.theme.JamsyTheme
-import ca.sheridancollege.jamsy.util.Resource
-import ca.sheridancollege.jamsy.viewmodel.AuthViewModel
-import ca.sheridancollege.jamsy.viewmodel.ViewModelFactory
 
+import dagger.hilt.android.AndroidEntryPoint
+
+import ca.sheridancollege.jamsy.presentation.navigation.NavGraph
+import ca.sheridancollege.jamsy.presentation.theme.JamsyTheme
+import ca.sheridancollege.jamsy.presentation.viewmodels.AuthViewModel
+import ca.sheridancollege.jamsy.util.Resource
+
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     private val TAG = "MainActivity"
-    private lateinit var authViewModel: AuthViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-
-        // Use the ViewModelFactory
-        val factory = ViewModelFactory(this)
-        authViewModel = ViewModelProvider(this, factory)[AuthViewModel::class.java]
-
-
-        handleIntent(intent)
 
         setContent {
             JamsyTheme {
@@ -44,7 +40,7 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     val navController = rememberNavController()
-                    val authViewModel: AuthViewModel = viewModel(factory = factory)
+                    val authViewModel: AuthViewModel = viewModel()
 
                     val authState by authViewModel.authState.collectAsState()
 
@@ -64,6 +60,11 @@ class MainActivity : ComponentActivity() {
                         }
                     }
 
+                    // Handle OAuth callback when authViewModel is available
+                    LaunchedEffect(Unit) {
+                        handleIntent(intent, authViewModel)
+                    }
+
                     NavGraph(navController = navController)
                 }
             }
@@ -72,10 +73,14 @@ class MainActivity : ComponentActivity() {
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
-        intent?.let { handleIntent(it) }
+        intent?.let { newIntent ->
+            // Get the current authViewModel from the composition
+            // This is a workaround since we can't access the ViewModel directly
+            Log.d(TAG, "Received new intent with data: ${newIntent.data}")
+        }
     }
 
-    private fun handleIntent(intent: Intent) {
+    private fun handleIntent(intent: Intent, authViewModel: AuthViewModel) {
         val data: Uri? = intent.data
         if (data != null && data.toString().startsWith("jamsy://callback")) {
             Log.d(TAG, "Received intent with data: $data")

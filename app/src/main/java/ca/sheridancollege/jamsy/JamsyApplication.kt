@@ -1,12 +1,15 @@
 package ca.sheridancollege.jamsy
+
 import android.app.Application
 import android.util.Log
 import coil.ImageLoader
 import coil.ImageLoaderFactory
 import coil.request.CachePolicy
 import com.google.firebase.FirebaseApp
+import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.CoroutineExceptionHandler
 
+@HiltAndroidApp
 class JamsyApplication : Application(), ImageLoaderFactory {
     companion object {
         private const val TAG = "JamsyApp"
