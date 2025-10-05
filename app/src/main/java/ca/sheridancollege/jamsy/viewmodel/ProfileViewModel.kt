@@ -4,15 +4,19 @@ import android.content.Context
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import ca.sheridancollege.jamsy.model.User
 import ca.sheridancollege.jamsy.repository.UserRepository
 import ca.sheridancollege.jamsy.util.Resource
+import javax.inject.Inject
 
-class ProfileViewModel : ViewModel() {
-    private val repository = UserRepository()
+@HiltViewModel
+class ProfileViewModel @Inject constructor(
+    private val repository: UserRepository
+) : ViewModel() {
 
     private val _profileState = MutableStateFlow<Resource<User>>(Resource.Loading)
     val profileState: StateFlow<Resource<User>> = _profileState

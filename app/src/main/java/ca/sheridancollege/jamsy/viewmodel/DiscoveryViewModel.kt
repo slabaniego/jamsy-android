@@ -7,12 +7,15 @@ import ca.sheridancollege.jamsy.model.Track
 import ca.sheridancollege.jamsy.repository.JamsyRepository
 import ca.sheridancollege.jamsy.util.Resource
 import ca.sheridancollege.jamsy.data.DiscoveryDataStore
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class DiscoveryViewModel(
+@HiltViewModel
+class DiscoveryViewModel @Inject constructor(
     private val jamsyRepository: JamsyRepository
 ) : ViewModel() {
 

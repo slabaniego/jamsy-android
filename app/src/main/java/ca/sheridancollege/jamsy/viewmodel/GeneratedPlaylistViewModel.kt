@@ -5,12 +5,15 @@ import androidx.lifecycle.viewModelScope
 import ca.sheridancollege.jamsy.model.Track
 import ca.sheridancollege.jamsy.repository.JamsyRepository
 import ca.sheridancollege.jamsy.util.Resource
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class GeneratedPlaylistViewModel(
+@HiltViewModel
+class GeneratedPlaylistViewModel @Inject constructor(
     private val jamsyRepository: JamsyRepository
 ) : ViewModel() {
 

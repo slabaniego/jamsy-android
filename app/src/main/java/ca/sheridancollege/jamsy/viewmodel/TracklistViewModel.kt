@@ -5,11 +5,16 @@ import androidx.lifecycle.viewModelScope
 import ca.sheridancollege.jamsy.model.Track
 import ca.sheridancollege.jamsy.repository.TrackRepository
 import ca.sheridancollege.jamsy.util.Resource
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class TrackListViewModel(private val repository: TrackRepository) : ViewModel() {
+@HiltViewModel
+class TrackListViewModel @Inject constructor(
+    private val repository: TrackRepository
+) : ViewModel() {
 
     private val _tracksState = MutableStateFlow<Resource<List<Track>>>(Resource.Loading)
     val tracksState: StateFlow<Resource<List<Track>>> = _tracksState

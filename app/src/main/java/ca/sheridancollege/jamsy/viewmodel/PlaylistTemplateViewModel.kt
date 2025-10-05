@@ -6,12 +6,15 @@ import ca.sheridancollege.jamsy.model.PlaylistTemplate
 import ca.sheridancollege.jamsy.repository.JamsyRepository
 import ca.sheridancollege.jamsy.services.PlaylistTemplateService
 import ca.sheridancollege.jamsy.util.Resource
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class PlaylistTemplateViewModel(
+@HiltViewModel
+class PlaylistTemplateViewModel @Inject constructor(
     private val jamsyRepository: JamsyRepository,
     private val playlistTemplateService: PlaylistTemplateService
 ) : ViewModel() {

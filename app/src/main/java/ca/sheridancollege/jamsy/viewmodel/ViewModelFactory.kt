@@ -30,12 +30,12 @@ class ViewModelFactory(private val context: Context) : ViewModelProvider.Factory
                 HomeViewModel(trackRepository, jamsyRepository, authManager) as T
             }
             modelClass.isAssignableFrom(ProfileViewModel::class.java) -> {
-                ProfileViewModel() as T
+                ProfileViewModel(userRepository) as T
             }
             modelClass.isAssignableFrom(AuthViewModel::class.java) -> {
                 AuthViewModel(
                     authRepository,
-                    NetworkModule.jamsyRepository,
+                    jamsyRepository,
                     context
                 ) as T
             }

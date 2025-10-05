@@ -6,11 +6,14 @@ import ca.sheridancollege.jamsy.model.Track
 import ca.sheridancollege.jamsy.repository.JamsyRepository
 import ca.sheridancollege.jamsy.repository.TrackRepository
 import ca.sheridancollege.jamsy.util.Resource
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class HomeViewModel(
+@HiltViewModel
+class HomeViewModel @Inject constructor(
     private val trackRepository: TrackRepository,
     jamsyRepository: JamsyRepository,
     authManager: AuthManager

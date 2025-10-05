@@ -29,8 +29,6 @@ import ca.sheridancollege.jamsy.viewmodel.HomeViewModel
 import ca.sheridancollege.jamsy.viewmodel.ProfileViewModel
 import ca.sheridancollege.jamsy.viewmodel.TrackListViewModel
 import ca.sheridancollege.jamsy.viewmodel.GeneratedPlaylistViewModel
-import ca.sheridancollege.jamsy.viewmodel.ViewModelFactory
-import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import ca.sheridancollege.jamsy.ui.screens.PlaylistPreviewScreen
 import ca.sheridancollege.jamsy.viewmodel.PlaylistTemplateViewModel
 import ca.sheridancollege.jamsy.viewmodel.ArtistSelectionViewModel
@@ -41,19 +39,16 @@ import ca.sheridancollege.jamsy.viewmodel.SearchViewModel
 
 @Composable
 fun NavGraph(navController: NavHostController) {
-    val context = LocalContext.current
-    val factory = ViewModelFactory(context)
-
-    val authViewModel: AuthViewModel = viewModel(factory = factory, viewModelStoreOwner = LocalViewModelStoreOwner.current!!)
-    val profileViewModel: ProfileViewModel = viewModel(factory = factory, viewModelStoreOwner = LocalViewModelStoreOwner.current!!)
-    val homeViewModel: HomeViewModel = viewModel(factory = factory, viewModelStoreOwner = LocalViewModelStoreOwner.current!!)
-    val trackListViewModel: TrackListViewModel = viewModel(factory = factory, viewModelStoreOwner = LocalViewModelStoreOwner.current!!)
-    val playlistTemplateViewModel: PlaylistTemplateViewModel = viewModel(factory = factory, viewModelStoreOwner = LocalViewModelStoreOwner.current!!)
-    val artistSelectionViewModel: ArtistSelectionViewModel = viewModel(factory = factory, viewModelStoreOwner = LocalViewModelStoreOwner.current!!)
-    val discoveryViewModel: DiscoveryViewModel = viewModel(factory = factory, viewModelStoreOwner = LocalViewModelStoreOwner.current!!)
-    val likedTracksViewModel: LikedTracksViewModel = viewModel(factory = factory, viewModelStoreOwner = LocalViewModelStoreOwner.current!!)
-    val searchViewModel: SearchViewModel = viewModel(factory = factory, viewModelStoreOwner = LocalViewModelStoreOwner.current!!)
-    val generatedPlaylistViewModel: GeneratedPlaylistViewModel = viewModel(factory = factory, viewModelStoreOwner = LocalViewModelStoreOwner.current!!)
+    val authViewModel: AuthViewModel = viewModel()
+    val profileViewModel: ProfileViewModel = viewModel()
+    val homeViewModel: HomeViewModel = viewModel()
+    val trackListViewModel: TrackListViewModel = viewModel()
+    val playlistTemplateViewModel: PlaylistTemplateViewModel = viewModel()
+    val artistSelectionViewModel: ArtistSelectionViewModel = viewModel()
+    val discoveryViewModel: DiscoveryViewModel = viewModel()
+    val likedTracksViewModel: LikedTracksViewModel = viewModel()
+    val searchViewModel: SearchViewModel = viewModel()
+    val generatedPlaylistViewModel: GeneratedPlaylistViewModel = viewModel()
 
     val authState by authViewModel.authState.collectAsState()
 

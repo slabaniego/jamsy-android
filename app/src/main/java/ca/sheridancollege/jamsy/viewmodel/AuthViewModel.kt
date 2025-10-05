@@ -1,10 +1,13 @@
 package ca.sheridancollege.jamsy.viewmodel
+
 import android.content.Context
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -12,11 +15,13 @@ import ca.sheridancollege.jamsy.repository.AuthRepository
 import ca.sheridancollege.jamsy.repository.JamsyRepository
 import ca.sheridancollege.jamsy.util.Resource
 import ca.sheridancollege.jamsy.auth.SpotifyOAuthHelper
+import javax.inject.Inject
 
-class AuthViewModel(
+@HiltViewModel
+class AuthViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val jamsyRepository: JamsyRepository,
-    private val context: Context
+    @ApplicationContext private val context: Context
 ) : ViewModel() {
 
     private val _loginState = MutableStateFlow<Resource<FirebaseUser>?>(null)
