@@ -1,4 +1,5 @@
 package ca.sheridancollege.jamsy.util
+
 import android.annotation.SuppressLint
 
 /**

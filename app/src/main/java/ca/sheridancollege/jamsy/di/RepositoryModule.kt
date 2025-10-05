@@ -1,19 +1,23 @@
 package ca.sheridancollege.jamsy.di
 
 import android.content.Context
-import ca.sheridancollege.jamsy.auth.AuthManager
-import ca.sheridancollege.jamsy.repository.AuthRepository
-import ca.sheridancollege.jamsy.repository.JamsyRepository
-import ca.sheridancollege.jamsy.repository.TrackRepository
-import ca.sheridancollege.jamsy.repository.UserRepository
-import ca.sheridancollege.jamsy.services.DiscoveryService
-import ca.sheridancollege.jamsy.services.PlaylistTemplateService
+
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+
 import javax.inject.Singleton
+
+import ca.sheridancollege.jamsy.data.AuthManager
+import ca.sheridancollege.jamsy.data.DiscoveryService
+import ca.sheridancollege.jamsy.data.PlaylistTemplateService
+import ca.sheridancollege.jamsy.data.repository.AuthRepository
+import ca.sheridancollege.jamsy.data.repository.JamsyRepository
+import ca.sheridancollege.jamsy.data.repository.TrackRepository as TrackRepositoryImpl
+import ca.sheridancollege.jamsy.data.repository.UserRepository
+import ca.sheridancollege.jamsy.domain.repository.TrackRepository
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -38,7 +42,7 @@ object RepositoryModule {
     fun provideTrackRepository(
         jamsyRepository: JamsyRepository
     ): TrackRepository {
-        return TrackRepository(jamsyRepository)
+        return TrackRepositoryImpl(jamsyRepository)
     }
 
     @Provides

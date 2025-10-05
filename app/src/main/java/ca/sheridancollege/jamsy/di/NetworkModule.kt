@@ -1,12 +1,14 @@
 package ca.sheridancollege.jamsy.di
 
-import ca.sheridancollege.jamsy.api.ApiClient
-import ca.sheridancollege.jamsy.network.JamsyApiService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+
 import javax.inject.Singleton
+
+import ca.sheridancollege.jamsy.data.datasource.remote.ApiClient
+import ca.sheridancollege.jamsy.data.datasource.remote.JamsyApiService
 
 @Module
 @InstallIn(SingletonComponent::class)

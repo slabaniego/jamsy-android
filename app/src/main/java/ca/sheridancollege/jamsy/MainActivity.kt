@@ -4,6 +4,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
+
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -16,11 +17,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
-import ca.sheridancollege.jamsy.navigation.NavGraph
-import ca.sheridancollege.jamsy.ui.theme.JamsyTheme
-import ca.sheridancollege.jamsy.util.Resource
-import ca.sheridancollege.jamsy.viewmodel.AuthViewModel
+
 import dagger.hilt.android.AndroidEntryPoint
+
+import ca.sheridancollege.jamsy.presentation.navigation.NavGraph
+import ca.sheridancollege.jamsy.presentation.theme.JamsyTheme
+import ca.sheridancollege.jamsy.presentation.viewmodels.AuthViewModel
+import ca.sheridancollege.jamsy.util.Resource
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
