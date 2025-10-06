@@ -27,8 +27,8 @@ class LikedTracksViewModel @Inject constructor(
     private val _playlistPreviewState = MutableStateFlow<Resource<List<Track>>>(Resource.Loading)
     val playlistPreviewState: StateFlow<Resource<List<Track>>> = _playlistPreviewState.asStateFlow()
     
-    private val _playlistCreationState = MutableStateFlow<Resource<Map<String, String>>>(Resource.Loading)
-    val playlistCreationState: StateFlow<Resource<Map<String, String>>> = _playlistCreationState.asStateFlow()
+    private val _playlistCreationState = MutableStateFlow<Resource<String>>(Resource.Loading)
+    val playlistCreationState: StateFlow<Resource<String>> = _playlistCreationState.asStateFlow()
 
     fun loadLikedTracks(authToken: String) {
         viewModelScope.launch {
@@ -50,7 +50,18 @@ class LikedTracksViewModel @Inject constructor(
         viewModelScope.launch {
             _playlistPreviewState.value = Resource.Loading
             try {
-                val result = repository.previewPlaylist(authToken)
+                // Get liked tracks from current state
+                val likedTracks = when (val state = _likedTracksState.value) {
+                    is Resource.Success -> state.data
+                    else -> emptyList()
+                }
+                
+                if (likedTracks.isEmpty()) {
+                    _playlistPreviewState.value = Resource.Error("No liked tracks available")
+                    return@launch
+                }
+                
+                val result = repository.getPreviewPlaylist(authToken, likedTracks)
                 _playlistPreviewState.value = if (result.isSuccess) {
                     Resource.Success(result.getOrNull() ?: emptyList())
                 } else {
@@ -62,13 +73,13 @@ class LikedTracksViewModel @Inject constructor(
         }
     }
     
-    fun createPlaylist(authToken: String) {
+    fun createPlaylist(authToken: String, tracks: List<Track>) {
         viewModelScope.launch {
             _playlistCreationState.value = Resource.Loading
             try {
-                val result = repository.createPlaylist(authToken)
+                val result = repository.createPlaylist(authToken, tracks)
                 _playlistCreationState.value = if (result.isSuccess) {
-                    Resource.Success(result.getOrNull() ?: emptyMap())
+                    Resource.Success(result.getOrNull() ?: "")
                 } else {
                     Resource.Error(result.exceptionOrNull()?.message ?: "Failed to create playlist")
                 }

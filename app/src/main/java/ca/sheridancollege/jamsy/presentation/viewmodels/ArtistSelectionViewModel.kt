@@ -60,6 +60,10 @@ class ArtistSelectionViewModel @Inject constructor(
         }
     }
 
+    fun setErrorState(message: String) {
+        _artistsState.value = Resource.Error(message)
+    }
+
     fun toggleArtistSelection(artist: Artist) {
         val currentSelection = _selectedArtists.value.toMutableList()
         if (currentSelection.contains(artist)) {
@@ -87,11 +91,11 @@ class ArtistSelectionViewModel @Inject constructor(
                 val artistNamesJson = _selectedArtists.value.map { it.name }.joinToString(",")
                 
                 val result = jamsyRepository.submitArtistSelection(
-                    selectedArtistIds = selectedArtistIds,
+                    _selectedArtistIds = selectedArtistIds,
                     artistNamesJson = artistNamesJson,
                     workout = workout,
-                    mood = mood,
-                    action = action,
+                    _mood = mood,
+                    _action = action,
                     authToken = authToken
                 )
                 

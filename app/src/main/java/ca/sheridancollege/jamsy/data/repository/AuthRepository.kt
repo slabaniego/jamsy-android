@@ -11,6 +11,9 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 import java.io.IOException
 
@@ -76,6 +79,11 @@ class AuthRepository(context: Context) : AuthRepositoryInterface {
             val response = tokenResponse.getOrThrow()
             validateSpotifyResponse(response)
             saveSpotifyToken(response.accessToken)
+            
+            // ✅ REMOVED: Pre-loading all workouts at once caused 429 rate limit errors
+            // Artists will now load on-demand when user selects a workout
+            println("AuthRepository: Login successful. Artists will load when workout is selected.")
+            
             signInWithFirebaseToken(response.firebaseCustomToken)
 
         } catch (e: IOException) {

@@ -52,11 +52,10 @@ class DiscoveryService(
     /**
      * Preview playlist before creating
      */
-    suspend fun previewPlaylist(authToken: String): Result<List<Track>> {
+    suspend fun previewPlaylist(authToken: String, likedTracks: List<Track>): Result<List<Track>> {
         return withContext(Dispatchers.IO) {
             try {
-                val response = jamsyRepository.previewPlaylist(authToken)
-                response
+                jamsyRepository.getPreviewPlaylist(authToken, likedTracks)
             } catch (e: Exception) {
                 Result.failure(e)
             }
@@ -66,10 +65,10 @@ class DiscoveryService(
     /**
      * Create playlist in Spotify
      */
-    suspend fun createPlaylist(authToken: String): Result<Map<String, String>> {
+    suspend fun createPlaylist(authToken: String, tracks: List<Track>): Result<String> {
         return withContext(Dispatchers.IO) {
             try {
-                jamsyRepository.createPlaylist(authToken)
+                jamsyRepository.createPlaylist(authToken, tracks)
             } catch (e: Exception) {
                 Result.failure(e)
             }

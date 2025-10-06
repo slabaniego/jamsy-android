@@ -23,6 +23,9 @@ object DiscoveryDataStore {
     private val _isNewSession = MutableStateFlow<Boolean>(false)
     val isNewSession: StateFlow<Boolean> = _isNewSession.asStateFlow()
     
+    private val _likedTracks = MutableStateFlow<List<Track>>(emptyList())
+    val likedTracks: StateFlow<List<Track>> = _likedTracks.asStateFlow()
+    
     fun setDiscoveryTracks(tracks: List<Track>) {
         println("DiscoveryDataStore: Setting ${tracks.size} tracks")
         println("DiscoveryDataStore: Track names: ${tracks.map { "${it.name} by ${it.artists.firstOrNull()}" }}")
@@ -43,12 +46,27 @@ object DiscoveryDataStore {
         return tracks
     }
     
+    fun setLikedTracks(tracks: List<Track>) {
+        println("DiscoveryDataStore: Setting ${tracks.size} liked tracks")
+        _likedTracks.value = tracks
+    }
+    
+    fun addLikedTrack(track: Track) {
+        val current = _likedTracks.value.toMutableList()
+        if (!current.any { it.name == track.name && it.artists.firstOrNull() == track.artists.firstOrNull() }) {
+            current.add(track)
+            _likedTracks.value = current
+            println("DiscoveryDataStore: Added liked track, total: ${current.size}")
+        }
+    }
+    
     fun clear() {
         println("DiscoveryDataStore: Clearing all data")
         _discoveryTracks.value = emptyList()
         _workout.value = ""
         _mood.value = ""
         _isNewSession.value = false
+        _likedTracks.value = emptyList()
     }
     
     fun markSessionAsStarted() {

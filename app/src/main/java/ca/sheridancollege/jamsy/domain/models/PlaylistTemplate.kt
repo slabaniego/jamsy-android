@@ -5,24 +5,24 @@ import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
 data class PlaylistTemplate(
-    @Json(name = "id")
-    val id: String,
-
     @Json(name = "name")
     val name: String,
 
     @Json(name = "description")
     val description: String,
 
-    @Json(name = "genres")
-    val genres: List<String>,
+    @Json(name = "seedGenres")
+    val seedGenres: List<String>,
 
-    @Json(name = "minTempo")
-    val minTempo: Int,
+    @Json(name = "targetEnergy")
+    val targetEnergy: Int,
 
-    @Json(name = "maxTempo")
-    val maxTempo: Int,
+    @Json(name = "targetTempo")
+    val targetTempo: Int,
 
-    @Json(name = "isExplicit")
-    val isExplicit: Boolean
+    @Json(name = "includeExplicit")
+    val includeExplicit: Boolean,
+
+    @Json(name = "mood")
+    val mood: String
 )

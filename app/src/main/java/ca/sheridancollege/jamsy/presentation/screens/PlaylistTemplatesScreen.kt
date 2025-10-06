@@ -208,7 +208,7 @@ private fun PlaylistTemplateCard(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    template.genres.take(3).forEach { genre ->
+                    template.seedGenres.take(3).forEach { genre ->
                         Surface(
                             shape = RoundedCornerShape(12.dp),
                             color = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
@@ -226,7 +226,7 @@ private fun PlaylistTemplateCard(
                 // Tempo info
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "Tempo: ${template.minTempo}-${template.maxTempo} BPM",
+                    text = "Tempo: ${template.targetTempo} BPM",
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
                 )

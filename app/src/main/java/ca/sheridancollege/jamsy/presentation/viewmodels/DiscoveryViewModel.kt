@@ -175,11 +175,11 @@ class DiscoveryViewModel @Inject constructor(
 
                 val artistNamesJson = artistNames.joinToString(",")
                 val result = jamsyRepository.submitArtistSelection(
-                    selectedArtistIds = selectedArtistIds,
+                    _selectedArtistIds = selectedArtistIds,
                     artistNamesJson = artistNamesJson,
                     workout = workout,
-                    mood = mood,
-                    action = "discover",
+                    _mood = mood,
+                    _action = "discover",
                     authToken = authToken
                 )
 
@@ -249,6 +249,8 @@ class DiscoveryViewModel @Inject constructor(
                         if (!isAlreadyLiked) {
                             currentLiked.add(track)
                             _likedTracks.value = currentLiked
+                            // Also store in DiscoveryDataStore so GeneratedPlaylistViewModel can access it
+                            DiscoveryDataStore.addLikedTrack(track)
                             println("DiscoveryViewModel: ✅ Added track to liked list!")
                             println("DiscoveryViewModel: Total liked tracks after adding: ${_likedTracks.value.size}")
                             println("DiscoveryViewModel: Liked tracks: ${_likedTracks.value.map { "${it.name} by ${it.artists.firstOrNull()}" }}")
