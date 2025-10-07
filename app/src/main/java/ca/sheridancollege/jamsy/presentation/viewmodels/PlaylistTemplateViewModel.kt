@@ -13,13 +13,11 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 import ca.sheridancollege.jamsy.data.PlaylistTemplateService
-import ca.sheridancollege.jamsy.data.repository.JamsyRepository
 import ca.sheridancollege.jamsy.domain.models.PlaylistTemplate
 import ca.sheridancollege.jamsy.util.Resource
 
 @HiltViewModel
 class PlaylistTemplateViewModel @Inject constructor(
-    private val jamsyRepository: JamsyRepository,
     private val playlistTemplateService: PlaylistTemplateService
 ) : ViewModel() {
 

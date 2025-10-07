@@ -1,30 +1,47 @@
 package ca.sheridancollege.jamsy.data.repository
 
+import ca.sheridancollege.jamsy.data.datasource.remote.ApiClient
+import ca.sheridancollege.jamsy.data.datasource.remote.DiscoveryRequest
+import ca.sheridancollege.jamsy.data.datasource.remote.JamsyApiService
+import ca.sheridancollege.jamsy.data.mappers.TrackMapper
+import ca.sheridancollege.jamsy.domain.models.SongAction
+import ca.sheridancollege.jamsy.domain.models.Track
+import ca.sheridancollege.jamsy.domain.models.TrackActionRequest
+import ca.sheridancollege.jamsy.domain.repository.TrackRepository as TrackRepositoryInterface
+import ca.sheridancollege.jamsy.util.Resource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-import ca.sheridancollege.jamsy.domain.models.SongAction
-import ca.sheridancollege.jamsy.domain.models.Track
-import ca.sheridancollege.jamsy.domain.repository.TrackRepository as TrackRepositoryInterface
-import ca.sheridancollege.jamsy.util.Resource
-
-class TrackRepository(private val jamsyRepository: JamsyRepository) : TrackRepositoryInterface {
-    // Note: This class requires authentication token for track actions
-    // The authToken should be passed from the ViewModel layer
+/**
+ * Repository for track-related operations.
+ * Handles track search, discovery, liked tracks, and track actions.
+ */
+class TrackRepository : TrackRepositoryInterface {
+    
+    private val apiService: JamsyApiService = ApiClient.jamsyApiService
 
     /**
-     * Retrieves a list of tracks from the Jamsy API.
+     * Retrieves a list of tracks from the Jamsy API without authentication.
      *
      * @return Resource containing a list of Track objects or error message
      */
     override suspend fun getTracks(): Resource<List<Track>> {
         return withContext(Dispatchers.IO) {
             try {
-                val result = jamsyRepository.getTracks()
-                if (result.isSuccess) {
-                    Resource.Success(result.getOrNull() ?: emptyList())
+                val requestBody = DiscoveryRequest(
+                    seedArtists = emptyList(),
+                    workout = "general"
+                )
+                val response = apiService.getDiscoveryTracks(requestBody, "")
+                
+                if (response.isSuccessful && response.body() != null) {
+                    val tracksDto = response.body()!!
+                    // Use type-safe mapper to convert DTOs to domain models
+                    val tracks = TrackMapper.toDomainModelList(tracksDto.tracks)
+                    Resource.Success(tracks)
                 } else {
-                    Resource.Error(result.exceptionOrNull()?.message ?: "Failed to load tracks")
+                    val errorBody = response.errorBody()?.string()
+                    Resource.Error("Failed to get discovery tracks: $errorBody")
                 }
             } catch (e: Exception) {
                 Resource.Error("Failed to load tracks: ${e.message}")
@@ -49,7 +66,7 @@ class TrackRepository(private val jamsyRepository: JamsyRepository) : TrackRepos
                     action = "like",
                     genres = track.genres ?: emptyList()
                 )
-                val result = jamsyRepository.handleTrackAction(songAction, authToken)
+                val result = handleTrackAction(songAction, authToken)
                 if (result.isSuccess) {
                     Resource.Success(Unit)
                 } else {
@@ -78,7 +95,7 @@ class TrackRepository(private val jamsyRepository: JamsyRepository) : TrackRepos
                     action = "dislike",
                     genres = track.genres ?: emptyList()
                 )
-                val result = jamsyRepository.handleTrackAction(songAction, authToken)
+                val result = handleTrackAction(songAction, authToken)
                 if (result.isSuccess) {
                     Resource.Success(Unit)
                 } else {
@@ -98,11 +115,130 @@ class TrackRepository(private val jamsyRepository: JamsyRepository) : TrackRepos
     override suspend fun getLikedTracks(authToken: String): Resource<List<Track>> {
         return withContext(Dispatchers.IO) {
             try {
-                // This would typically call an API to get liked tracks
-                // For now, return empty list as placeholder
-                Resource.Success(emptyList())
+                val authHeader = "Bearer $authToken"
+                val response = apiService.getLikedTracks(authHeader)
+                if (response.isSuccessful && response.body() != null) {
+                    val tracksDto = response.body()!!
+                    // Use type-safe mapper to convert DTOs to domain models
+                    val tracks = TrackMapper.toDomainModelList(tracksDto.tracks)
+                    Resource.Success(tracks)
+                } else {
+                    Resource.Error("Failed to get liked tracks: ${response.errorBody()?.string()}")
+                }
             } catch (e: Exception) {
                 Resource.Error("Failed to get liked tracks: ${e.message}")
+            }
+        }
+    }
+    
+    /**
+     * Search for tracks using various filters.
+     * 
+     * @param query The search query string
+     * @param authToken The authentication token
+     * @param excludeExplicit Whether to exclude explicit content
+     * @param excludeLoveSongs Whether to exclude love songs
+     * @param excludeFolk Whether to exclude folk music
+     * @return Result containing list of tracks or failure
+     */
+    suspend fun searchTracks(
+        query: String,
+        authToken: String,
+        excludeExplicit: Boolean = true,
+        excludeLoveSongs: Boolean = false,
+        excludeFolk: Boolean = false
+    ): Result<List<Track>> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val authHeader = "Bearer $authToken"
+                val response = apiService.searchTracks(
+                    query, excludeExplicit, excludeLoveSongs, excludeFolk, authHeader
+                )
+
+                if (response.isSuccessful && response.body() != null) {
+                    val tracksDto = response.body()!!
+                    // Use type-safe mapper to convert DTOs to domain models
+                    val tracks = TrackMapper.toDomainModelList(tracksDto.tracks)
+                    Result.success(tracks)
+                } else {
+                    Result.failure(Exception("Failed to search tracks: ${response.errorBody()?.string()}"))
+                }
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
+        }
+    }
+    
+    /**
+     * Get discovery tracks with authentication.
+     * 
+     * @param authToken The authentication token
+     * @return Result containing list of tracks or failure
+     */
+    suspend fun getDiscoveryTracks(authToken: String): Result<List<Track>> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val authHeader = "Bearer $authToken"
+                
+                val requestBody = DiscoveryRequest(
+                    seedArtists = emptyList(),
+                    workout = "general"
+                )
+                
+                val response = apiService.getDiscoveryTracks(requestBody, authHeader)
+                if (response.isSuccessful && response.body() != null) {
+                    val tracksDto = response.body()!!
+                    // Use type-safe mapper to convert DTOs to domain models
+                    val tracks = TrackMapper.toDomainModelList(tracksDto.tracks)
+                    Result.success(tracks)
+                } else {
+                    Result.failure(Exception("Failed to get discovery tracks: ${response.errorBody()?.string()}"))
+                }
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
+        }
+    }
+    
+    /**
+     * Handle track action (like/dislike).
+     * 
+     * @param songAction The song action details
+     * @param authToken The authentication token
+     * @return Result containing success message or failure
+     */
+    suspend fun handleTrackAction(songAction: SongAction, authToken: String): Result<String> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val authHeader = "Bearer $authToken"
+                
+                // Convert SongAction to TrackActionRequest
+                val trackActionRequest = TrackActionRequest(
+                    isrc = songAction.isrc,
+                    songName = songAction.songName,
+                    artist = songAction.artist,
+                    genres = songAction.genres?.joinToString(",") ?: "",
+                    action = songAction.action
+                )
+                
+                val response = apiService.handleTrackAction(trackActionRequest, authHeader)
+                
+                if (response.isSuccessful && response.body() != null) {
+                    val responseBody = response.body()!!
+                    val status = responseBody["status"]
+                    val message = responseBody["message"] ?: "Success"
+                    
+                    if (status == "success") {
+                        Result.success(message)
+                    } else {
+                        Result.failure(Exception("Track action failed: $message"))
+                    }
+                } else {
+                    val errorBody = response.errorBody()?.string()
+                    Result.failure(Exception("Failed to handle track action: $errorBody"))
+                }
+            } catch (e: Exception) {
+                Result.failure(e)
             }
         }
     }

@@ -11,7 +11,6 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 import ca.sheridancollege.jamsy.data.AuthManager
-import ca.sheridancollege.jamsy.data.repository.JamsyRepository
 import ca.sheridancollege.jamsy.domain.repository.TrackRepository
 import ca.sheridancollege.jamsy.domain.models.Track
 import ca.sheridancollege.jamsy.util.Resource
@@ -19,9 +18,8 @@ import ca.sheridancollege.jamsy.util.Resource
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val trackRepository: TrackRepository,
-    jamsyRepository: JamsyRepository,
     authManager: AuthManager
-) : BaseViewModel(jamsyRepository, authManager) {
+) : BaseViewModel(authManager) {
 
     private val _tracksState = MutableStateFlow<Resource<List<Track>>>(Resource.Loading)
     val tracksState: StateFlow<Resource<List<Track>>> = _tracksState

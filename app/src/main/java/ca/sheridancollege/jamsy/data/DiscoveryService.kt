@@ -3,7 +3,8 @@ package ca.sheridancollege.jamsy.data
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-import ca.sheridancollege.jamsy.data.repository.JamsyRepository
+import ca.sheridancollege.jamsy.data.repository.PlaylistRepositoryImpl
+import ca.sheridancollege.jamsy.data.repository.TrackRepository
 import ca.sheridancollege.jamsy.domain.models.Track
 
 /**
@@ -11,7 +12,8 @@ import ca.sheridancollege.jamsy.domain.models.Track
  * Mirrors the backend DiscoveryService functionality
  */
 class DiscoveryService(
-    private val jamsyRepository: JamsyRepository
+    private val trackRepository: TrackRepository,
+    private val playlistRepository: PlaylistRepositoryImpl
 ) {
     
     /**
@@ -24,7 +26,7 @@ class DiscoveryService(
         authToken: String
     ): Result<List<Track>> {
         return try {
-            jamsyRepository.getDiscoveryTracks(authToken)
+            trackRepository.getDiscoveryTracks(authToken)
         } catch (e: Exception) {
             Result.failure(e)
         }
@@ -52,11 +54,10 @@ class DiscoveryService(
     /**
      * Preview playlist before creating
      */
-    suspend fun previewPlaylist(authToken: String): Result<List<Track>> {
+    suspend fun previewPlaylist(authToken: String, likedTracks: List<Track>): Result<List<Track>> {
         return withContext(Dispatchers.IO) {
             try {
-                val response = jamsyRepository.previewPlaylist(authToken)
-                response
+                playlistRepository.getPreviewPlaylist(authToken, likedTracks)
             } catch (e: Exception) {
                 Result.failure(e)
             }
@@ -66,10 +67,10 @@ class DiscoveryService(
     /**
      * Create playlist in Spotify
      */
-    suspend fun createPlaylist(authToken: String): Result<Map<String, String>> {
+    suspend fun createPlaylist(authToken: String, tracks: List<Track>): Result<String> {
         return withContext(Dispatchers.IO) {
             try {
-                jamsyRepository.createPlaylist(authToken)
+                playlistRepository.createPlaylist(authToken, tracks)
             } catch (e: Exception) {
                 Result.failure(e)
             }

@@ -11,6 +11,9 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 import java.io.IOException
 
@@ -32,7 +35,7 @@ class AuthRepository(context: Context) : AuthRepositoryInterface {
 
     // Dependencies
     private val firebaseAuth = FirebaseAuth.getInstance()
-    private val jamsyRepository = JamsyRepository()
+    private val spotifyAuthRepository = SpotifyAuthRepositoryImpl()
     private val prefs: SharedPreferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
     // State
@@ -76,6 +79,11 @@ class AuthRepository(context: Context) : AuthRepositoryInterface {
             val response = tokenResponse.getOrThrow()
             validateSpotifyResponse(response)
             saveSpotifyToken(response.accessToken)
+            
+            // ✅ REMOVED: Pre-loading all workouts at once caused 429 rate limit errors
+            // Artists will now load on-demand when user selects a workout
+            println("AuthRepository: Login successful. Artists will load when workout is selected.")
+            
             signInWithFirebaseToken(response.firebaseCustomToken)
 
         } catch (e: IOException) {
@@ -128,7 +136,7 @@ class AuthRepository(context: Context) : AuthRepositoryInterface {
     }
 
     private suspend fun exchangeCodeForSpotifyToken(code: String): Result<SpotifyAuthResponse> {
-        return jamsyRepository.exchangeCodeForToken(code, SPOTIFY_CALLBACK_URL)
+        return spotifyAuthRepository.exchangeCodeForToken(code, SPOTIFY_CALLBACK_URL)
     }
 
     private fun validateSpotifyResponse(response: SpotifyAuthResponse) {

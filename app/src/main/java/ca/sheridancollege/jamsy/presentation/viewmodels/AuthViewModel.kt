@@ -20,13 +20,11 @@ import javax.inject.Inject
 
 import ca.sheridancollege.jamsy.data.SpotifyOAuthHelper
 import ca.sheridancollege.jamsy.data.repository.AuthRepository
-import ca.sheridancollege.jamsy.data.repository.JamsyRepository
 import ca.sheridancollege.jamsy.util.Resource
 
 @HiltViewModel
 class AuthViewModel @Inject constructor(
     private val authRepository: AuthRepository,
-    private val jamsyRepository: JamsyRepository,
     @ApplicationContext private val context: Context
 ) : ViewModel() {
 

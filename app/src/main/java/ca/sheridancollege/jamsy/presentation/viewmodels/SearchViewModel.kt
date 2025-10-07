@@ -12,13 +12,13 @@ import kotlinx.coroutines.launch
 
 import javax.inject.Inject
 
-import ca.sheridancollege.jamsy.data.repository.JamsyRepository
+import ca.sheridancollege.jamsy.data.repository.TrackRepository
 import ca.sheridancollege.jamsy.domain.models.Track
 import ca.sheridancollege.jamsy.util.Resource
 
 @HiltViewModel
 class SearchViewModel @Inject constructor(
-    private val repository: JamsyRepository
+    private val trackRepository: TrackRepository
 ) : ViewModel() {
 
     private val _searchState = MutableStateFlow<Resource<List<Track>>>(Resource.Loading)
@@ -40,7 +40,7 @@ class SearchViewModel @Inject constructor(
                     return@launch
                 }
                 
-                val result = repository.searchTracks(
+                val result = trackRepository.searchTracks(
                     query = query,
                     authToken = authToken,
                     excludeExplicit = excludeExplicit,

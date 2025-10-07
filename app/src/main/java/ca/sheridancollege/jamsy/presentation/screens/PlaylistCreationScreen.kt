@@ -1,13 +1,13 @@
 package ca.sheridancollege.jamsy.presentation.screens
 
+import android.annotation.SuppressLint
 import android.content.Intent
-import android.net.Uri
+
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -45,11 +45,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import ca.sheridancollege.jamsy.domain.models.Track
 
 import ca.sheridancollege.jamsy.presentation.viewmodels.LikedTracksViewModel
 import ca.sheridancollege.jamsy.util.Resource
+import androidx.core.net.toUri
 
+@SuppressLint("UseKtx")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlaylistCreationScreen(
@@ -58,12 +60,24 @@ fun PlaylistCreationScreen(
     authToken: String?
 ) {
     val playlistCreationState by viewModel.playlistCreationState.collectAsState()
+    val likedTracksState by viewModel.likedTracksState.collectAsState()
     val context = LocalContext.current
     
     // Start playlist creation when screen is shown
     LaunchedEffect(authToken) {
         authToken?.let { token ->
-            viewModel.createPlaylist(token)
+            // Get liked tracks first, then create playlist
+            viewModel.loadLikedTracks(token)
+        }
+    }
+    
+    // Create playlist when liked tracks are loaded
+    LaunchedEffect(likedTracksState) {
+        if (likedTracksState is Resource.Success && authToken != null) {
+            val tracks = (likedTracksState as Resource.Success<List<Track>>).data
+            if (tracks.isNotEmpty()) {
+                viewModel.createPlaylist(authToken, tracks)
+            }
         }
     }
 
@@ -154,7 +168,7 @@ fun PlaylistCreationScreen(
                         Button(
                             onClick = {
                                 authToken?.let { token ->
-                                    viewModel.createPlaylist(token)
+                                    viewModel.loadLikedTracks(token)
                                 }
                             }
                         ) {
@@ -164,8 +178,7 @@ fun PlaylistCreationScreen(
                 }
 
                 is Resource.Success -> {
-                    val playlistData = state.data
-                    val playlistUrl = playlistData["playlistUrl"]
+                    val playlistUrl = state.data
                     
                     Column(
                         modifier = Modifier
@@ -229,10 +242,11 @@ fun PlaylistCreationScreen(
                                 
                                 Spacer(modifier = Modifier.height(16.dp))
                                 
-                                if (playlistUrl != null) {
+                                if (playlistUrl.isNotEmpty()) {
                                     Button(
                                         onClick = {
-                                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(playlistUrl))
+                                            val intent = Intent(Intent.ACTION_VIEW,
+                                                playlistUrl.toUri())
                                             context.startActivity(intent)
                                         },
                                         colors = ButtonDefaults.buttonColors(

@@ -83,10 +83,22 @@ fun ArtistSelectionScreen(
         println("ArtistSelectionScreen: currentUser = ${currentUser?.uid}")
         println("ArtistSelectionScreen: currentUser is null = ${currentUser == null}")
         
-        val authToken = authViewModel.getSpotifyAccessToken()?.takeIf { it.isNotBlank() } ?: "dummy_token"
-        println("ArtistSelectionScreen: authToken = ${if (authToken == "dummy_token") "dummy_token (no real token)" else "real token: ${authToken.take(10)}..."}")
+        // Check if user is authenticated with Firebase first
+        if (currentUser == null) {
+            println("ArtistSelectionScreen: No Firebase user, showing error")
+            viewModel.setErrorState("Please log in first")
+            return@LaunchedEffect
+        }
+        
+        val authToken = authViewModel.getSpotifyAccessToken()?.takeIf { it.isNotBlank() }
+        if (authToken == null) {
+            println("ArtistSelectionScreen: No valid Spotify token available, showing error")
+            viewModel.setErrorState("Please log in with Spotify first")
+            return@LaunchedEffect
+        }
+        
+        println("ArtistSelectionScreen: authToken = real token: ${authToken.take(10)}...")
         println("ArtistSelectionScreen: authToken length = ${authToken.length}")
-        println("ArtistSelectionScreen: authToken isBlank = ${authToken.isBlank()}")
         viewModel.loadArtists(workout, mood, authToken)
     }
 

@@ -8,5 +8,8 @@ import ca.sheridancollege.jamsy.domain.models.Track
 @JsonClass(generateAdapter = true)
 data class CreatePlaylistRequest(
     @Json(name = "tracks")
-    val tracks: List<Track>
+    val tracks: List<Track>,
+    
+    @Json(name = "playlistName")
+    val playlistName: String = "My Mobile Playlist"
 )

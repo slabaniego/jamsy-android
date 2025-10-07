@@ -22,7 +22,11 @@ data class Artist(
 
     // For compatibility with the UI that expects images list
     @Json(name = "images")
-    val images: List<String>? = null
+    val images: List<String>? = null,
+
+    // Workout categories from Java backend
+    @Json(name = "workoutCategories")
+    val workoutCategories: List<String>? = null
 ) {
     // Helper property to get the first image URL
     val firstImageUrl: String?

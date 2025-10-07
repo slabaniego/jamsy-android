@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 import ca.sheridancollege.jamsy.data.DiscoveryDataStore
-import ca.sheridancollege.jamsy.data.repository.JamsyRepository
+import ca.sheridancollege.jamsy.data.repository.ArtistRepositoryImpl
 import ca.sheridancollege.jamsy.domain.models.SongAction
 import ca.sheridancollege.jamsy.domain.models.Track
 import ca.sheridancollege.jamsy.domain.usecases.GetDiscoveryTracksUseCase
@@ -24,7 +24,7 @@ import ca.sheridancollege.jamsy.util.Resource
 class DiscoveryViewModel @Inject constructor(
     private val getDiscoveryTracksUseCase: GetDiscoveryTracksUseCase,
     private val handleTrackActionUseCase: HandleTrackActionUseCase,
-    private val jamsyRepository: JamsyRepository
+    private val artistRepository: ArtistRepositoryImpl
 ) : ViewModel() {
 
     private val instanceId = System.currentTimeMillis() // Unique identifier for this instance
@@ -174,7 +174,7 @@ class DiscoveryViewModel @Inject constructor(
                 }
 
                 val artistNamesJson = artistNames.joinToString(",")
-                val result = jamsyRepository.submitArtistSelection(
+                val result = artistRepository.submitArtistSelection(
                     selectedArtistIds = selectedArtistIds,
                     artistNamesJson = artistNamesJson,
                     workout = workout,
@@ -249,6 +249,8 @@ class DiscoveryViewModel @Inject constructor(
                         if (!isAlreadyLiked) {
                             currentLiked.add(track)
                             _likedTracks.value = currentLiked
+                            // Also store in DiscoveryDataStore so GeneratedPlaylistViewModel can access it
+                            DiscoveryDataStore.addLikedTrack(track)
                             println("DiscoveryViewModel: ✅ Added track to liked list!")
                             println("DiscoveryViewModel: Total liked tracks after adding: ${_likedTracks.value.size}")
                             println("DiscoveryViewModel: Liked tracks: ${_likedTracks.value.map { "${it.name} by ${it.artists.firstOrNull()}" }}")
