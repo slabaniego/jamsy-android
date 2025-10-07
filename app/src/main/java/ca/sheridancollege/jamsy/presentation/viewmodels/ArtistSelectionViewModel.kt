@@ -13,14 +13,14 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 import ca.sheridancollege.jamsy.data.DiscoveryDataStore
-import ca.sheridancollege.jamsy.data.repository.JamsyRepository
+import ca.sheridancollege.jamsy.data.repository.ArtistRepositoryImpl
 import ca.sheridancollege.jamsy.domain.models.Artist
 import ca.sheridancollege.jamsy.domain.models.Track
 import ca.sheridancollege.jamsy.util.Resource
 
 @HiltViewModel
 class ArtistSelectionViewModel @Inject constructor(
-    private val jamsyRepository: JamsyRepository
+    private val artistRepository: ArtistRepositoryImpl
 ) : ViewModel() {
 
     private val _artistsState = MutableStateFlow<Resource<List<Artist>>>(Resource.Loading)
@@ -45,7 +45,7 @@ class ArtistSelectionViewModel @Inject constructor(
             
             try {
                 println("ArtistSelectionViewModel: Loading artists for workout: $workout, mood: $mood, authToken: ${if (authToken.isBlank()) "EMPTY" else "PRESENT"}")
-                val result = jamsyRepository.getArtistsByWorkout(workout, mood, authToken)
+                val result = artistRepository.getArtistsByWorkout(workout, mood, authToken)
                 result.onSuccess { artistList ->
                     println("ArtistSelectionViewModel: Successfully loaded ${artistList.size} artists")
                     _artistsState.value = Resource.Success(artistList)
@@ -88,14 +88,14 @@ class ArtistSelectionViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val selectedArtistIds = _selectedArtists.value.mapNotNull { it.id }
-                val artistNamesJson = _selectedArtists.value.map { it.name }.joinToString(",")
-                
-                val result = jamsyRepository.submitArtistSelection(
-                    _selectedArtistIds = selectedArtistIds,
+                val artistNamesJson = _selectedArtists.value.joinToString(",") { it.name }
+
+                val result = artistRepository.submitArtistSelection(
+                    selectedArtistIds = selectedArtistIds,
                     artistNamesJson = artistNamesJson,
                     workout = workout,
-                    _mood = mood,
-                    _action = action,
+                    mood = mood,
+                    action = action,
                     authToken = authToken
                 )
                 

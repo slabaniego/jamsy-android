@@ -13,13 +13,13 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 import ca.sheridancollege.jamsy.data.DiscoveryDataStore
-import ca.sheridancollege.jamsy.data.repository.JamsyRepository
+import ca.sheridancollege.jamsy.data.repository.PlaylistRepositoryImpl
 import ca.sheridancollege.jamsy.domain.models.Track
 import ca.sheridancollege.jamsy.util.Resource
 
 @HiltViewModel
 class GeneratedPlaylistViewModel @Inject constructor(
-    private val jamsyRepository: JamsyRepository
+    private val playlistRepository: PlaylistRepositoryImpl
 ) : ViewModel() {
 
     private val _playlistState = MutableStateFlow<Resource<List<Track>>>(Resource.Loading)
@@ -45,7 +45,7 @@ class GeneratedPlaylistViewModel @Inject constructor(
                 }
                 
                 // Call the preview-playlist endpoint with liked tracks
-                val result = jamsyRepository.getPreviewPlaylist(authToken, likedTracks)
+                val result = playlistRepository.getPreviewPlaylist(authToken, likedTracks)
                 println("GeneratedPlaylistViewModel: Repository call completed")
                 println("GeneratedPlaylistViewModel: Result isSuccess: ${result.isSuccess}")
                 
@@ -90,7 +90,7 @@ class GeneratedPlaylistViewModel @Inject constructor(
                 
                 println("GeneratedPlaylistViewModel: Exporting ${tracks.size} tracks to Spotify")
                 
-                val result = jamsyRepository.createPlaylist(authToken, tracks)
+                val result = playlistRepository.createPlaylist(authToken, tracks)
                 if (result.isSuccess) {
                     val playlistUrl = result.getOrNull() ?: ""
                     println("GeneratedPlaylistViewModel: Successfully created playlist: $playlistUrl")

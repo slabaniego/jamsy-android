@@ -12,13 +12,15 @@ import kotlinx.coroutines.launch
 
 import javax.inject.Inject
 
-import ca.sheridancollege.jamsy.data.repository.JamsyRepository
+import ca.sheridancollege.jamsy.data.repository.PlaylistRepositoryImpl
+import ca.sheridancollege.jamsy.data.repository.TrackRepository
 import ca.sheridancollege.jamsy.domain.models.Track
 import ca.sheridancollege.jamsy.util.Resource
 
 @HiltViewModel
 class LikedTracksViewModel @Inject constructor(
-    private val repository: JamsyRepository
+    private val trackRepository: TrackRepository,
+    private val playlistRepository: PlaylistRepositoryImpl
 ) : ViewModel() {
 
     private val _likedTracksState = MutableStateFlow<Resource<List<Track>>>(Resource.Loading)
@@ -33,42 +35,29 @@ class LikedTracksViewModel @Inject constructor(
     fun loadLikedTracks(authToken: String) {
         viewModelScope.launch {
             _likedTracksState.value = Resource.Loading
-            try {
-                val result = repository.getLikedTracks(authToken)
-                _likedTracksState.value = if (result.isSuccess) {
-                    Resource.Success(result.getOrNull() ?: emptyList())
-                } else {
-                    Resource.Error(result.exceptionOrNull()?.message ?: "Failed to load liked tracks")
-                }
-            } catch (e: Exception) {
-                _likedTracksState.value = Resource.Error(e.message ?: "Unknown error occurred")
-            }
+            _likedTracksState.value = trackRepository.getLikedTracks(authToken)
         }
     }
 
     fun previewPlaylist(authToken: String) {
         viewModelScope.launch {
             _playlistPreviewState.value = Resource.Loading
-            try {
-                // Get liked tracks from current state
-                val likedTracks = when (val state = _likedTracksState.value) {
-                    is Resource.Success -> state.data
-                    else -> emptyList()
-                }
-                
-                if (likedTracks.isEmpty()) {
-                    _playlistPreviewState.value = Resource.Error("No liked tracks available")
-                    return@launch
-                }
-                
-                val result = repository.getPreviewPlaylist(authToken, likedTracks)
-                _playlistPreviewState.value = if (result.isSuccess) {
-                    Resource.Success(result.getOrNull() ?: emptyList())
-                } else {
-                    Resource.Error(result.exceptionOrNull()?.message ?: "Failed to preview playlist")
-                }
-            } catch (e: Exception) {
-                _playlistPreviewState.value = Resource.Error(e.message ?: "Unknown error occurred")
+            
+            // Get liked tracks from current state
+            val likedTracks = when (val state = _likedTracksState.value) {
+                is Resource.Success -> state.data
+                else -> emptyList()
+            }
+            
+            if (likedTracks.isEmpty()) {
+                _playlistPreviewState.value = Resource.Error("No liked tracks available")
+                return@launch
+            }
+            
+            val result = playlistRepository.getPreviewPlaylist(authToken, likedTracks)
+            _playlistPreviewState.value = when {
+                result.isSuccess -> Resource.Success(result.getOrNull() ?: emptyList())
+                else -> Resource.Error(result.exceptionOrNull()?.message ?: "Failed to preview playlist")
             }
         }
     }
@@ -76,15 +65,11 @@ class LikedTracksViewModel @Inject constructor(
     fun createPlaylist(authToken: String, tracks: List<Track>) {
         viewModelScope.launch {
             _playlistCreationState.value = Resource.Loading
-            try {
-                val result = repository.createPlaylist(authToken, tracks)
-                _playlistCreationState.value = if (result.isSuccess) {
-                    Resource.Success(result.getOrNull() ?: "")
-                } else {
-                    Resource.Error(result.exceptionOrNull()?.message ?: "Failed to create playlist")
-                }
-            } catch (e: Exception) {
-                _playlistCreationState.value = Resource.Error(e.message ?: "Unknown error occurred")
+            
+            val result = playlistRepository.createPlaylist(authToken, tracks)
+            _playlistCreationState.value = when {
+                result.isSuccess -> Resource.Success(result.getOrNull() ?: "")
+                else -> Resource.Error(result.exceptionOrNull()?.message ?: "Failed to create playlist")
             }
         }
     }

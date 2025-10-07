@@ -14,7 +14,9 @@ import ca.sheridancollege.jamsy.data.AuthManager
 import ca.sheridancollege.jamsy.data.DiscoveryService
 import ca.sheridancollege.jamsy.data.PlaylistTemplateService
 import ca.sheridancollege.jamsy.data.repository.AuthRepository
-import ca.sheridancollege.jamsy.data.repository.JamsyRepository
+import ca.sheridancollege.jamsy.data.repository.ArtistRepositoryImpl
+import ca.sheridancollege.jamsy.data.repository.PlaylistRepositoryImpl
+import ca.sheridancollege.jamsy.data.repository.SpotifyAuthRepositoryImpl
 import ca.sheridancollege.jamsy.data.repository.TrackRepository as TrackRepositoryImpl
 import ca.sheridancollege.jamsy.data.repository.UserRepository
 import ca.sheridancollege.jamsy.domain.repository.TrackRepository
@@ -33,16 +35,34 @@ object RepositoryModule {
 
     @Provides
     @Singleton
-    fun provideJamsyRepository(): JamsyRepository {
-        return JamsyRepository()
+    fun provideSpotifyAuthRepository(): SpotifyAuthRepositoryImpl {
+        return SpotifyAuthRepositoryImpl()
     }
 
     @Provides
     @Singleton
+    fun provideArtistRepository(): ArtistRepositoryImpl {
+        return ArtistRepositoryImpl()
+    }
+
+    @Provides
+    @Singleton
+    fun providePlaylistRepository(): PlaylistRepositoryImpl {
+        return PlaylistRepositoryImpl()
+    }
+
+    @Provides
+    @Singleton
+    fun provideTrackRepositoryImpl(): TrackRepositoryImpl {
+        return TrackRepositoryImpl()
+    }
+    
+    @Provides
+    @Singleton
     fun provideTrackRepository(
-        jamsyRepository: JamsyRepository
+        trackRepositoryImpl: TrackRepositoryImpl
     ): TrackRepository {
-        return TrackRepositoryImpl(jamsyRepository)
+        return trackRepositoryImpl
     }
 
     @Provides
@@ -62,16 +82,18 @@ object RepositoryModule {
     @Provides
     @Singleton
     fun providePlaylistTemplateService(
-        jamsyRepository: JamsyRepository
+        playlistRepository: PlaylistRepositoryImpl
     ): PlaylistTemplateService {
-        return PlaylistTemplateService(jamsyRepository)
+        return PlaylistTemplateService(playlistRepository)
     }
 
     @Provides
     @Singleton
     fun provideDiscoveryService(
-        jamsyRepository: JamsyRepository
+        trackRepository: TrackRepositoryImpl,
+        playlistRepository: PlaylistRepositoryImpl
     ): DiscoveryService {
-        return DiscoveryService(jamsyRepository)
+        return DiscoveryService(trackRepository, playlistRepository)
     }
 }
+

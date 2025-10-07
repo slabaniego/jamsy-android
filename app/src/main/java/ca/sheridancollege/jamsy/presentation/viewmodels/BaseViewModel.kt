@@ -3,13 +3,11 @@ package ca.sheridancollege.jamsy.presentation.viewmodels
 import androidx.lifecycle.ViewModel
 
 import ca.sheridancollege.jamsy.data.AuthManager
-import ca.sheridancollege.jamsy.data.repository.JamsyRepository
 
 /**
  * Base ViewModel that provides authentication context to all ViewModels
  */
 abstract class BaseViewModel(
-    protected val jamsyRepository: JamsyRepository,
     protected val authManager: AuthManager
 ) : ViewModel() {
     

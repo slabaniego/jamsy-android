@@ -35,7 +35,7 @@ class AuthRepository(context: Context) : AuthRepositoryInterface {
 
     // Dependencies
     private val firebaseAuth = FirebaseAuth.getInstance()
-    private val jamsyRepository = JamsyRepository()
+    private val spotifyAuthRepository = SpotifyAuthRepositoryImpl()
     private val prefs: SharedPreferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
     // State
@@ -136,7 +136,7 @@ class AuthRepository(context: Context) : AuthRepositoryInterface {
     }
 
     private suspend fun exchangeCodeForSpotifyToken(code: String): Result<SpotifyAuthResponse> {
-        return jamsyRepository.exchangeCodeForToken(code, SPOTIFY_CALLBACK_URL)
+        return spotifyAuthRepository.exchangeCodeForToken(code, SPOTIFY_CALLBACK_URL)
     }
 
     private fun validateSpotifyResponse(response: SpotifyAuthResponse) {

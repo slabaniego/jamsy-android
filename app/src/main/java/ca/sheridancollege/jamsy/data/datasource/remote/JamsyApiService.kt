@@ -10,7 +10,8 @@ import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
 
-import ca.sheridancollege.jamsy.domain.models.Artist
+import ca.sheridancollege.jamsy.data.datasource.remote.dto.ArtistsResponseDto
+import ca.sheridancollege.jamsy.data.datasource.remote.dto.TracksResponseDto
 import ca.sheridancollege.jamsy.domain.models.PlaylistTemplate
 import ca.sheridancollege.jamsy.domain.models.PreviewPlaylistRequest
 import ca.sheridancollege.jamsy.domain.models.Track
@@ -29,7 +30,7 @@ interface JamsyApiService {
     @GET("api/auth/refresh")
     suspend fun refreshToken(
         @Query("refresh_token") refreshToken: String
-    ): Response<Map<String, String>>
+    ): Response<SpotifyAuthResponse>
 
     // Playlist Templates - FIXED: Match backend endpoints
     @GET("api/spotify/templates")
@@ -50,21 +51,21 @@ interface JamsyApiService {
         @Path("workout") workout: String,
         @Path("mood") mood: String,
         @Header("Authorization") authHeader: String
-    ): Response<Map<String, Any>>
+    ): Response<ArtistsResponseDto>
 
     // Submit selected artists and get discovery tracks - FIXED: Use mobile API
     @POST("api/discover")
     suspend fun submitArtistSelection(
         @Body requestBody: DiscoveryRequest,
         @Header("Authorization") authHeader: String
-    ): Response<Map<String, List<Track>>>
+    ): Response<TracksResponseDto>
 
     // Get discovery tracks - FIXED: Match backend endpoints
     @POST("api/discover")
     suspend fun getDiscoveryTracks(
         @Body requestBody: DiscoveryRequest,
         @Header("Authorization") authHeader: String
-    ): Response<Map<String, List<Track>>>
+    ): Response<TracksResponseDto>
 
     // Handle track actions (like/dislike) - FIXED: Match backend endpoints
     @POST("api/track/action")
@@ -77,7 +78,7 @@ interface JamsyApiService {
     @GET("api/liked")
     suspend fun getLikedTracks(
         @Header("Authorization") authHeader: String
-    ): Response<Map<String, List<Track>>>
+    ): Response<TracksResponseDto>
 
     // Search tracks - FIXED: Match backend endpoints
     @GET("api/search")
@@ -87,14 +88,14 @@ interface JamsyApiService {
         @Query("excludeLoveSongs") excludeLoveSongs: Boolean = false,
         @Query("excludeFolk") excludeFolk: Boolean = false,
         @Header("Authorization") authHeader: String
-    ): Response<Map<String, Any>>
+    ): Response<TracksResponseDto>
 
     // Preview playlist - FIXED: Match backend endpoints (POST with liked tracks)
     @POST("api/spotify/preview-playlist")
     suspend fun getPreviewPlaylist(
         @Header("Authorization") authHeader: String,
         @Body requestBody: PreviewPlaylistRequest
-    ): Response<Map<String, Any>>
+    ): Response<TracksResponseDto>
 
     // Create playlist - FIXED: Match backend endpoints (PR #39)
     @POST("api/spotify/create-playlist")

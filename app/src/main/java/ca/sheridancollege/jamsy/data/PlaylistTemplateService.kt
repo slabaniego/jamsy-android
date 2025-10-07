@@ -1,6 +1,6 @@
 package ca.sheridancollege.jamsy.data
 
-import ca.sheridancollege.jamsy.data.repository.JamsyRepository
+import ca.sheridancollege.jamsy.data.repository.PlaylistRepositoryImpl
 import ca.sheridancollege.jamsy.domain.models.PlaylistTemplate
 import ca.sheridancollege.jamsy.domain.models.Track
 
@@ -9,7 +9,7 @@ import ca.sheridancollege.jamsy.domain.models.Track
  * Mirrors the backend PlaylistTemplateService functionality
  */
 class PlaylistTemplateService(
-    private val jamsyRepository: JamsyRepository
+    private val playlistRepository: PlaylistRepositoryImpl
 ) {
     
     /**
@@ -17,7 +17,7 @@ class PlaylistTemplateService(
      */
     suspend fun getDefaultTemplates(authToken: String): Result<List<PlaylistTemplate>> {
         return try {
-            jamsyRepository.getPlaylistTemplates(authToken)
+            playlistRepository.getPlaylistTemplates(authToken)
         } catch (e: Exception) {
             Result.failure(e)
         }
@@ -31,7 +31,7 @@ class PlaylistTemplateService(
         accessToken: String
     ): Result<List<Track>> {
         return try {
-            jamsyRepository.getRecommendationsByTemplate(templateName, accessToken)
+            playlistRepository.getRecommendationsByTemplate(templateName, accessToken)
         } catch (e: Exception) {
             Result.failure(e)
         }
