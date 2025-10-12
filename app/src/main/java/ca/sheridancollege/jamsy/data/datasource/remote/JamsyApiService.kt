@@ -111,4 +111,10 @@ interface JamsyApiService {
         @Query("accessToken") accessToken: String,
         @Header("Authorization") authHeader: String
     ): Response<List<Track>>
+    
+    // Restart flow - Clear discovery session
+    @POST("api/restart")
+    suspend fun restartFlow(
+        @Header("Authorization") authHeader: String
+    ): Response<Map<String, String>>
 }

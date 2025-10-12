@@ -12,6 +12,7 @@ import kotlinx.coroutines.launch
 
 import javax.inject.Inject
 
+import ca.sheridancollege.jamsy.data.DiscoveryDataStore
 import ca.sheridancollege.jamsy.data.repository.PlaylistRepositoryImpl
 import ca.sheridancollege.jamsy.data.repository.TrackRepository
 import ca.sheridancollege.jamsy.domain.models.Track
@@ -72,5 +73,12 @@ class LikedTracksViewModel @Inject constructor(
                 else -> Resource.Error(result.exceptionOrNull()?.message ?: "Failed to create playlist")
             }
         }
+    }
+
+    fun restartDiscoveryFlow() {
+        println("LikedTracksViewModel: Restarting discovery flow - clearing all data")
+        DiscoveryDataStore.clear()
+        _likedTracksState.value = Resource.Loading
+        _playlistPreviewState.value = Resource.Loading
     }
 }
