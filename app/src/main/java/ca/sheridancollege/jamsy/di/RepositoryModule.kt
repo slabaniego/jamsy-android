@@ -18,8 +18,9 @@ import ca.sheridancollege.jamsy.data.repository.ArtistRepositoryImpl
 import ca.sheridancollege.jamsy.data.repository.PlaylistRepositoryImpl
 import ca.sheridancollege.jamsy.data.repository.SpotifyAuthRepositoryImpl
 import ca.sheridancollege.jamsy.data.repository.TrackRepository as TrackRepositoryImpl
-import ca.sheridancollege.jamsy.data.repository.UserRepository
+import ca.sheridancollege.jamsy.data.repository.UserRepository as UserRepositoryImpl
 import ca.sheridancollege.jamsy.domain.repository.TrackRepository
+import ca.sheridancollege.jamsy.domain.repository.UserRepository
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -67,8 +68,16 @@ object RepositoryModule {
 
     @Provides
     @Singleton
-    fun provideUserRepository(): UserRepository {
-        return UserRepository()
+    fun provideUserRepositoryImpl(): UserRepositoryImpl {
+        return UserRepositoryImpl()
+    }
+    
+    @Provides
+    @Singleton
+    fun provideUserRepository(
+        userRepositoryImpl: UserRepositoryImpl
+    ): UserRepository {
+        return userRepositoryImpl
     }
 
     @Provides

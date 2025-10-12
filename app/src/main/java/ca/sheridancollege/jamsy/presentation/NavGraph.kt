@@ -205,6 +205,12 @@ fun NavGraph(navController: NavHostController) {
             PlaylistPreviewScreen(
                 onNavigateToPlaylistCreation = { navController.navigate(Screen.PlaylistCreation.route) },
                 onBack = { navController.popBackStack() },
+                onRestartFlow = {
+                    // Navigate back to home and clear the back stack
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(Screen.Home.route) { inclusive = true }
+                    }
+                },
                 viewModel = likedTracksViewModel
             )
         }
@@ -225,6 +231,12 @@ fun NavGraph(navController: NavHostController) {
                     // Navigate back to home after successful export
                     navController.navigate(Screen.Home.route) {
                         popUpTo(Screen.Home.route) { inclusive = false }
+                    }
+                },
+                onRestartFlow = {
+                    // Navigate back to home and clear the back stack
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(Screen.Home.route) { inclusive = true }
                     }
                 },
                 viewModel = generatedPlaylistViewModel,

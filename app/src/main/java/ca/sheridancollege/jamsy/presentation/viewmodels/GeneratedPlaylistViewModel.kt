@@ -107,4 +107,10 @@ class GeneratedPlaylistViewModel @Inject constructor(
             }
         }
     }
+
+    fun restartDiscoveryFlow() {
+        println("GeneratedPlaylistViewModel: Restarting discovery flow - clearing all data")
+        DiscoveryDataStore.clear()
+        _playlistState.value = Resource.Loading
+    }
 }

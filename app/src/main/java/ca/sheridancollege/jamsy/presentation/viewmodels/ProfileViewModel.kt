@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 
 import javax.inject.Inject
 
-import ca.sheridancollege.jamsy.data.repository.UserRepository
+import ca.sheridancollege.jamsy.domain.repository.UserRepository
 import ca.sheridancollege.jamsy.domain.models.User
 import ca.sheridancollege.jamsy.util.Resource
 
