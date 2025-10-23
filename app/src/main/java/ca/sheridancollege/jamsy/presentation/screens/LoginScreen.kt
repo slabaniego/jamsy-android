@@ -1,10 +1,7 @@
 package ca.sheridancollege.jamsy.presentation.screens
 
-import android.content.Intent
-import android.net.Uri
 import android.widget.Toast
 
-import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -40,8 +37,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 
-import ca.sheridancollege.jamsy.config.AppConfig
 import ca.sheridancollege.jamsy.presentation.viewmodels.AuthViewModel
+import ca.sheridancollege.jamsy.presentation.theme.Gray
+import ca.sheridancollege.jamsy.presentation.theme.LightGray
+import ca.sheridancollege.jamsy.presentation.theme.SpotifyBlack
+import ca.sheridancollege.jamsy.presentation.theme.SpotifyDarkGray
+import ca.sheridancollege.jamsy.presentation.theme.SpotifyGreen
+import ca.sheridancollege.jamsy.presentation.theme.SpotifyMediumGray
+import ca.sheridancollege.jamsy.presentation.theme.White
 import ca.sheridancollege.jamsy.util.Resource
 
 
@@ -97,14 +100,29 @@ fun LoginScreen(
         }
     }
 
+    LoginScreenContent(
+        errorMessage = errorMessage,
+        onNavigateToSignup = onNavigateToSignup,
+        onConnectSpotifyClick = { viewModel.launchSpotifyAuth() },
+        isLoading = loginState is Resource.Loading
+    )
+}
+
+@Composable
+private fun LoginScreenContent(
+    errorMessage: String = "",
+    onNavigateToSignup: () -> Unit = {},
+    onConnectSpotifyClick: () -> Unit = {},
+    isLoading: Boolean = false
+) {
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(
                 brush = Brush.verticalGradient(
                     colors = listOf(
-                        Color(0xFF1F1F1F),
-                        Color(0xFF121212)
+                        SpotifyDarkGray,
+                        SpotifyBlack
                     )
                 )
             )
@@ -120,7 +138,7 @@ fun LoginScreen(
             Text(
                 text = "JAMSY",
                 style = MaterialTheme.typography.headlineLarge,
-                color = Color.White
+                color = White
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -128,7 +146,7 @@ fun LoginScreen(
             Text(
                 text = "Discover Hidden Gems",
                 style = MaterialTheme.typography.titleMedium,
-                color = Color(0xFF1DB954)
+                color = SpotifyGreen
             )
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -138,7 +156,7 @@ fun LoginScreen(
                     .fillMaxWidth()
                     .padding(16.dp),
                 colors = CardDefaults.cardColors(
-                    containerColor = Color(0xFF2A2A2A)
+                    containerColor = SpotifyMediumGray
                 ),
                 shape = RoundedCornerShape(16.dp)
             ) {
@@ -149,7 +167,7 @@ fun LoginScreen(
                     Text(
                         text = "Uncover amazing artists that fly under the radar",
                         style = MaterialTheme.typography.bodyLarge,
-                        color = Color.White,
+                        color = White,
                         textAlign = TextAlign.Center,
                         modifier = Modifier.padding(bottom = 16.dp)
                     )
@@ -157,7 +175,7 @@ fun LoginScreen(
                     Text(
                         text = "Our algorithm finds talented musicians with fewer than 50,000 monthly listeners",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = Color.LightGray,
+                        color = LightGray,
                         textAlign = TextAlign.Center
                     )
                 }
@@ -174,12 +192,9 @@ fun LoginScreen(
             }
 
             Button(
-                onClick = {
-                    errorMessage = ""
-                    viewModel.launchSpotifyAuth()
-                },
+                onClick = onConnectSpotifyClick,
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF1DB954)
+                    containerColor = SpotifyGreen
                 ),
                 modifier = Modifier
                     .fillMaxWidth()
@@ -187,20 +202,20 @@ fun LoginScreen(
                     .padding(horizontal = 16.dp),
                 shape = RoundedCornerShape(28.dp)
             ) {
-                if (loginState is Resource.Loading) {
+                if (isLoading) {
                     CircularProgressIndicator(
                         color = MaterialTheme.colorScheme.onPrimary,
                         modifier = Modifier.size(24.dp)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                 }
-                Text("CONNECT WITH SPOTIFY", color = Color.White)
+                Text("CONNECT WITH SPOTIFY", color = White)
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
             TextButton(onClick = onNavigateToSignup) {
-                Text("Don't have an account? Sign up", color = Color.LightGray)
+                Text("Don't have an account? Sign up", color = LightGray)
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -208,7 +223,7 @@ fun LoginScreen(
             Text(
                 text = "Find your next favorite artist that nobody knows about yet",
                 style = MaterialTheme.typography.bodySmall,
-                color = Color.Gray,
+                color = Gray,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(horizontal = 32.dp)
             )
@@ -216,33 +231,13 @@ fun LoginScreen(
     }
 }
 
-private fun launchSpotifyLogin(context: android.content.Context) {
-    val clientId = "024491d2f5bb43fb93ff6c69eacf6ab8"
-
-    val redirectUri = AppConfig.SPOTIFY_AUTH_REDIRECT_URI
-
-    val scope = "user-top-read user-library-read user-read-recently-played"
-
-    val spotifyAuthUrl = "https://accounts.spotify.com/authorize" +
-            "?client_id=$clientId" +
-            "&response_type=code" +
-            "&redirect_uri=${Uri.encode(redirectUri)}" +
-            "&scope=${Uri.encode(scope)}" +
-            "&show_dialog=true"
-
-    try {
-        val customTabsIntent = CustomTabsIntent.Builder().build()
-        customTabsIntent.launchUrl(context, Uri.parse(spotifyAuthUrl))
-    } catch (e: Exception) {
-        try {
-            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(spotifyAuthUrl))
-            context.startActivity(intent)
-        } catch (e2: Exception) {
-            Toast.makeText(
-                context,
-                "Unable to open browser for authentication",
-                Toast.LENGTH_SHORT
-            ).show()
-        }
-    }
+@androidx.compose.ui.tooling.preview.Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun LoginScreenPreview() {
+    LoginScreenContent(
+        errorMessage = "",
+        onNavigateToSignup = {},
+        onConnectSpotifyClick = {},
+        isLoading = false
+    )
 }
