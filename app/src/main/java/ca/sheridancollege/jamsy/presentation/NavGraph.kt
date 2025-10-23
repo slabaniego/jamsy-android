@@ -1,19 +1,15 @@
-package ca.sheridancollege.jamsy.presentation.navigation
-
-import android.content.Context
+package ca.sheridancollege.jamsy.presentation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 
-import ca.sheridancollege.jamsy.presentation.Screen
 import ca.sheridancollege.jamsy.presentation.screens.ArtistSelectionScreen
 import ca.sheridancollege.jamsy.presentation.screens.ChooseYourWorkoutScreen
 import ca.sheridancollege.jamsy.presentation.screens.DiscoveryScreen

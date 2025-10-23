@@ -41,8 +41,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-
-import ca.sheridancollege.jamsy.domain.models.Track
 import ca.sheridancollege.jamsy.presentation.Screen
 import ca.sheridancollege.jamsy.presentation.components.BottomBar
 import ca.sheridancollege.jamsy.presentation.components.TrackItem

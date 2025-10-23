@@ -1,5 +1,6 @@
 package ca.sheridancollege.jamsy.presentation.screens
 
+import android.annotation.SuppressLint
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
@@ -7,7 +8,6 @@ import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -42,6 +42,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -70,6 +71,7 @@ import ca.sheridancollege.jamsy.presentation.viewmodels.DiscoveryViewModel
 import ca.sheridancollege.jamsy.presentation.viewmodels.LikedTracksViewModel
 import ca.sheridancollege.jamsy.util.Resource
 
+@SuppressLint("AutoboxingStateCreation")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DiscoveryScreen(
@@ -89,7 +91,7 @@ fun DiscoveryScreen(
     
     var dragOffset by remember { mutableFloatStateOf(0f) }
     var isProcessingAction by remember { mutableStateOf(false) }
-    var lastActionTime by remember { mutableStateOf(0L) }
+    var lastActionTime by remember { mutableLongStateOf(0L) }
     
     // Initialize session and load tracks only once
     LaunchedEffect(authToken) {

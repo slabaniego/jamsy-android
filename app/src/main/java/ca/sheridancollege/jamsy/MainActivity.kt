@@ -20,7 +20,7 @@ import androidx.navigation.compose.rememberNavController
 
 import dagger.hilt.android.AndroidEntryPoint
 
-import ca.sheridancollege.jamsy.presentation.navigation.NavGraph
+import ca.sheridancollege.jamsy.presentation.NavGraph
 import ca.sheridancollege.jamsy.presentation.theme.JamsyTheme
 import ca.sheridancollege.jamsy.presentation.viewmodels.AuthViewModel
 import ca.sheridancollege.jamsy.util.Resource
