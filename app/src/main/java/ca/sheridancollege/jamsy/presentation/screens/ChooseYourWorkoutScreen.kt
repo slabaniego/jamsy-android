@@ -25,14 +25,23 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+
+import ca.sheridancollege.jamsy.presentation.theme.LightGray
+import ca.sheridancollege.jamsy.presentation.theme.SpotifyBlack
+import ca.sheridancollege.jamsy.presentation.theme.SpotifyDarkGray
+import ca.sheridancollege.jamsy.presentation.theme.SpotifyGreen
+import ca.sheridancollege.jamsy.presentation.theme.SpotifyMediumGray
+import ca.sheridancollege.jamsy.presentation.theme.White
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -42,7 +51,7 @@ fun ChooseYourWorkoutScreen(
 ) {
     val workoutOptions = listOf(
         WorkoutOption("Cardio", "💓", "High-energy cardio workouts", "Energetic"),
-        WorkoutOption("Strength Training", "💪", "Build muscle and strength", "Powerful"),
+        WorkoutOption("Strength", "💪", "Build muscle and strength", "Powerful"),
         WorkoutOption("HIIT", "⚡", "High-intensity interval training", "Intense"),
         WorkoutOption("Yoga", "🧘", "Mindful movement and flexibility", "Calm")
     )
@@ -54,14 +63,18 @@ fun ChooseYourWorkoutScreen(
                     Text(
                         "Choose Your Workout",
                         fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        color = SpotifyGreen
                     )
                 },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = SpotifyGreen)
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = SpotifyDarkGray
+                )
             )
         }
     ) { paddingValues ->
@@ -72,8 +85,8 @@ fun ChooseYourWorkoutScreen(
                 .background(
                     Brush.verticalGradient(
                         colors = listOf(
-                            MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
-                            MaterialTheme.colorScheme.background
+                            SpotifyDarkGray,
+                            SpotifyBlack
                         )
                     )
                 )
@@ -88,7 +101,8 @@ fun ChooseYourWorkoutScreen(
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    color = White
                 )
                 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -96,7 +110,7 @@ fun ChooseYourWorkoutScreen(
                 Text(
                     text = "Select a workout type to get personalized music recommendations",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    color = LightGray,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -107,7 +121,8 @@ fun ChooseYourWorkoutScreen(
                     columns = GridCells.Fixed(2),
                     horizontalArrangement = Arrangement.spacedBy(16.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp),
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    contentPadding = androidx.compose.foundation.layout.PaddingValues(bottom = 24.dp)
                 ) {
                     items(workoutOptions) { workout ->
                         WorkoutCard(
@@ -134,7 +149,7 @@ private fun WorkoutCard(
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
+            containerColor = SpotifyMediumGray
         )
     ) {
         Column(
@@ -156,17 +171,9 @@ private fun WorkoutCard(
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-            
-            Spacer(modifier = Modifier.height(8.dp))
-            
-            Text(
-                text = workout.description,
-                style = MaterialTheme.typography.bodySmall,
-                textAlign = TextAlign.Center,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                maxLines = 2
+                color = White,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
         }
     }
