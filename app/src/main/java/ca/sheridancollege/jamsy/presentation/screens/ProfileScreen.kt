@@ -43,6 +43,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 
+import coil.compose.rememberAsyncImagePainter
+
 import ca.sheridancollege.jamsy.presentation.Screen
 import ca.sheridancollege.jamsy.presentation.components.BottomBar
 import ca.sheridancollege.jamsy.presentation.viewmodels.ProfileViewModel
@@ -181,22 +183,35 @@ fun ProfileScreen(
                                 .clickable { selectImage() },
                             contentAlignment = Alignment.Center
                         ) {
-                            // Display profile image using Base64 string
-                            if (user.profileImageBase64.isNotEmpty()) {
+                            // Priority 1: Display Spotify profile image
+                            if (user.spotifyProfileImageUrl.isNotEmpty()) {
+                                Image(
+                                    painter = rememberAsyncImagePainter(
+                                        model = user.spotifyProfileImageUrl
+                                    ),
+                                    contentDescription = "Spotify Profile Image",
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentScale = ContentScale.Crop
+                                )
+                            }
+                            // Priority 2: Display local Base64 profile image
+                            else if (user.profileImageBase64.isNotEmpty()) {
                                 val imageBytes = Base64.decode(user.profileImageBase64, Base64.DEFAULT)
                                 val bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
 
                                 if (bitmap != null) {
                                     Image(
                                         bitmap = bitmap.asImageBitmap(),
-                                        contentDescription = "Profile Image",
+                                        contentDescription = "Local Profile Image",
                                         modifier = Modifier.fillMaxSize(),
                                         contentScale = ContentScale.Crop
                                     )
                                 } else {
                                     Text("Invalid image data")
                                 }
-                            } else {
+                            }
+                            // Priority 3: Show placeholder
+                            else {
                                 Text("Tap to add photo")
                             }
 
@@ -210,11 +225,25 @@ fun ProfileScreen(
 
                         Spacer(modifier = Modifier.height(16.dp))
 
-                        // Email
+                        // Display Name from Spotify
                         Text(
-                            text = user.email,
-                            style = MaterialTheme.typography.titleLarge
+                            text = if (user.displayName.isNotEmpty()) {
+                                user.displayName
+                            } else {
+                                "(No Spotify name available)"
+                            },
+                            style = MaterialTheme.typography.headlineSmall
                         )
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        // Subscription Type
+                        if (user.spotifySubscriptionType.isNotEmpty()) {
+                            Text(
+                                text = user.spotifySubscriptionType.replaceFirstChar { it.uppercase() },
+                                style = MaterialTheme.typography.titleLarge
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                        }
 
                         Spacer(modifier = Modifier.height(32.dp))
 

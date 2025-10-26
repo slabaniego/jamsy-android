@@ -46,6 +46,8 @@ fun BottomBar(
             )
         )
 
+        // TODO: Search tab - to be implemented later
+        /*
         NavigationBarItem(
             icon = { Icon(Icons.Default.Search, contentDescription = "Search") },
             label = { Text("Search") },
@@ -59,7 +61,10 @@ fun BottomBar(
                 unselectedTextColor = LightGray
             )
         )
+        */
 
+        // TODO: Tracks tab - to be implemented later
+        /*
         NavigationBarItem(
             icon = { Icon(Icons.AutoMirrored.Filled.List, contentDescription = "Tracks") },
             label = { Text("Tracks") },
@@ -73,6 +78,7 @@ fun BottomBar(
                 unselectedTextColor = LightGray
             )
         )
+        */
 
         NavigationBarItem(
             icon = { Icon(Icons.Default.Person, contentDescription = "Profile") },

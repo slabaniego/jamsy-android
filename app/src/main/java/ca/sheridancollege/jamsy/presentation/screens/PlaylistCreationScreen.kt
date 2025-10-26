@@ -50,6 +50,9 @@ import ca.sheridancollege.jamsy.domain.models.Track
 import ca.sheridancollege.jamsy.presentation.viewmodels.LikedTracksViewModel
 import ca.sheridancollege.jamsy.util.Resource
 import androidx.core.net.toUri
+import ca.sheridancollege.jamsy.presentation.theme.SpotifyMediumGray
+import ca.sheridancollege.jamsy.presentation.theme.SpotifyGreen
+import ca.sheridancollege.jamsy.presentation.theme.White
 
 @SuppressLint("UseKtx")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -217,7 +220,7 @@ fun PlaylistCreationScreen(
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(16.dp),
                             colors = CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.primaryContainer
+                                containerColor = SpotifyMediumGray
                             )
                         ) {
                             Column(
@@ -228,7 +231,7 @@ fun PlaylistCreationScreen(
                                     text = "🎵 Ready to Listen?",
                                     style = MaterialTheme.typography.titleLarge,
                                     fontWeight = FontWeight.Bold,
-                                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                                    color = White
                                 )
                                 
                                 Spacer(modifier = Modifier.height(8.dp))
@@ -236,7 +239,7 @@ fun PlaylistCreationScreen(
                                 Text(
                                     text = "Open your playlist in Spotify to start listening to your personalized music discovery",
                                     style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f),
+                                    color = White.copy(alpha = 0.8f),
                                     textAlign = TextAlign.Center
                                 )
                                 

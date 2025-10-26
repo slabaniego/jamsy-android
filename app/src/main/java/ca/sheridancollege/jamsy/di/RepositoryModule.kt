@@ -68,8 +68,10 @@ object RepositoryModule {
 
     @Provides
     @Singleton
-    fun provideUserRepositoryImpl(): UserRepositoryImpl {
-        return UserRepositoryImpl()
+    fun provideUserRepositoryImpl(
+        authRepository: AuthRepository
+    ): UserRepositoryImpl {
+        return UserRepositoryImpl(authRepository)
     }
     
     @Provides

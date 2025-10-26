@@ -44,6 +44,9 @@ import ca.sheridancollege.jamsy.presentation.components.LoadingScreen
 import ca.sheridancollege.jamsy.presentation.components.ErrorScreen
 import ca.sheridancollege.jamsy.presentation.components.AppTopBar
 import ca.sheridancollege.jamsy.presentation.viewmodels.PlaylistTemplateViewModel
+import ca.sheridancollege.jamsy.presentation.theme.SpotifyMediumGray
+import ca.sheridancollege.jamsy.presentation.theme.SpotifyGreen
+import ca.sheridancollege.jamsy.presentation.theme.White
 import ca.sheridancollege.jamsy.util.Resource
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -159,19 +162,12 @@ private fun PlaylistTemplateCard(
             .fillMaxWidth()
             .clickable { onClick() },
         shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+        colors = CardDefaults.cardColors(containerColor = SpotifyMediumGray)
     ) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(
-                    Brush.horizontalGradient(
-                        colors = listOf(
-                            MaterialTheme.colorScheme.primaryContainer,
-                            MaterialTheme.colorScheme.secondaryContainer
-                        )
-                    )
-                )
                 .padding(24.dp)
         ) {
             Column {
@@ -182,7 +178,7 @@ private fun PlaylistTemplateCard(
                     Icon(
                         Icons.Default.FitnessCenter,
                         contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
+                        tint = SpotifyGreen,
                         modifier = Modifier.size(32.dp)
                     )
                     Spacer(modifier = Modifier.width(16.dp))
@@ -191,12 +187,12 @@ private fun PlaylistTemplateCard(
                             text = template.name,
                             style = MaterialTheme.typography.headlineSmall,
                             fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                            color = White
                         )
                         Text(
                             text = template.description,
                             style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
+                            color = White.copy(alpha = 0.8f)
                         )
                     }
                 }
@@ -211,13 +207,13 @@ private fun PlaylistTemplateCard(
                     template.seedGenres.take(3).forEach { genre ->
                         Surface(
                             shape = RoundedCornerShape(12.dp),
-                            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
+                            color = SpotifyGreen.copy(alpha = 0.2f)
                         ) {
                             Text(
                                 text = genre,
                                 modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
                                 style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.primary
+                                color = SpotifyGreen
                             )
                         }
                     }
@@ -228,7 +224,7 @@ private fun PlaylistTemplateCard(
                 Text(
                     text = "Tempo: ${template.targetTempo} BPM",
                     style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
+                    color = White.copy(alpha = 0.7f)
                 )
             }
         }

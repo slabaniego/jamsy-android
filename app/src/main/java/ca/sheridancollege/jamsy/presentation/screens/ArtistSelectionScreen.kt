@@ -24,6 +24,7 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -36,6 +37,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -60,6 +62,11 @@ import ca.sheridancollege.jamsy.domain.models.Artist
 import ca.sheridancollege.jamsy.presentation.viewmodels.ArtistSelectionViewModel
 import ca.sheridancollege.jamsy.presentation.viewmodels.AuthViewModel
 import ca.sheridancollege.jamsy.util.Resource
+import ca.sheridancollege.jamsy.presentation.theme.SpotifyBlack
+import ca.sheridancollege.jamsy.presentation.theme.SpotifyDarkGray
+import ca.sheridancollege.jamsy.presentation.theme.SpotifyGreen
+import ca.sheridancollege.jamsy.presentation.theme.White
+import ca.sheridancollege.jamsy.presentation.theme.LightGray
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -109,12 +116,13 @@ fun ArtistSelectionScreen(
                         Text(
                             "Select Artists",
                             fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Bold,
+                            color = White
                         )
                         Text(
                             "$workout • $mood",
                             fontSize = 12.sp,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = LightGray
                         )
                     }
                 },
@@ -122,13 +130,19 @@ fun ArtistSelectionScreen(
                     IconButton(onClick = onBack) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back")
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = SpotifyDarkGray,
+                    titleContentColor = SpotifyGreen,
+                    navigationIconContentColor = White
+                )
             )
         },
         bottomBar = {
             Surface(
                 modifier = Modifier.fillMaxWidth(),
-                shadowElevation = 8.dp
+                shadowElevation = 8.dp,
+                color = SpotifyDarkGray
             ) {
                 Column(
                     modifier = Modifier.padding(16.dp)
@@ -136,7 +150,7 @@ fun ArtistSelectionScreen(
                     Text(
                         text = "${selectedArtists.size}/5 artists selected",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = if (selectedArtists.size == 5) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                        color = if (selectedArtists.size == 5) SpotifyGreen else LightGray,
                         modifier = Modifier.padding(bottom = 8.dp)
                     )
                     Button(
@@ -155,7 +169,11 @@ fun ArtistSelectionScreen(
                             )
                         },
                         modifier = Modifier.fillMaxWidth(),
-                        enabled = selectedArtists.size == 5
+                        enabled = selectedArtists.size == 5,
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = SpotifyGreen,
+                            contentColor = White
+                        )
                     ) {
                         Text("Start Discovering New Music")
                     }
@@ -170,8 +188,8 @@ fun ArtistSelectionScreen(
                 .background(
                     Brush.verticalGradient(
                         colors = listOf(
-                            MaterialTheme.colorScheme.primary.copy(alpha = 0.05f),
-                            MaterialTheme.colorScheme.background
+                            SpotifyDarkGray,
+                            SpotifyBlack
                         )
                     )
                 )
@@ -190,7 +208,7 @@ fun ArtistSelectionScreen(
                             Text(
                                 text = "Finding artists for $workout...",
                                 style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                color = LightGray
                             )
                         }
                     }
@@ -207,12 +225,12 @@ fun ArtistSelectionScreen(
                         Text(
                             text = "Failed to load artists",
                             style = MaterialTheme.typography.headlineSmall,
-                            color = MaterialTheme.colorScheme.error
+                            color = SpotifyGreen
                         )
                         Text(
                             text = state.message,
                             style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            color = LightGray,
                             textAlign = TextAlign.Center
                         )
                         Spacer(modifier = Modifier.height(16.dp))
@@ -239,12 +257,13 @@ fun ArtistSelectionScreen(
                         ) {
                             Text(
                                 text = "No artists found",
-                                style = MaterialTheme.typography.headlineSmall
+                                style = MaterialTheme.typography.headlineSmall,
+                                color = White
                             )
                             Text(
                                 text = "Try a different workout type",
                                 style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                color = LightGray
                             )
                         }
                     } else {
@@ -254,7 +273,7 @@ fun ArtistSelectionScreen(
                             Text(
                                 text = "Choose artists you like to personalize your playlist",
                                 style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                color = LightGray,
                                 modifier = Modifier.padding(16.dp),
                                 textAlign = TextAlign.Center
                             )
@@ -310,7 +329,7 @@ private fun ArtistCard(
                 if (isSelected) {
                     Modifier.border(
                         2.dp,
-                        MaterialTheme.colorScheme.primary,
+                        SpotifyGreen,
                         RoundedCornerShape(16.dp)
                     )
                 } else {
@@ -327,9 +346,9 @@ private fun ArtistCard(
                 .fillMaxWidth()
                 .background(
                     if (isSelected) {
-                        MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
+                        SpotifyDarkGray
                     } else {
-                        MaterialTheme.colorScheme.surface
+                        SpotifyDarkGray
                     }
                 )
         ) {
@@ -355,7 +374,7 @@ private fun ArtistCard(
                                 .align(Alignment.TopEnd)
                                 .offset(x = 8.dp, y = (-8).dp),
                             shape = CircleShape,
-                            color = MaterialTheme.colorScheme.primary
+                            color = SpotifyGreen
                         ) {
                             Icon(
                                 Icons.Default.Check,
@@ -363,7 +382,7 @@ private fun ArtistCard(
                                 modifier = Modifier
                                     .size(20.dp)
                                     .padding(2.dp),
-                                tint = MaterialTheme.colorScheme.onPrimary
+                                tint = White
                             )
                         }
                     }
@@ -379,9 +398,9 @@ private fun ArtistCard(
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                     color = if (isSelected) {
-                        MaterialTheme.colorScheme.primary
+                        SpotifyGreen
                     } else {
-                        MaterialTheme.colorScheme.onSurface
+                        White
                     }
                 )
                 
@@ -390,7 +409,7 @@ private fun ArtistCard(
                     Text(
                         text = artist.genres.take(2).joinToString(", "),
                         style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        color = LightGray,
                         textAlign = TextAlign.Center,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
