@@ -41,4 +41,15 @@ object ApiClient {
     val jamsyApiService: JamsyApiService by lazy {
         retrofit.create(JamsyApiService::class.java)
     }
+
+    // Spotify API Service for direct API calls
+    private val spotifyRetrofit = Retrofit.Builder()
+        .baseUrl("https://api.spotify.com/")
+        .client(okHttpClient)
+        .addConverterFactory(MoshiConverterFactory.create(moshi))
+        .build()
+
+    val spotifyApiService: SpotifyApiService by lazy {
+        spotifyRetrofit.create(SpotifyApiService::class.java)
+    }
 }

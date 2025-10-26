@@ -19,18 +19,23 @@ import java.io.ByteArrayOutputStream
 import ca.sheridancollege.jamsy.domain.models.User
 import ca.sheridancollege.jamsy.domain.repository.UserRepository as UserRepositoryInterface
 import ca.sheridancollege.jamsy.util.Resource
+import ca.sheridancollege.jamsy.data.datasource.remote.ApiClient
 
-class UserRepository : UserRepositoryInterface {
+class UserRepository(
+    private val authRepository: AuthRepository
+) : UserRepositoryInterface {
     companion object {
         private const val TAG = "UserRepository"
     }
 
     private val firestore = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
+    private val spotifyApiService = ApiClient.spotifyApiService
 
     /**
      * Retrieves the current user's profile from Firestore.
      * Creates a new user document if one doesn't exist.
+     * Fetches Spotify display name on first load if available.
      *
      * @return Resource containing the User object or error message
      */
@@ -40,15 +45,112 @@ class UserRepository : UserRepositoryInterface {
             val userDoc = firestore.collection("users").document(currentUser.uid).get().await()
 
             if (userDoc.exists()) {
-                Resource.Success(userDoc.toObject(User::class.java) ?: User(currentUser.uid, currentUser.email ?: ""))
+                val user = userDoc.toObject(User::class.java) ?: User(currentUser.uid, currentUser.email ?: "")
+                
+                // If displayName OR image URL OR subscription type is empty, try to fetch from Spotify
+                if (user.displayName.isEmpty() || user.spotifyProfileImageUrl.isEmpty() || user.spotifySubscriptionType.isEmpty()) {
+                    val (spotifyName, spotifyImageUrl, subscriptionType) = fetchSpotifyUserData()
+                    
+                    if (spotifyName != null || spotifyImageUrl != null || subscriptionType != null) {
+                        // Update with whatever we got from Spotify
+                        val updatedUser = user.copy(
+                            displayName = spotifyName ?: user.displayName,
+                            spotifyProfileImageUrl = spotifyImageUrl ?: user.spotifyProfileImageUrl,
+                            spotifySubscriptionType = subscriptionType ?: user.spotifySubscriptionType
+                        )
+                        
+                        // Save to Firestore for future use
+                        try {
+                            val updateMap = mutableMapOf<String, Any>()
+                            if (spotifyName != null) {
+                                updateMap["displayName"] = spotifyName
+                            }
+                            if (spotifyImageUrl != null) {
+                                updateMap["spotifyProfileImageUrl"] = spotifyImageUrl
+                            }
+                            if (subscriptionType != null) {
+                                updateMap["spotifySubscriptionType"] = subscriptionType
+                            }
+                            if (updateMap.isNotEmpty()) {
+                                firestore.collection("users").document(currentUser.uid)
+                                    .update(updateMap).await()
+                            }
+                        } catch (e: Exception) {
+                            Log.e(TAG, "Failed to save Spotify data to Firestore", e)
+                        }
+                        return Resource.Success(updatedUser)
+                    }
+                }
+                
+                Resource.Success(user)
             } else {
-                val newUser = User(currentUser.uid, currentUser.email ?: "")
+                // Create new user with Spotify data if available
+                var displayName = ""
+                var spotifyImageUrl = ""
+                var subscriptionType = ""
+                val (spotifyName, imageUrl, subType) = fetchSpotifyUserData()
+                if (spotifyName != null) {
+                    displayName = spotifyName
+                }
+                if (imageUrl != null) {
+                    spotifyImageUrl = imageUrl
+                }
+                if (subType != null) {
+                    subscriptionType = subType
+                }
+                
+                val newUser = User(
+                    currentUser.uid, 
+                    currentUser.email ?: "", 
+                    "", 
+                    displayName,
+                    spotifyImageUrl,
+                    subscriptionType
+                )
                 firestore.collection("users").document(currentUser.uid).set(newUser).await()
                 Resource.Success(newUser)
             }
         } catch (e: Exception) {
             Log.e(TAG, "Error getting user profile", e)
             Resource.Error(e.message ?: "An unknown error occurred")
+        }
+    }
+
+    /**
+     * Fetches the current user's Spotify data (name, profile image URL, and subscription type)
+     * 
+     * @return Triple of (displayName, profileImageUrl, subscriptionType) or (null, null, null) if unable to fetch
+     */
+    private suspend fun fetchSpotifyUserData(): Triple<String?, String?, String?> {
+        return try {
+            val accessToken = authRepository.getSpotifyAccessToken()
+            
+            if (accessToken.isNullOrEmpty()) {
+                return Triple(null, null, null)
+            }
+
+            val response = spotifyApiService.getCurrentUserProfile("Bearer $accessToken")
+            
+            if (response.isSuccessful && response.body() != null) {
+                val spotifyProfile = response.body()!!
+                
+                // Get the first (highest resolution) image URL
+                val imageUrl = if (spotifyProfile.images.isNotEmpty()) {
+                    spotifyProfile.images.first().url
+                } else {
+                    null
+                }
+                
+                val subscriptionType = spotifyProfile.product
+                
+                Triple(spotifyProfile.display_name, imageUrl, subscriptionType)
+            } else {
+                Log.e(TAG, "Spotify API error: ${response.code()}")
+                Triple(null, null, null)
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error fetching Spotify user data", e)
+            Triple(null, null, null)
         }
     }
 
@@ -128,7 +230,10 @@ class UserRepository : UserRepositoryInterface {
             
             val userData = hashMapOf(
                 "email" to user.email,
-                "profileImageBase64" to user.profileImageBase64
+                "profileImageBase64" to user.profileImageBase64,
+                "displayName" to user.displayName,
+                "spotifyProfileImageUrl" to user.spotifyProfileImageUrl,
+                "spotifySubscriptionType" to user.spotifySubscriptionType
             )
             
             firestore.collection("users").document(currentUser.uid)

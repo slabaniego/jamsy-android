@@ -45,6 +45,9 @@ import androidx.compose.ui.unit.dp
 import ca.sheridancollege.jamsy.presentation.components.TrackItem
 import ca.sheridancollege.jamsy.presentation.components.AppTopBar
 import ca.sheridancollege.jamsy.presentation.viewmodels.LikedTracksViewModel
+import ca.sheridancollege.jamsy.presentation.theme.SpotifyMediumGray
+import ca.sheridancollege.jamsy.presentation.theme.SpotifyGreen
+import ca.sheridancollege.jamsy.presentation.theme.White
 import ca.sheridancollege.jamsy.util.Resource
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -202,7 +205,7 @@ fun PlaylistPreviewScreen(
                                     .padding(16.dp),
                                 shape = RoundedCornerShape(16.dp),
                                 colors = CardDefaults.cardColors(
-                                    containerColor = MaterialTheme.colorScheme.primaryContainer
+                                    containerColor = SpotifyMediumGray
                                 )
                             ) {
                                 Column(
@@ -212,19 +215,19 @@ fun PlaylistPreviewScreen(
                                         text = "🎶 Your Extended Playlist",
                                         style = MaterialTheme.typography.headlineSmall,
                                         fontWeight = FontWeight.Bold,
-                                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                                        color = White
                                     )
                                     Spacer(modifier = Modifier.height(8.dp))
                                     Text(
                                         text = "${tracks.size} tracks • ~${(tracks.size * 3.5).toInt()} minutes",
                                         style = MaterialTheme.typography.bodyMedium,
-                                        color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
+                                        color = White.copy(alpha = 0.8f)
                                     )
                                     Spacer(modifier = Modifier.height(8.dp))
                                     Text(
                                         text = "We've expanded your liked tracks with similar music for the perfect playlist",
                                         style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
+                                        color = White.copy(alpha = 0.7f)
                                     )
                                 }
                             }
@@ -259,7 +262,7 @@ fun PlaylistPreviewScreen(
                                     onClick = { showCreateDialog = true },
                                     modifier = Modifier.fillMaxWidth(),
                                     colors = androidx.compose.material3.ButtonDefaults.buttonColors(
-                                        containerColor = MaterialTheme.colorScheme.primary
+                                        containerColor = SpotifyGreen
                                     )
                                 ) {
                                     Text(

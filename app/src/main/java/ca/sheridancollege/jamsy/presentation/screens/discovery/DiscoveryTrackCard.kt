@@ -52,6 +52,7 @@ import kotlin.math.abs
 import ca.sheridancollege.jamsy.domain.models.Track
 import ca.sheridancollege.jamsy.presentation.theme.LightGray
 import ca.sheridancollege.jamsy.presentation.theme.SpotifyGreen
+import ca.sheridancollege.jamsy.presentation.theme.SpotifyDarkGray
 import ca.sheridancollege.jamsy.presentation.theme.White
 
 private const val DRAG_ANIMATION_DURATION = 100
@@ -111,7 +112,8 @@ fun DiscoveryTrackCard(
                 }
             },
         shape = RoundedCornerShape(24.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 16.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 16.dp),
+        colors = CardDefaults.cardColors(containerColor = SpotifyDarkGray)
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
             // Album cover with swipe indicators

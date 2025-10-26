@@ -36,6 +36,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 
 import ca.sheridancollege.jamsy.domain.models.Track
+import ca.sheridancollege.jamsy.presentation.theme.SpotifyMediumGray
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -55,7 +56,7 @@ fun TrackItem(
             .fillMaxWidth()
             .padding(vertical = 4.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
+            containerColor = SpotifyMediumGray
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
