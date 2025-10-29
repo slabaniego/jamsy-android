@@ -42,8 +42,8 @@ import ca.sheridancollege.jamsy.presentation.viewmodels.DiscoveryViewModel
 import ca.sheridancollege.jamsy.presentation.viewmodels.LikedTracksViewModel
 
 private const val TAG = "DiscoveryScreen"
-private const val SWIPE_THRESHOLD_LIKE = 200
-private const val SWIPE_THRESHOLD_DISLIKE = -200
+private const val SWIPE_THRESHOLD_LIKE = 60
+private const val SWIPE_THRESHOLD_DISLIKE = -60
 
 /**
  * Discovery screen for discovering and rating music tracks
