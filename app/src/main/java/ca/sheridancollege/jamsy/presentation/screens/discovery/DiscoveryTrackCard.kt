@@ -1,9 +1,6 @@
 package ca.sheridancollege.jamsy.presentation.screens.discovery
 
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -34,7 +31,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -50,12 +46,14 @@ import coil.compose.AsyncImage
 import kotlin.math.abs
 
 import ca.sheridancollege.jamsy.domain.models.Track
+import ca.sheridancollege.jamsy.presentation.swipe.SwipeableCard
+import ca.sheridancollege.jamsy.presentation.swipe.SwipeCardConfig
+import ca.sheridancollege.jamsy.presentation.swipe.SwipeDirection
 import ca.sheridancollege.jamsy.presentation.theme.LightGray
 import ca.sheridancollege.jamsy.presentation.theme.SpotifyGreen
 import ca.sheridancollege.jamsy.presentation.theme.SpotifyDarkGray
 import ca.sheridancollege.jamsy.presentation.theme.White
 
-private const val DRAG_ANIMATION_DURATION = 100
 private const val TRACK_CARD_WIDTH = 300
 private const val TRACK_CARD_HEIGHT = 500
 
@@ -91,77 +89,75 @@ fun DiscoveryTrackCard(
         }
     }
 
-    val rotation by animateFloatAsState(
-        targetValue = dragOffset * 0.1f,
-        animationSpec = tween(durationMillis = DRAG_ANIMATION_DURATION)
-    )
-
-    Card(
-        modifier = Modifier
-            .size(width = TRACK_CARD_WIDTH.dp, height = TRACK_CARD_HEIGHT.dp)
-            .graphicsLayer {
-                translationX = dragOffset
-                rotationZ = rotation
-                alpha = 1f - (abs(dragOffset) / 800f)
-            }
-            .pointerInput(Unit) {
-                detectDragGestures(
-                    onDragEnd = { onDragEnd(dragOffset) }
-                ) { _, dragAmount ->
-                    onDragUpdate(dragOffset + dragAmount.x)
-                }
-            },
-        shape = RoundedCornerShape(24.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 16.dp),
-        colors = CardDefaults.cardColors(containerColor = SpotifyDarkGray)
+    SwipeableCard(
+        modifier = Modifier.size(width = TRACK_CARD_WIDTH.dp, height = TRACK_CARD_HEIGHT.dp),
+        dragOffset = dragOffset,
+        onDragUpdate = onDragUpdate,
+        onDragEnd = onDragEnd,
+        onSwipe = { direction ->
+            // Swipe is handled by parent component through onDragEnd
+        },
+        config = SwipeCardConfig(
+            rotationDegrees = 20f,
+            alphaThreshold = 400f,
+            swipeThreshold = 60f,
+            animationDurationMs = 100
+        )
     ) {
-        Column(modifier = Modifier.fillMaxSize()) {
-            // Album cover with swipe indicators
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(300.dp)
-            ) {
-                AsyncImage(
-                    model = track.albumCover ?: track.imageUrl ?: "https://via.placeholder.com/300",
-                    contentDescription = "Album cover",
-                    modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop
-                )
+        Card(
+            shape = RoundedCornerShape(24.dp),
+            elevation = CardDefaults.cardElevation(defaultElevation = 16.dp),
+            colors = CardDefaults.cardColors(containerColor = SpotifyDarkGray),
+            modifier = Modifier.fillMaxSize()
+        ) {
+            Column(modifier = Modifier.fillMaxSize()) {
+                // Album cover with swipe indicators
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(300.dp)
+                ) {
+                    AsyncImage(
+                        model = track.albumCover ?: track.imageUrl ?: "https://via.placeholder.com/300",
+                        contentDescription = "Album cover",
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
+                    )
 
-                if (abs(dragOffset) > 50) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(
-                                if (dragOffset > 0) {
-                                    SpotifyGreen.copy(alpha = 0.7f)
-                                } else {
-                                    MaterialTheme.colorScheme.error.copy(alpha = 0.7f)
-                                }
-                            ),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            imageVector = if (dragOffset > 0) Icons.Default.Favorite else Icons.Default.ThumbDown,
-                            contentDescription = null,
-                            modifier = Modifier.size(64.dp),
-                            tint = White
-                        )
+                    if (abs(dragOffset) > 50) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(
+                                    if (dragOffset > 0) {
+                                        SpotifyGreen.copy(alpha = 0.7f)
+                                    } else {
+                                        MaterialTheme.colorScheme.error.copy(alpha = 0.7f)
+                                    }
+                                ),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = if (dragOffset > 0) Icons.Default.Favorite else Icons.Default.ThumbDown,
+                                contentDescription = null,
+                                modifier = Modifier.size(64.dp),
+                                tint = White
+                            )
+                        }
                     }
                 }
-            }
 
-            // Track info
-            TrackInfoContent(track = track, isPlaying = isPlaying, onPlayClick = {
-                isPlaying = if (isPlaying) {
-                    exoPlayer.pause()
-                    false
-                } else {
-                    exoPlayer.play()
-                    true
-                }
-            })
+                // Track info
+                TrackInfoContent(track = track, isPlaying = isPlaying, onPlayClick = {
+                    isPlaying = if (isPlaying) {
+                        exoPlayer.pause()
+                        false
+                    } else {
+                        exoPlayer.play()
+                        true
+                    }
+                })
+            }
         }
     }
 }
