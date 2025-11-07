@@ -1,15 +1,13 @@
 package ca.sheridancollege.jamsy.presentation.screens
 
-import android.graphics.BitmapFactory
 import android.net.Uri
-import android.util.Base64
 import android.util.Log
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -17,9 +15,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -37,16 +32,23 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-
-import coil.compose.rememberAsyncImagePainter
 
 import ca.sheridancollege.jamsy.presentation.Screen
 import ca.sheridancollege.jamsy.presentation.components.BottomBar
+import ca.sheridancollege.jamsy.presentation.components.GlassCard
+import ca.sheridancollege.jamsy.presentation.components.PremiumGradientButton
+import ca.sheridancollege.jamsy.presentation.components.PremiumProfileImage
+import ca.sheridancollege.jamsy.presentation.components.ProfileInfoCard
+import ca.sheridancollege.jamsy.domain.models.User
+import ca.sheridancollege.jamsy.presentation.theme.SpotifyBlack
+import ca.sheridancollege.jamsy.presentation.theme.SpotifyDarkGray
+import ca.sheridancollege.jamsy.presentation.theme.SpotifyGreen
 import ca.sheridancollege.jamsy.presentation.viewmodels.ProfileViewModel
 import ca.sheridancollege.jamsy.util.PermissionHandler
 import ca.sheridancollege.jamsy.util.Resource
@@ -156,113 +158,179 @@ fun ProfileScreen(
             }
         }
     ) { paddingValues ->
+        ProfileScreenContent(
+            profileState = profileState,
+            uploadState = uploadState,
+            onSelectImage = selectImage,
+            onRetry = { viewModel.getUserProfile() },
+            paddingValues = paddingValues
+        )
+    }
+}
+
+@Composable
+private fun ProfileScreenContent(
+    profileState: Resource<User>,
+    uploadState: Resource<String>?,
+    onSelectImage: () -> Unit,
+    onRetry: () -> Unit,
+    paddingValues: androidx.compose.foundation.layout.PaddingValues
+) {
+    // Animation states for entrance effects
+    var imageAlpha by remember { mutableStateOf(0f) }
+    var infoAlpha by remember { mutableStateOf(0f) }
+    var buttonAlpha by remember { mutableStateOf(0f) }
+
+    // Animated alpha values
+    val animatedImageAlpha by animateFloatAsState(
+        targetValue = imageAlpha,
+        animationSpec = tween(durationMillis = 800, delayMillis = 100),
+        label = "image_alpha"
+    )
+    val animatedInfoAlpha by animateFloatAsState(
+        targetValue = infoAlpha,
+        animationSpec = tween(durationMillis = 800, delayMillis = 300),
+        label = "info_alpha"
+    )
+    val animatedButtonAlpha by animateFloatAsState(
+        targetValue = buttonAlpha,
+        animationSpec = tween(durationMillis = 800, delayMillis = 500),
+        label = "button_alpha"
+    )
+
+    LaunchedEffect(profileState) {
+        if (profileState is Resource.Success) {
+            imageAlpha = 1f
+            infoAlpha = 1f
+            buttonAlpha = 1f
+        }
+    }
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(paddingValues)
+            .background(
+                brush = Brush.verticalGradient(
+                    colors = listOf(
+                        SpotifyDarkGray,
+                        SpotifyBlack,
+                        SpotifyBlack
+                    )
+                )
+            )
+    ) {
+        // Decorative gradient orbs for premium feel
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues),
-            contentAlignment = Alignment.Center
-        ) {
-            when (profileState) {
-                is Resource.Loading -> {
-                    CircularProgressIndicator()
+                .background(
+                    brush = Brush.radialGradient(
+                        colors = listOf(
+                            SpotifyGreen.copy(alpha = 0.08f),
+                            Color.Transparent
+                        ),
+                        radius = 800f
+                    )
+                )
+        )
+
+        when (profileState) {
+            is Resource.Loading -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(color = SpotifyGreen)
                 }
-                is Resource.Success -> {
-                    val user = (profileState as Resource.Success).data
-                    Column(
+            }
+            is Resource.Success -> {
+                val user = profileState.data
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = androidx.compose.foundation.layout.Arrangement.Center
+                ) {
+                    // Premium profile image with glassmorphism border
+                    PremiumProfileImage(
+                        spotifyImageUrl = user.spotifyProfileImageUrl,
+                        localImageBase64 = user.profileImageBase64,
+                        isLoading = uploadState is Resource.Loading,
+                        onImageClick = onSelectImage,
+                        modifier = Modifier.alpha(animatedImageAlpha)
+                    )
+
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    // Profile info card with glassmorphism
+                    ProfileInfoCard(
+                        displayName = user.displayName,
+                        subscriptionType = user.spotifySubscriptionType,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        // Profile image
+                            .alpha(animatedInfoAlpha)
+                    )
+
+                    Spacer(modifier = Modifier.height(32.dp))
+
+                    // Premium gradient button
+                    PremiumGradientButton(
+                        text = "CHANGE PROFILE PHOTO",
+                        onClick = onSelectImage,
+                        isLoading = uploadState is Resource.Loading,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .alpha(animatedButtonAlpha)
+                            .padding(horizontal = 16.dp)
+                    )
+                }
+            }
+            is Resource.Error -> {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = androidx.compose.foundation.layout.Arrangement.Center
+                ) {
+                    GlassCard(modifier = Modifier.fillMaxWidth()) {
                         Box(
                             modifier = Modifier
-                                .size(128.dp)
-                                .clip(CircleShape)
-                                .border(2.dp, MaterialTheme.colorScheme.primary, CircleShape)
-                                .clickable { selectImage() },
+                                .fillMaxWidth()
+                                .padding(24.dp),
                             contentAlignment = Alignment.Center
                         ) {
-                            // Priority 1: Display Spotify profile image
-                            if (user.spotifyProfileImageUrl.isNotEmpty()) {
-                                Image(
-                                    painter = rememberAsyncImagePainter(
-                                        model = user.spotifyProfileImageUrl
-                                    ),
-                                    contentDescription = "Spotify Profile Image",
-                                    modifier = Modifier.fillMaxSize(),
-                                    contentScale = ContentScale.Crop
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Text(
+                                    text = "Error loading profile",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    color = MaterialTheme.colorScheme.error,
+                                    textAlign = TextAlign.Center
                                 )
-                            }
-                            // Priority 2: Display local Base64 profile image
-                            else if (user.profileImageBase64.isNotEmpty()) {
-                                val imageBytes = Base64.decode(user.profileImageBase64, Base64.DEFAULT)
-                                val bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
-
-                                if (bitmap != null) {
-                                    Image(
-                                        bitmap = bitmap.asImageBitmap(),
-                                        contentDescription = "Local Profile Image",
-                                        modifier = Modifier.fillMaxSize(),
-                                        contentScale = ContentScale.Crop
-                                    )
-                                } else {
-                                    Text("Invalid image data")
-                                }
-                            }
-                            // Priority 3: Show placeholder
-                            else {
-                                Text("Tap to add photo")
-                            }
-
-                            // Show loading indicator during upload
-                            if (uploadState is Resource.Loading) {
-                                CircularProgressIndicator(
-                                    modifier = Modifier.size(64.dp)
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Text(
+                                    text = profileState.message,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                                    textAlign = TextAlign.Center
                                 )
                             }
                         }
-
-                        Spacer(modifier = Modifier.height(16.dp))
-
-                        // Display Name from Spotify
-                        Text(
-                            text = if (user.displayName.isNotEmpty()) {
-                                user.displayName
-                            } else {
-                                "(No Spotify name available)"
-                            },
-                            style = MaterialTheme.typography.headlineSmall
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-
-                        // Subscription Type
-                        if (user.spotifySubscriptionType.isNotEmpty()) {
-                            Text(
-                                text = user.spotifySubscriptionType.replaceFirstChar { it.uppercase() },
-                                style = MaterialTheme.typography.titleLarge
-                            )
-                            Spacer(modifier = Modifier.height(8.dp))
-                        }
-
-                        Spacer(modifier = Modifier.height(32.dp))
-
-                        // Tap to change photo button
-                        Button(onClick = { selectImage() }) {
-                            Text("Change Profile Photo")
-                        }
                     }
-                }
-                is Resource.Error -> {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text("Error loading profile: ${(profileState as Resource.Error).message}")
 
-                        Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(24.dp))
 
-                        Button(onClick = { viewModel.getUserProfile() }) {
-                            Text("Retry")
-                        }
-                    }
+                    PremiumGradientButton(
+                        text = "RETRY",
+                        onClick = onRetry,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp)
+                    )
                 }
             }
         }
