@@ -1,8 +1,6 @@
 package ca.sheridancollege.jamsy.presentation.screens
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,22 +9,14 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -47,21 +37,19 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-
-import coil.compose.AsyncImage
 
 import ca.sheridancollege.jamsy.domain.models.Artist
 import ca.sheridancollege.jamsy.presentation.viewmodels.ArtistSelectionViewModel
 import ca.sheridancollege.jamsy.presentation.viewmodels.AuthViewModel
 import ca.sheridancollege.jamsy.util.Resource
+import ca.sheridancollege.jamsy.presentation.components.GlassCard
+import ca.sheridancollege.jamsy.presentation.components.PremiumArtistCard
+import ca.sheridancollege.jamsy.presentation.components.PremiumGradientButton
 import ca.sheridancollege.jamsy.presentation.theme.SpotifyBlack
 import ca.sheridancollege.jamsy.presentation.theme.SpotifyDarkGray
 import ca.sheridancollege.jamsy.presentation.theme.SpotifyGreen
@@ -153,7 +141,8 @@ fun ArtistSelectionScreen(
                         color = if (selectedArtists.size == 5) SpotifyGreen else LightGray,
                         modifier = Modifier.padding(bottom = 8.dp)
                     )
-                    Button(
+                    PremiumGradientButton(
+                        text = "Start Discovering New Music",
                         onClick = {
                             val authToken = authViewModel.getSpotifyAccessToken()?.takeIf { it.isNotBlank() } ?: "dummy_token"
                             viewModel.submitSelection(
@@ -168,15 +157,8 @@ fun ArtistSelectionScreen(
                                 }
                             )
                         },
-                        modifier = Modifier.fillMaxWidth(),
-                        enabled = selectedArtists.size == 5,
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = SpotifyGreen,
-                            contentColor = White
-                        )
-                    ) {
-                        Text("Start Discovering New Music")
-                    }
+                        enabled = selectedArtists.size == 5
+                    )
                 }
             }
         }
@@ -189,11 +171,27 @@ fun ArtistSelectionScreen(
                     Brush.verticalGradient(
                         colors = listOf(
                             SpotifyDarkGray,
+                            SpotifyBlack,
                             SpotifyBlack
                         )
                     )
                 )
         ) {
+            // Decorative green glow
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        brush = Brush.radialGradient(
+                            colors = listOf(
+                                SpotifyGreen.copy(alpha = 0.08f),
+                                androidx.compose.ui.graphics.Color.Transparent
+                            ),
+                            radius = 800f
+                        )
+                    )
+            )
+
             when (val state = artistsState) {
                 is Resource.Loading -> {
                     Box(
@@ -270,13 +268,27 @@ fun ArtistSelectionScreen(
                         Column(
                             modifier = Modifier.fillMaxSize()
                         ) {
-                            Text(
-                                text = "Choose artists you like to personalize your playlist",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = LightGray,
-                                modifier = Modifier.padding(16.dp),
-                                textAlign = TextAlign.Center
-                            )
+                            // Header with glass card
+                            GlassCard(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp)
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(20.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(
+                                        text = "Choose artists you like to personalize your playlist",
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = LightGray,
+                                        textAlign = TextAlign.Center,
+                                        lineHeight = 20.sp
+                                    )
+                                }
+                            }
                             
                             LazyVerticalGrid(
                                 columns = GridCells.Fixed(2),
@@ -286,7 +298,7 @@ fun ArtistSelectionScreen(
                                 verticalArrangement = Arrangement.spacedBy(12.dp)
                             ) {
                                 items(artists) { artist ->
-                                    ArtistCard(
+                                    PremiumArtistCard(
                                         artist = artist,
                                         isSelected = selectedArtists.contains(artist),
                                         onToggle = { viewModel.toggleArtistSelection(artist) }
@@ -312,110 +324,5 @@ fun ArtistSelectionScreen(
                 }
             }
         )
-    }
-}
-
-@Composable
-private fun ArtistCard(
-    artist: Artist,
-    isSelected: Boolean,
-    onToggle: () -> Unit
-) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onToggle() }
-            .then(
-                if (isSelected) {
-                    Modifier.border(
-                        2.dp,
-                        SpotifyGreen,
-                        RoundedCornerShape(16.dp)
-                    )
-                } else {
-                    Modifier
-                }
-            ),
-        shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = if (isSelected) 8.dp else 4.dp
-        )
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(
-                    if (isSelected) {
-                        SpotifyDarkGray
-                    } else {
-                        SpotifyDarkGray
-                    }
-                )
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Box {
-                    AsyncImage(
-                        model = artist.firstImageUrl ?: "https://via.placeholder.com/100",
-                        contentDescription = artist.name,
-                        modifier = Modifier
-                            .size(80.dp)
-                            .clip(CircleShape),
-                        contentScale = ContentScale.Crop
-                    )
-                    
-                    if (isSelected) {
-                        Surface(
-                            modifier = Modifier
-                                .align(Alignment.TopEnd)
-                                .offset(x = 8.dp, y = (-8).dp),
-                            shape = CircleShape,
-                            color = SpotifyGreen
-                        ) {
-                            Icon(
-                                Icons.Default.Check,
-                                contentDescription = "Selected",
-                                modifier = Modifier
-                                    .size(20.dp)
-                                    .padding(2.dp),
-                                tint = White
-                            )
-                        }
-                    }
-                }
-                
-                Spacer(modifier = Modifier.height(12.dp))
-                
-                Text(
-                    text = artist.name,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Medium,
-                    textAlign = TextAlign.Center,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
-                    color = if (isSelected) {
-                        SpotifyGreen
-                    } else {
-                        White
-                    }
-                )
-                
-                if (!artist.genres.isNullOrEmpty()) {
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = artist.genres.take(2).joinToString(", "),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = LightGray,
-                        textAlign = TextAlign.Center,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                }
-            }
-        }
     }
 }
