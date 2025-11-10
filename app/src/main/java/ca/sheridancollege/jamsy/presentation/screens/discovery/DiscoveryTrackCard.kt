@@ -14,8 +14,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.ThumbDown
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -30,7 +28,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -48,7 +45,7 @@ import kotlin.math.abs
 import ca.sheridancollege.jamsy.domain.models.Track
 import ca.sheridancollege.jamsy.presentation.swipe.SwipeableCard
 import ca.sheridancollege.jamsy.presentation.swipe.SwipeCardConfig
-import ca.sheridancollege.jamsy.presentation.swipe.SwipeDirection
+import ca.sheridancollege.jamsy.presentation.components.PremiumButton
 import ca.sheridancollege.jamsy.presentation.theme.LightGray
 import ca.sheridancollege.jamsy.presentation.theme.SpotifyGreen
 import ca.sheridancollege.jamsy.presentation.theme.SpotifyDarkGray
@@ -228,13 +225,13 @@ fun TrackInfoContent(
         // Audio preview controls
         if (!track.previewUrl.isNullOrBlank()) {
             Spacer(modifier = Modifier.height(16.dp))
-            Button(
+            PremiumButton(
+                text = if (isPlaying) "Pause Preview" else "Play Preview",
                 onClick = onPlayClick,
                 modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = SpotifyGreen)
-            ) {
-                Text(if (isPlaying) "⏸️ Pause Preview" else "▶️ Play Preview", color = White)
-            }
+                enabled = true,
+                fontSize = 14
+            )
         }
     }
 }
