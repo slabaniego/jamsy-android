@@ -6,16 +6,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -24,20 +16,15 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 
 import ca.sheridancollege.jamsy.data.DiscoveryDataStore
 import ca.sheridancollege.jamsy.presentation.screens.discovery.DiscoveryContent
-import ca.sheridancollege.jamsy.presentation.theme.LightGray
+import ca.sheridancollege.jamsy.presentation.screens.discovery.DiscoveryHeader
 import ca.sheridancollege.jamsy.presentation.theme.SpotifyBlack
 import ca.sheridancollege.jamsy.presentation.theme.SpotifyDarkGray
 import ca.sheridancollege.jamsy.presentation.theme.SpotifyGreen
-import ca.sheridancollege.jamsy.presentation.theme.White
 import ca.sheridancollege.jamsy.presentation.viewmodels.DiscoveryViewModel
 import ca.sheridancollege.jamsy.presentation.viewmodels.LikedTracksViewModel
 
@@ -96,17 +83,7 @@ fun DiscoveryScreen(
 
     Scaffold(
         topBar = {
-            DiscoveryTopAppBar(
-                likedTracksCount = likedTracks.size,
-                onBack = onBack,
-                onViewLiked = {
-                    if (authToken.isNotBlank() && likedTracksViewModel != null) {
-                        likedTracksViewModel.loadLikedTracks(authToken)
-                    }
-                    onNavigateToGeneratedPlaylist()
-                },
-                hasLikedTracks = likedTracks.isNotEmpty()
-            )
+            // Premium header removed - integrated into main content for better animations
         }
     ) { paddingValues ->
         Box(
@@ -115,98 +92,94 @@ fun DiscoveryScreen(
                 .padding(paddingValues)
                 .background(
                     Brush.verticalGradient(
-                        colors = listOf(SpotifyDarkGray, SpotifyBlack)
+                        colors = listOf(SpotifyDarkGray, SpotifyBlack, SpotifyBlack)
                     )
                 )
         ) {
-            DiscoveryContent(
-                tracksState = tracksState,
-                currentTrackIndex = currentTrackIndex,
-                likedTracks = likedTracks,
-                dragOffset = dragOffset,
-                isProcessingLike = isProcessingLike,
-                isProcessingDislike = isProcessingDislike,
-                onDragOffsetChange = { dragOffset = it },
-                onProcessingLikeChange = { isProcessingLike = it },
-                onProcessingDislikeChange = { isProcessingDislike = it },
-                onDragEnd = { offset ->
-                    if (!isProcessingLike && !isProcessingDislike) {
-                        val action = when {
-                            offset > SWIPE_THRESHOLD_LIKE -> "like"
-                            offset < SWIPE_THRESHOLD_DISLIKE -> "dislike"
-                            else -> null
-                        }
-                        
-                        if (action != null) {
-                            Log.d(TAG, "Processing swipe action: $action")
-                            val currentTrack = viewModel.getCurrentTrack()
-                            if (currentTrack != null) {
-                                if (action == "like") isProcessingLike = true else isProcessingDislike = true
-                                viewModel.handleTrackAction(
-                                    track = currentTrack,
-                                    action = action,
-                                    authToken = authToken,
-                                    onComplete = {
-                                        isProcessingLike = false
-                                        isProcessingDislike = false
-                                        dragOffset = 0f
-                                    }
-                                )
-                            }
-                        } else {
-                            dragOffset = 0f
-                        }
-                    }
-                },
-                onNavigateToGeneratedPlaylist = onNavigateToGeneratedPlaylist,
-                onBack = onBack,
-                viewModel = viewModel,
-                authToken = authToken
+            // Decorative gradient orbs for premium feel (similar to Login screen)
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        brush = Brush.radialGradient(
+                            colors = listOf(
+                                SpotifyGreen.copy(alpha = 0.08f),
+                                androidx.compose.ui.graphics.Color.Transparent
+                            ),
+                            radius = 800f
+                        )
+                    )
             )
+
+            androidx.compose.foundation.layout.Column(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                // Premium header at the top with animations
+                DiscoveryHeader(
+                    likedTracksCount = likedTracks.size,
+                    onBack = onBack,
+                    onViewLiked = {
+                        if (authToken.isNotBlank() && likedTracksViewModel != null) {
+                            likedTracksViewModel.loadLikedTracks(authToken)
+                        }
+                        onNavigateToGeneratedPlaylist()
+                    },
+                    hasLikedTracks = likedTracks.isNotEmpty(),
+                    animationDelay = 100
+                )
+
+                // Main content area
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxSize()
+                ) {
+                    DiscoveryContent(
+                        tracksState = tracksState,
+                        currentTrackIndex = currentTrackIndex,
+                        likedTracks = likedTracks,
+                        dragOffset = dragOffset,
+                        isProcessingLike = isProcessingLike,
+                        isProcessingDislike = isProcessingDislike,
+                        onDragOffsetChange = { dragOffset = it },
+                        onProcessingLikeChange = { isProcessingLike = it },
+                        onProcessingDislikeChange = { isProcessingDislike = it },
+                        onDragEnd = { offset ->
+                            if (!isProcessingLike && !isProcessingDislike) {
+                                val action = when {
+                                    offset > SWIPE_THRESHOLD_LIKE -> "like"
+                                    offset < SWIPE_THRESHOLD_DISLIKE -> "dislike"
+                                    else -> null
+                                }
+                                
+                                if (action != null) {
+                                    Log.d(TAG, "Processing swipe action: $action")
+                                    val currentTrack = viewModel.getCurrentTrack()
+                                    if (currentTrack != null) {
+                                        if (action == "like") isProcessingLike = true else isProcessingDislike = true
+                                        viewModel.handleTrackAction(
+                                            track = currentTrack,
+                                            action = action,
+                                            authToken = authToken,
+                                            onComplete = {
+                                                isProcessingLike = false
+                                                isProcessingDislike = false
+                                                dragOffset = 0f
+                                            }
+                                        )
+                                    }
+                                } else {
+                                    dragOffset = 0f
+                                }
+                            }
+                        },
+                        onNavigateToGeneratedPlaylist = onNavigateToGeneratedPlaylist,
+                        onBack = onBack,
+                        viewModel = viewModel,
+                        authToken = authToken
+                    )
+                }
+            }
         }
     }
-}
-
-/**
- * Top app bar for discovery screen
- */
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun DiscoveryTopAppBar(
-    likedTracksCount: Int,
-    onBack: () -> Unit,
-    onViewLiked: () -> Unit,
-    hasLikedTracks: Boolean
-) {
-    TopAppBar(
-        title = { 
-            androidx.compose.foundation.layout.Column {
-                Text(
-                    "Discover Music",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = White
-                )
-                Text(
-                    "$likedTracksCount tracks liked",
-                    fontSize = 12.sp,
-                    color = LightGray
-                )
-            }
-        },
-        navigationIcon = {
-            IconButton(onClick = onBack) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = SpotifyGreen)
-            }
-        },
-        actions = {
-            TextButton(
-                onClick = onViewLiked,
-                enabled = hasLikedTracks
-            ) {
-                Text("View Liked", color = SpotifyGreen)
-            }
-        },
-        colors = TopAppBarDefaults.topAppBarColors(containerColor = SpotifyDarkGray)
-    )
 }
