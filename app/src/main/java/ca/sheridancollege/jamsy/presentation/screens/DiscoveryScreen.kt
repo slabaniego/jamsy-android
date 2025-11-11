@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 
 import ca.sheridancollege.jamsy.data.DiscoveryDataStore
+import ca.sheridancollege.jamsy.presentation.components.PremiumButton
 import ca.sheridancollege.jamsy.presentation.screens.discovery.DiscoveryContent
 import ca.sheridancollege.jamsy.presentation.components.PremiumHeader
 import ca.sheridancollege.jamsy.presentation.theme.SpotifyBlack
@@ -119,15 +120,21 @@ fun DiscoveryScreen(
                     title = "Discover Music",
                     subtitle = "${likedTracks.size} tracks liked",
                     onBack = onBack,
-                    onActionClick = {
-                        if (authToken.isNotBlank() && likedTracksViewModel != null) {
-                            likedTracksViewModel.loadLikedTracks(authToken)
-                        }
-                        onNavigateToGeneratedPlaylist()
-                    },
-                    actionButtonText = "View",
-                    actionButtonEnabled = likedTracks.isNotEmpty(),
-                    animationDelay = 100
+                    animationDelay = 100,
+                    showBackButton = true,
+                    trailingContent = {
+                        PremiumButton(
+                            text = "View",
+                            onClick = {
+                                if (authToken.isNotBlank() && likedTracksViewModel != null) {
+                                    likedTracksViewModel.loadLikedTracks(authToken)
+                                }
+                                onNavigateToGeneratedPlaylist()
+                            },
+                            enabled = likedTracks.isNotEmpty(),
+                            fontSize = 12
+                        )
+                    }
                 )
 
                 // Main content area

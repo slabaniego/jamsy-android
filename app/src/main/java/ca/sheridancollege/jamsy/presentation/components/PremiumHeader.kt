@@ -36,21 +36,23 @@ import ca.sheridancollege.jamsy.presentation.theme.White
 /**
  * Premium reusable header component with glassmorphic design.
  * Can be used across multiple screens with customizable title and subtitle.
- * Displays navigation controls and an action button.
+ * Displays navigation controls and customizable trailing content.
+ *
+ * @param title Header title text
+ * @param subtitle Header subtitle text
+ * @param onBack Callback when back button is clicked
+ * @param animationDelay Delay for entrance animation in milliseconds
+ * @param showBackButton Whether to show the back button
+ * @param trailingContent Optional composable for custom content on the right side (avatar, buttons, etc)
  */
 @Composable
 fun PremiumHeader(
     title: String,
     subtitle: String,
     onBack: () -> Unit = {},
-    onActionClick: () -> Unit,
-    actionButtonText: String = "View",
-    actionButtonEnabled: Boolean = true,
     animationDelay: Int = 100,
     showBackButton: Boolean = true,
-    spotifyImageUrl: String? = null,
-    localImageBase64: String? = null,
-    isLoadingImage: Boolean = false
+    trailingContent: (@Composable () -> Unit)? = null
 ) {
     // Animation state
     var titleAlpha by remember { mutableFloatStateOf(0f) }
@@ -122,27 +124,66 @@ fun PremiumHeader(
                 )
             }
 
-            // Avatar - show if image data provided
-            if (!spotifyImageUrl.isNullOrEmpty() || !localImageBase64.isNullOrEmpty()) {
-                HeaderAvatar(
-                    spotifyImageUrl = spotifyImageUrl,
-                    localImageBase64 = localImageBase64,
-                    isLoading = isLoadingImage
-                )
-
+            // Trailing content (avatar, button, or custom content)
+            if (trailingContent != null) {
                 Spacer(modifier = Modifier.width(12.dp))
-            }
-
-            // Action button - only show if text is not empty
-            if (actionButtonText.isNotEmpty()) {
-                PremiumButton(
-                    text = actionButtonText,
-                    onClick = onActionClick,
-                    enabled = actionButtonEnabled,
-                    fontSize = 12
-                )
+                trailingContent()
             }
         }
     }
+}
+
+/**
+ * Overload for backward compatibility - with built-in action button
+ * 
+ * This version is convenient for simple cases where you just need an action button
+ */
+@Composable
+fun PremiumHeader(
+    title: String,
+    subtitle: String,
+    onBack: () -> Unit = {},
+    onActionClick: () -> Unit,
+    actionButtonText: String = "View",
+    actionButtonEnabled: Boolean = true,
+    animationDelay: Int = 100,
+    showBackButton: Boolean = true,
+    spotifyImageUrl: String? = null,
+    localImageBase64: String? = null,
+    isLoadingImage: Boolean = false
+) {
+    PremiumHeader(
+        title = title,
+        subtitle = subtitle,
+        onBack = onBack,
+        animationDelay = animationDelay,
+        showBackButton = showBackButton,
+        trailingContent = {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // Avatar - show if image data provided
+                if (!spotifyImageUrl.isNullOrEmpty() || !localImageBase64.isNullOrEmpty()) {
+                    HeaderAvatar(
+                        spotifyImageUrl = spotifyImageUrl,
+                        localImageBase64 = localImageBase64,
+                        isLoading = isLoadingImage
+                    )
+
+                    Spacer(modifier = Modifier.width(12.dp))
+                }
+
+                // Action button - only show if text is not empty
+                if (actionButtonText.isNotEmpty()) {
+                    PremiumButton(
+                        text = actionButtonText,
+                        onClick = onActionClick,
+                        enabled = actionButtonEnabled,
+                        fontSize = 12
+                    )
+                }
+            }
+        }
+    )
 }
 
