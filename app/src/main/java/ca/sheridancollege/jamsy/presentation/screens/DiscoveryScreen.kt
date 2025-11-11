@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 
 import ca.sheridancollege.jamsy.data.DiscoveryDataStore
+import ca.sheridancollege.jamsy.presentation.components.PremiumButton
 import ca.sheridancollege.jamsy.presentation.screens.discovery.DiscoveryContent
 import ca.sheridancollege.jamsy.presentation.components.PremiumHeader
 import ca.sheridancollege.jamsy.presentation.theme.SpotifyBlack
