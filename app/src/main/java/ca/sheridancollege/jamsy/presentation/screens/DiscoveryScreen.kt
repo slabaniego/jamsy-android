@@ -21,7 +21,7 @@ import androidx.compose.ui.graphics.Brush
 
 import ca.sheridancollege.jamsy.data.DiscoveryDataStore
 import ca.sheridancollege.jamsy.presentation.screens.discovery.DiscoveryContent
-import ca.sheridancollege.jamsy.presentation.screens.discovery.DiscoveryHeader
+import ca.sheridancollege.jamsy.presentation.components.PremiumHeader
 import ca.sheridancollege.jamsy.presentation.theme.SpotifyBlack
 import ca.sheridancollege.jamsy.presentation.theme.SpotifyDarkGray
 import ca.sheridancollege.jamsy.presentation.theme.SpotifyGreen
@@ -115,16 +115,18 @@ fun DiscoveryScreen(
                 modifier = Modifier.fillMaxSize()
             ) {
                 // Premium header at the top with animations
-                DiscoveryHeader(
-                    likedTracksCount = likedTracks.size,
+                PremiumHeader(
+                    title = "Discover Music",
+                    subtitle = "${likedTracks.size} tracks liked",
                     onBack = onBack,
-                    onViewLiked = {
+                    onActionClick = {
                         if (authToken.isNotBlank() && likedTracksViewModel != null) {
                             likedTracksViewModel.loadLikedTracks(authToken)
                         }
                         onNavigateToGeneratedPlaylist()
                     },
-                    hasLikedTracks = likedTracks.isNotEmpty(),
+                    actionButtonText = "View",
+                    actionButtonEnabled = likedTracks.isNotEmpty(),
                     animationDelay = 100
                 )
 
