@@ -119,15 +119,21 @@ fun DiscoveryScreen(
                     title = "Discover Music",
                     subtitle = "${likedTracks.size} tracks liked",
                     onBack = onBack,
-                    onActionClick = {
-                        if (authToken.isNotBlank() && likedTracksViewModel != null) {
-                            likedTracksViewModel.loadLikedTracks(authToken)
-                        }
-                        onNavigateToGeneratedPlaylist()
-                    },
-                    actionButtonText = "View",
-                    actionButtonEnabled = likedTracks.isNotEmpty(),
-                    animationDelay = 100
+                    animationDelay = 100,
+                    showBackButton = true,
+                    trailingContent = {
+                        PremiumButton(
+                            text = "View",
+                            onClick = {
+                                if (authToken.isNotBlank() && likedTracksViewModel != null) {
+                                    likedTracksViewModel.loadLikedTracks(authToken)
+                                }
+                                onNavigateToGeneratedPlaylist()
+                            },
+                            enabled = likedTracks.isNotEmpty(),
+                            fontSize = 12
+                        )
+                    }
                 )
 
                 // Main content area
