@@ -12,23 +12,30 @@ import javax.inject.Inject
 
 import ca.sheridancollege.jamsy.data.AuthManager
 import ca.sheridancollege.jamsy.domain.repository.TrackRepository
+import ca.sheridancollege.jamsy.domain.repository.UserRepository
 import ca.sheridancollege.jamsy.domain.models.Track
+import ca.sheridancollege.jamsy.domain.models.User
 import ca.sheridancollege.jamsy.util.Resource
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val trackRepository: TrackRepository,
+    private val userRepository: UserRepository,
     authManager: AuthManager
 ) : BaseViewModel(authManager) {
 
     private val _tracksState = MutableStateFlow<Resource<List<Track>>>(Resource.Loading)
     val tracksState: StateFlow<Resource<List<Track>>> = _tracksState
 
+    private val _userProfileState = MutableStateFlow<Resource<User>>(Resource.Loading)
+    val userProfileState: StateFlow<Resource<User>> = _userProfileState
+
     private val _currentTrackIndex = MutableStateFlow(0)
     val currentTrackIndex: StateFlow<Int> = _currentTrackIndex
 
     init {
         fetchTracksFromBackend()
+        loadUserProfile()
     }
 
     fun fetchTracksFromBackend() {
@@ -36,6 +43,12 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             val result = trackRepository.getTracks()
             _tracksState.value = result
+        }
+    }
+
+    fun loadUserProfile() {
+        viewModelScope.launch {
+            _userProfileState.value = userRepository.getUserProfile()
         }
     }
 

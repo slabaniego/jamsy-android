@@ -15,10 +15,9 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -28,22 +27,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 
 import ca.sheridancollege.jamsy.presentation.Screen
 import ca.sheridancollege.jamsy.presentation.components.BottomBar
 import ca.sheridancollege.jamsy.presentation.components.GlassCard
-import ca.sheridancollege.jamsy.presentation.components.HomeActionCard
-import ca.sheridancollege.jamsy.presentation.components.PremiumGradientButton
+import ca.sheridancollege.jamsy.presentation.components.PremiumButton
+import ca.sheridancollege.jamsy.presentation.components.PremiumHeader
 import ca.sheridancollege.jamsy.presentation.theme.LightGray
 import ca.sheridancollege.jamsy.presentation.theme.SpotifyBlack
 import ca.sheridancollege.jamsy.presentation.theme.SpotifyDarkGray
 import ca.sheridancollege.jamsy.presentation.theme.SpotifyGreen
 import ca.sheridancollege.jamsy.presentation.theme.White
 import ca.sheridancollege.jamsy.presentation.viewmodels.HomeViewModel
+import ca.sheridancollege.jamsy.domain.models.User
+import ca.sheridancollege.jamsy.util.Resource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -54,19 +52,11 @@ fun HomeScreen(
     onNavigateToChooseWorkout: () -> Unit,
     onNavigateToDiscovery: () -> Unit,
     onLogout: () -> Unit,
-    @Suppress("UNUSED_PARAMETER")
     viewModel: HomeViewModel
 ) {
+    val userProfileState by viewModel.userProfileState.collectAsState()
+
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Discover Music") },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = SpotifyDarkGray,
-                    titleContentColor = SpotifyGreen
-                )
-            )
-        },
         bottomBar = {
             BottomBar(
                 selectedRoute = Screen.Home.route,
@@ -80,6 +70,7 @@ fun HomeScreen(
     ) { paddingValues ->
         HomeScreenContent(
             paddingValues = paddingValues,
+            userProfileState = userProfileState,
             onNavigateToChooseWorkout = onNavigateToChooseWorkout,
             onNavigateToDiscovery = onNavigateToDiscovery,
             onNavigateToSearch = onNavigateToSearch
@@ -90,27 +81,22 @@ fun HomeScreen(
 @Composable
 private fun HomeScreenContent(
     paddingValues: androidx.compose.foundation.layout.PaddingValues,
+    userProfileState: Resource<User>,
     onNavigateToChooseWorkout: () -> Unit,
     onNavigateToDiscovery: () -> Unit,
     onNavigateToSearch: () -> Unit
 ) {
     // Animation states for entrance effects
-    var titleAlpha by remember { mutableStateOf(0f) }
-    var subtitleAlpha by remember { mutableStateOf(0f) }
+    var welcomeAlpha by remember { mutableStateOf(0f) }
     var mainButtonAlpha by remember { mutableStateOf(0f) }
     var actionCard1Alpha by remember { mutableStateOf(0f) }
     var actionCard2Alpha by remember { mutableStateOf(0f) }
 
     // Animated alpha values
-    val animatedTitleAlpha by animateFloatAsState(
-        targetValue = titleAlpha,
-        animationSpec = tween(durationMillis = 800, delayMillis = 100),
-        label = "title_alpha"
-    )
-    val animatedSubtitleAlpha by animateFloatAsState(
-        targetValue = subtitleAlpha,
-        animationSpec = tween(durationMillis = 800, delayMillis = 300),
-        label = "subtitle_alpha"
+    val animatedWelcomeAlpha by animateFloatAsState(
+        targetValue = welcomeAlpha,
+        animationSpec = tween(durationMillis = 800, delayMillis = 200),
+        label = "welcome_alpha"
     )
     val animatedMainButtonAlpha by animateFloatAsState(
         targetValue = mainButtonAlpha,
@@ -129,8 +115,7 @@ private fun HomeScreenContent(
     )
 
     LaunchedEffect(Unit) {
-        titleAlpha = 1f
-        subtitleAlpha = 1f
+        welcomeAlpha = 1f
         mainButtonAlpha = 1f
         actionCard1Alpha = 1f
         actionCard2Alpha = 1f
@@ -168,84 +153,102 @@ private fun HomeScreenContent(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
         ) {
-            // Title + subtitle within glassmorphism card
-            GlassCard(
+            // Premium header with user avatar
+            val spotifyImageUrl = (userProfileState as? Resource.Success)?.data?.spotifyProfileImageUrl
+            val localImageBase64 = (userProfileState as? Resource.Success)?.data?.profileImageBase64
+            val isLoadingImage = userProfileState is Resource.Loading
+
+            PremiumHeader(
+                title = "Discover Music",
+                subtitle = "Discover music based on your\nworkout and mood",
+                onBack = { /* No back action */ },
+                onActionClick = { /* No action */ },
+                actionButtonText = "",
+                actionButtonEnabled = false,
+                animationDelay = 100,
+                showBackButton = false,
+                spotifyImageUrl = spotifyImageUrl,
+                localImageBase64 = localImageBase64,
+                isLoadingImage = isLoadingImage
+            )
+
+            Column(
                 modifier = Modifier
+                    .weight(1f)
                     .fillMaxWidth()
-                    .alpha(animatedSubtitleAlpha)
+                    .padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
             ) {
-                Column(
+                // Welcome card with glassmorphism
+                GlassCard(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(20.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
+                        .alpha(animatedWelcomeAlpha)
                 ) {
-                    Text(
-                        text = "Welcome to Jamsy",
-                        style = MaterialTheme.typography.headlineLarge.copy(
-                            fontSize = 36.sp,
-                            fontWeight = FontWeight.Bold,
-                            letterSpacing = 0.5.sp
-                        ),
-                        color = White,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.alpha(animatedTitleAlpha)
-                    )
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(20.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            text = "Welcome to Jamsy",
+                            style = MaterialTheme.typography.headlineMedium,
+                            color = White
+                        )
 
-                    Spacer(modifier = Modifier.height(12.dp))
+                        Spacer(modifier = Modifier.height(12.dp))
 
-                    Text(
-                        text = "Discover music based on your workout and mood",
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = LightGray,
-                        textAlign = TextAlign.Center,
-                        lineHeight = 22.sp
-                    )
+                        Text(
+                            text = "Discover music based on your workout and mood",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = LightGray
+                        )
+                    }
                 }
+
+                Spacer(modifier = Modifier.height(40.dp))
+
+                // Premium gradient main button
+                PremiumButton(
+                    text = "Start Music Discovery",
+                    onClick = onNavigateToChooseWorkout,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .alpha(animatedMainButtonAlpha),
+                    enabled = true,
+                    fontSize = 14
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Quick Discovery button
+                PremiumButton(
+                    text = "Quick Discovery",
+                    onClick = onNavigateToDiscovery,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .alpha(animatedActionCard1Alpha),
+                    enabled = true,
+                    fontSize = 14
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Search Music button
+                PremiumButton(
+                    text = "Search Music",
+                    onClick = onNavigateToSearch,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .alpha(animatedActionCard2Alpha),
+                    enabled = true,
+                    fontSize = 14
+                )
             }
-
-            Spacer(modifier = Modifier.height(40.dp))
-
-            // Premium gradient main button
-            PremiumGradientButton(
-                text = "Start Music Discovery",
-                onClick = onNavigateToChooseWorkout,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .alpha(animatedMainButtonAlpha)
-                    .padding(horizontal = 16.dp)
-            )
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            // Quick Discovery action card
-            HomeActionCard(
-                title = "Quick Discovery",
-                //description = "Discover tracks instantly",
-                onClick = onNavigateToDiscovery,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .alpha(animatedActionCard1Alpha)
-                    .padding(horizontal = 16.dp)
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Search Music action card
-            HomeActionCard(
-                title = "Search Music",
-               // description = "Find tracks, artists, or albums",
-                onClick = onNavigateToSearch,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .alpha(animatedActionCard2Alpha)
-                    .padding(horizontal = 16.dp)
-            )
         }
     }
 }
@@ -255,6 +258,7 @@ private fun HomeScreenContent(
 fun HomeScreenPreview() {
     HomeScreenContent(
         paddingValues = androidx.compose.foundation.layout.PaddingValues(0.dp),
+        userProfileState = Resource.Loading,
         onNavigateToChooseWorkout = {},
         onNavigateToDiscovery = {},
         onNavigateToSearch = {}
