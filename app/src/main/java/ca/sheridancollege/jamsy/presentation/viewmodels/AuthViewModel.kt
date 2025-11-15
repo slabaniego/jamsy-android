@@ -78,10 +78,11 @@ class AuthViewModel @Inject constructor(
         }
     }
 
-    fun logout() {
+    fun logout(homeViewModel: HomeViewModel) {
         authRepository.logout()
         _loginState.value = null
         _signupState.value = null
+        homeViewModel.clearUserProfile()
     }
 
     fun resetState() {

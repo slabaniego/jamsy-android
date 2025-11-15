@@ -90,4 +90,8 @@ class HomeViewModel @Inject constructor(
         _tracksState.value = Resource.Loading
         _currentTrackIndex.value = 0
     }
+
+    fun clearUserProfile() {
+        _userProfileState.value = Resource.Loading
+    }
 }

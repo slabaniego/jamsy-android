@@ -80,7 +80,7 @@ fun NavGraph(navController: NavHostController) {
 
     val handleLogout: () -> Unit = {
 
-        authViewModel.logout()
+        authViewModel.logout(homeViewModel)
         profileViewModel.clearUserData()
         homeViewModel.clearData()
         trackListViewModel.clearData()

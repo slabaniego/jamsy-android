@@ -21,6 +21,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import ca.sheridancollege.jamsy.presentation.theme.SpotifyGreen
@@ -35,11 +36,12 @@ fun PremiumProfileImage(
     localImageBase64: String,
     isLoading: Boolean,
     onImageClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    size: Dp = 140.dp
 ) {
     Box(
         modifier = modifier
-            .size(140.dp)
+            .size(size)
             .clip(CircleShape)
             .border(
                 width = 3.dp,
@@ -99,7 +101,7 @@ fun PremiumProfileImage(
             ) {
                 CircularProgressIndicator(
                     color = SpotifyGreen,
-                    modifier = Modifier.size(64.dp)
+                    modifier = Modifier.size(size * 0.45f)
                 )
             }
         }
@@ -132,4 +134,3 @@ private fun PlaceholderText() {
         )
     }
 }
-

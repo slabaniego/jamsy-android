@@ -56,6 +56,10 @@ fun HomeScreen(
 ) {
     val userProfileState by viewModel.userProfileState.collectAsState()
 
+    LaunchedEffect(Unit) {
+        viewModel.loadUserProfile()
+    }
+
     Scaffold(
         bottomBar = {
             BottomBar(
@@ -166,7 +170,7 @@ private fun HomeScreenContent(
                 onActionClick = { /* No action */ },
                 actionButtonText = "",
                 actionButtonEnabled = false,
-                animationDelay = 100,
+                animationDelay = 0,
                 showBackButton = false,
                 spotifyImageUrl = spotifyImageUrl,
                 localImageBase64 = localImageBase64,
