@@ -22,7 +22,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -45,6 +44,8 @@ import ca.sheridancollege.jamsy.presentation.components.GlassCard
 import ca.sheridancollege.jamsy.presentation.components.PremiumGradientButton
 import ca.sheridancollege.jamsy.presentation.components.PremiumProfileImage
 import ca.sheridancollege.jamsy.presentation.components.ProfileInfoCard
+import ca.sheridancollege.jamsy.presentation.components.PremiumHeader
+import ca.sheridancollege.jamsy.presentation.components.PremiumButton
 import ca.sheridancollege.jamsy.domain.models.User
 import ca.sheridancollege.jamsy.presentation.theme.SpotifyBlack
 import ca.sheridancollege.jamsy.presentation.theme.SpotifyDarkGray
@@ -56,7 +57,6 @@ import ca.sheridancollege.jamsy.util.Resource
 
 private const val TAG = "ProfileScreen"
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
     onNavigateToHome: () -> Unit,
@@ -130,11 +130,7 @@ fun ProfileScreen(
     }
 
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Profile") }
-            )
-        },
+        topBar = {},
         bottomBar = {
             BottomBar(
                 selectedRoute = Screen.Profile.route,
@@ -163,6 +159,7 @@ fun ProfileScreen(
             uploadState = uploadState,
             onSelectImage = selectImage,
             onRetry = { viewModel.getUserProfile() },
+            onNavigateToHome = onNavigateToHome,
             paddingValues = paddingValues
         )
     }
@@ -174,6 +171,7 @@ private fun ProfileScreenContent(
     uploadState: Resource<String>?,
     onSelectImage: () -> Unit,
     onRetry: () -> Unit,
+    onNavigateToHome: () -> Unit,
     paddingValues: androidx.compose.foundation.layout.PaddingValues
 ) {
     // Animation states for entrance effects
@@ -235,24 +233,40 @@ private fun ProfileScreenContent(
                 )
         )
 
-        when (profileState) {
-            is Resource.Loading -> {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator(color = SpotifyGreen)
+        Column(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            // Premium header with back button
+            PremiumHeader(
+                title = "Profile",
+                subtitle = "Manage your account",
+                onBack = onNavigateToHome,
+                animationDelay = 100,
+                showBackButton = true,
+                trailingContent = null
+            )
+
+            Box(
+                modifier = Modifier.weight(1f)
+            ) {
+                when (profileState) {
+                is Resource.Loading -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator(color = SpotifyGreen)
+                    }
                 }
-            }
-            is Resource.Success -> {
-                val user = profileState.data
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(24.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = androidx.compose.foundation.layout.Arrangement.Center
-                ) {
+                is Resource.Success -> {
+                    val user = profileState.data
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(24.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = androidx.compose.foundation.layout.Arrangement.Center
+                    ) {
                     // Premium profile image with glassmorphism border
                     PremiumProfileImage(
                         spotifyImageUrl = user.spotifyProfileImageUrl,
@@ -275,62 +289,64 @@ private fun ProfileScreenContent(
 
                     Spacer(modifier = Modifier.height(32.dp))
 
-                    // Premium gradient button
-                    PremiumGradientButton(
-                        text = "CHANGE PROFILE PHOTO",
+                    // Premium button
+                    PremiumButton(
+                        text = if (uploadState is Resource.Loading) "Uploading..." else "Change Profile Photo",
                         onClick = onSelectImage,
-                        isLoading = uploadState is Resource.Loading,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .alpha(animatedButtonAlpha)
-                            .padding(horizontal = 16.dp)
+                            .alpha(animatedButtonAlpha),
+                        enabled = uploadState !is Resource.Loading,
+                        fontSize = 14
                     )
+                    }
                 }
-            }
-            is Resource.Error -> {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(24.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = androidx.compose.foundation.layout.Arrangement.Center
-                ) {
-                    GlassCard(modifier = Modifier.fillMaxWidth()) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(24.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Column(
-                                horizontalAlignment = Alignment.CenterHorizontally
+                is Resource.Error -> {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(24.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = androidx.compose.foundation.layout.Arrangement.Center
+                    ) {
+                        GlassCard(modifier = Modifier.fillMaxWidth()) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(24.dp),
+                                contentAlignment = Alignment.Center
                             ) {
-                                Text(
-                                    text = "Error loading profile",
-                                    style = MaterialTheme.typography.titleMedium,
-                                    color = MaterialTheme.colorScheme.error,
-                                    textAlign = TextAlign.Center
-                                )
-                                Spacer(modifier = Modifier.height(8.dp))
-                                Text(
-                                    text = profileState.message,
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
-                                    textAlign = TextAlign.Center
-                                )
+                                Column(
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
+                                    Text(
+                                        text = "Error loading profile",
+                                        style = MaterialTheme.typography.titleMedium,
+                                        color = MaterialTheme.colorScheme.error,
+                                        textAlign = TextAlign.Center
+                                    )
+                                    Spacer(modifier = Modifier.height(8.dp))
+                                    Text(
+                                        text = profileState.message,
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                                        textAlign = TextAlign.Center
+                                    )
+                                }
                             }
                         }
+
+                        Spacer(modifier = Modifier.height(24.dp))
+
+                        PremiumButton(
+                            text = "Try Again",
+                            onClick = onRetry,
+                            modifier = Modifier.fillMaxWidth(),
+                            enabled = true,
+                            fontSize = 14
+                        )
                     }
-
-                    Spacer(modifier = Modifier.height(24.dp))
-
-                    PremiumGradientButton(
-                        text = "RETRY",
-                        onClick = onRetry,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp)
-                    )
+                }
                 }
             }
         }

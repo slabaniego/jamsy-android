@@ -162,19 +162,18 @@ fun PremiumHeader(
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Avatar - show if image data provided
-                if (!spotifyImageUrl.isNullOrEmpty() || !localImageBase64.isNullOrEmpty()) {
-                    HeaderAvatar(
-                        spotifyImageUrl = spotifyImageUrl,
-                        localImageBase64 = localImageBase64,
-                        isLoading = isLoadingImage
-                    )
-
-                    Spacer(modifier = Modifier.width(12.dp))
-                }
+                // Avatar
+                PremiumProfileImage(
+                    spotifyImageUrl = spotifyImageUrl ?: "",
+                    localImageBase64 = localImageBase64 ?: "",
+                    isLoading = isLoadingImage,
+                    onImageClick = { onActionClick() },
+                    size = 80.dp
+                )
 
                 // Action button - only show if text is not empty
                 if (actionButtonText.isNotEmpty()) {
+                    Spacer(modifier = Modifier.width(12.dp))
                     PremiumButton(
                         text = actionButtonText,
                         onClick = onActionClick,
@@ -186,4 +185,3 @@ fun PremiumHeader(
         }
     )
 }
-
