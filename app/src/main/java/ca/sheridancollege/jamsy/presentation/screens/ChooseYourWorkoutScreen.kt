@@ -13,16 +13,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -35,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 import ca.sheridancollege.jamsy.presentation.components.GlassCard
+import ca.sheridancollege.jamsy.presentation.components.PremiumHeader
 import ca.sheridancollege.jamsy.presentation.theme.LightGray
 import ca.sheridancollege.jamsy.presentation.theme.SpotifyBlack
 import ca.sheridancollege.jamsy.presentation.theme.SpotifyDarkGray
@@ -42,7 +36,6 @@ import ca.sheridancollege.jamsy.presentation.theme.SpotifyGreen
 import ca.sheridancollege.jamsy.presentation.theme.SpotifyMediumGray
 import ca.sheridancollege.jamsy.presentation.theme.White
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChooseYourWorkoutScreen(
     onWorkoutSelected: (String, String) -> Unit,
@@ -56,26 +49,7 @@ fun ChooseYourWorkoutScreen(
     )
 
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { 
-                    Text(
-                        "Choose Your Workout",
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = SpotifyGreen
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = SpotifyGreen)
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = SpotifyDarkGray
-                )
-            )
-        }
+        topBar = {}
     ) { paddingValues ->
         Box(
             modifier = Modifier
@@ -106,12 +80,27 @@ fun ChooseYourWorkoutScreen(
             )
 
             Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp)
+                modifier = Modifier.fillMaxSize()
             ) {
-                GlassCard(
-                    modifier = Modifier.fillMaxWidth()
+                // Premium header at the top with animations
+                PremiumHeader(
+                    title = "Choose Your Workout",
+                    subtitle = "Select your workout type",
+                    onBack = onBack,
+                    animationDelay = 100,
+                    showBackButton = true,
+                    trailingContent = null
+                )
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp)
+                ) {
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    GlassCard(
+                        modifier = Modifier.fillMaxWidth()
                 ) {
                     Column(
                         modifier = Modifier
@@ -156,6 +145,7 @@ fun ChooseYourWorkoutScreen(
                             onClick = { onWorkoutSelected(workout.name, workout.mood) }
                         )
                     }
+                }
                 }
             }
         }
