@@ -37,7 +37,7 @@ import androidx.compose.ui.unit.sp
 
 import ca.sheridancollege.jamsy.presentation.viewmodels.AuthViewModel
 import ca.sheridancollege.jamsy.presentation.components.GlassCard
-import ca.sheridancollege.jamsy.presentation.components.PremiumGradientButton
+import ca.sheridancollege.jamsy.presentation.components.PremiumButton
 import ca.sheridancollege.jamsy.presentation.theme.Gray
 import ca.sheridancollege.jamsy.presentation.theme.LightGray
 import ca.sheridancollege.jamsy.presentation.theme.SpotifyBlack
@@ -300,13 +300,16 @@ private fun LoginScreenContent(
             }
 
             // Premium gradient button
-            PremiumGradientButton(
+            PremiumButton(
                 text = "CONNECT WITH SPOTIFY",
                 onClick = onConnectSpotifyClick,
-                isLoading = isLoading,
                 modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp)
                     .alpha(animatedButtonAlpha)
-                    .padding(horizontal = 16.dp)
+                    .padding(horizontal = 16.dp),
+                enabled = !isLoading,
+                fontSize = 16
             )
 
             Spacer(modifier = Modifier.height(20.dp))
