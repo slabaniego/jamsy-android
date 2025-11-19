@@ -120,13 +120,17 @@ fun GeneratedPlaylistScreen(
                     title = "Generated Playlist",
                     subtitle = "$tracksCount tracks • ~${tracksCount * 3} minutes",
                     onBack = onBack,
-                    onActionClick = {
-                        viewModel.restartDiscoveryFlow()
-                        onRestartFlow()
-                    },
-                    actionButtonText = "Start Over",
-                    actionButtonEnabled = true,
-                    animationDelay = 100
+                    animationDelay = 100,
+                    trailingContent = {
+                        PremiumButton(
+                            text = "Start Over",
+                            onClick = {
+                                viewModel.restartDiscoveryFlow()
+                                onRestartFlow()
+                            },
+                            fontSize = 12
+                        )
+                    }
                 )
 
                 Box(
