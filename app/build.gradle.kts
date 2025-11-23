@@ -111,8 +111,23 @@ dependencies {
     implementation(libs.androidx.storage)
     implementation(libs.androidx.media3.exoplayer)
 
-    // Testing
+    // Testing - JUnit 5
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.3")
+    testImplementation("org.junit.jupiter:junit-jupiter-engine:5.9.3")
+    testImplementation("org.junit.jupiter:junit-jupiter-params:5.9.3")
     testImplementation("junit:junit:4.13.2")
+    
+    // Mocking
+    testImplementation("io.mockk:mockk:1.13.8")
+    testImplementation("io.mockk:mockk-android:1.13.8")
+    
+    // Coroutines testing
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+    
+    // Assertions
+    testImplementation("org.assertj:assertj-core:3.24.1")
+    
+    // Android Testing
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
     androidTestImplementation(libs.compose.bom.v20231001)
