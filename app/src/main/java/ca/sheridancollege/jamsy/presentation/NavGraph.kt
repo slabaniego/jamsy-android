@@ -21,7 +21,6 @@ import ca.sheridancollege.jamsy.presentation.screens.PlaylistCreationScreen
 import ca.sheridancollege.jamsy.presentation.screens.PlaylistPreviewScreen
 import ca.sheridancollege.jamsy.presentation.screens.ProfileScreen
 import ca.sheridancollege.jamsy.presentation.screens.SignupScreen
-import ca.sheridancollege.jamsy.presentation.screens.SwipeTrackScreen
 import ca.sheridancollege.jamsy.presentation.viewmodels.ArtistSelectionViewModel
 import ca.sheridancollege.jamsy.presentation.viewmodels.AuthViewModel
 import ca.sheridancollege.jamsy.presentation.viewmodels.DiscoveryViewModel
@@ -29,7 +28,6 @@ import ca.sheridancollege.jamsy.presentation.viewmodels.GeneratedPlaylistViewMod
 import ca.sheridancollege.jamsy.presentation.viewmodels.HomeViewModel
 import ca.sheridancollege.jamsy.presentation.viewmodels.LikedTracksViewModel
 import ca.sheridancollege.jamsy.presentation.viewmodels.ProfileViewModel
-import ca.sheridancollege.jamsy.presentation.viewmodels.SwipeViewModel
 import ca.sheridancollege.jamsy.util.Resource
 
 
@@ -40,7 +38,6 @@ fun NavGraph(navController: NavHostController) {
     val homeViewModel: HomeViewModel = viewModel()
     val artistSelectionViewModel: ArtistSelectionViewModel = viewModel()
     val discoveryViewModel: DiscoveryViewModel = viewModel()
-    val swipeViewModel: SwipeViewModel = viewModel()
     val likedTracksViewModel: LikedTracksViewModel = viewModel()
     val generatedPlaylistViewModel: GeneratedPlaylistViewModel = viewModel()
 
@@ -150,19 +147,6 @@ fun NavGraph(navController: NavHostController) {
                 viewModel = discoveryViewModel,
                 likedTracksViewModel = likedTracksViewModel,
                 authToken = authToken
-            )
-        }
-
-        composable(Screen.SwipeTrack.route) {
-            val authToken = authViewModel.getSpotifyAccessToken()?.takeIf { it.isNotBlank() } ?: ""
-            SwipeTrackScreen(
-                viewModel = swipeViewModel,
-                authToken = authToken,
-                onNavigateToResults = { likedTracks ->
-                    // Pass liked tracks to the next screen if needed
-                    navController.navigate(Screen.GeneratedPlaylist.route)
-                },
-                onBack = { navController.popBackStack() }
             )
         }
 
