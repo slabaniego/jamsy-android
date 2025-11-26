@@ -15,7 +15,6 @@ import ca.sheridancollege.jamsy.presentation.screens.ChooseYourWorkoutScreen
 import ca.sheridancollege.jamsy.presentation.screens.DiscoveryScreen
 import ca.sheridancollege.jamsy.presentation.screens.GeneratedPlaylistScreen
 import ca.sheridancollege.jamsy.presentation.screens.HomeScreen
-import ca.sheridancollege.jamsy.presentation.screens.LikedTracksScreen
 import ca.sheridancollege.jamsy.presentation.screens.LoginScreen
 import ca.sheridancollege.jamsy.presentation.screens.PlaylistCreationScreen
 import ca.sheridancollege.jamsy.presentation.screens.PlaylistPreviewScreen
@@ -149,17 +148,7 @@ fun NavGraph(navController: NavHostController) {
                 authToken = authToken
             )
         }
-
-        composable(Screen.LikedTracks.route) {
-            LikedTracksScreen(
-                onBack = { navController.popBackStack() },
-                onPlaylistPreview = { navController.navigate(Screen.PlaylistPreview.route) },
-                onExtendedPlaylistPreview = { navController.navigate(Screen.PlaylistCreation.route) },
-                viewModel = likedTracksViewModel,
-                authToken = authViewModel.getSpotifyAccessToken()?.takeIf { it.isNotBlank() }
-            )
-        }
-
+        
         composable(Screen.PlaylistPreview.route) {
             PlaylistPreviewScreen(
                 onNavigateToPlaylistCreation = { navController.navigate(Screen.PlaylistCreation.route) },

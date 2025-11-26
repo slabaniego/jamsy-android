@@ -8,7 +8,6 @@ sealed class Screen(val route: String) {
     object ChooseYourWorkout : Screen("choose_workout")
     object ArtistSelection : Screen("artist_selection")
     object Discovery : Screen("discovery")
-    object LikedTracks : Screen("liked_tracks")
     object PlaylistPreview : Screen("playlist_preview")
     object PlaylistCreation : Screen("playlist_creation")
     object GeneratedPlaylist : Screen("generated_playlist")
