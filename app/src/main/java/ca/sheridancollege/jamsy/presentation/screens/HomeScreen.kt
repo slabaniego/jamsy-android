@@ -47,7 +47,6 @@ import ca.sheridancollege.jamsy.util.Resource
 @Composable
 fun HomeScreen(
     onNavigateToProfile: () -> Unit,
-    onNavigateToTrackList: () -> Unit,
     onNavigateToChooseWorkout: () -> Unit,
     onNavigateToDiscovery: () -> Unit,
     onLogout: () -> Unit,
@@ -65,7 +64,7 @@ fun HomeScreen(
                 selectedRoute = Screen.Home.route,
                 onHomeSelected = { /* Already on home */ },
                 onProfileSelected = onNavigateToProfile,
-                onTrackListSelected = onNavigateToTrackList,
+                onTrackListSelected = { /* Track list disabled */ },
                 onSearchSelected = { /* Search disabled */ },
                 onLogoutSelected = onLogout
             )

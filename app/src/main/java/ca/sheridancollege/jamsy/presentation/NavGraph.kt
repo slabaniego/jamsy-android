@@ -22,7 +22,6 @@ import ca.sheridancollege.jamsy.presentation.screens.PlaylistPreviewScreen
 import ca.sheridancollege.jamsy.presentation.screens.ProfileScreen
 import ca.sheridancollege.jamsy.presentation.screens.SignupScreen
 import ca.sheridancollege.jamsy.presentation.screens.SwipeTrackScreen
-import ca.sheridancollege.jamsy.presentation.screens.TrackListScreen
 import ca.sheridancollege.jamsy.presentation.viewmodels.ArtistSelectionViewModel
 import ca.sheridancollege.jamsy.presentation.viewmodels.AuthViewModel
 import ca.sheridancollege.jamsy.presentation.viewmodels.DiscoveryViewModel
@@ -31,7 +30,6 @@ import ca.sheridancollege.jamsy.presentation.viewmodels.HomeViewModel
 import ca.sheridancollege.jamsy.presentation.viewmodels.LikedTracksViewModel
 import ca.sheridancollege.jamsy.presentation.viewmodels.ProfileViewModel
 import ca.sheridancollege.jamsy.presentation.viewmodels.SwipeViewModel
-import ca.sheridancollege.jamsy.presentation.viewmodels.TrackListViewModel
 import ca.sheridancollege.jamsy.util.Resource
 
 
@@ -40,7 +38,6 @@ fun NavGraph(navController: NavHostController) {
     val authViewModel: AuthViewModel = viewModel()
     val profileViewModel: ProfileViewModel = viewModel()
     val homeViewModel: HomeViewModel = viewModel()
-    val trackListViewModel: TrackListViewModel = viewModel()
     val artistSelectionViewModel: ArtistSelectionViewModel = viewModel()
     val discoveryViewModel: DiscoveryViewModel = viewModel()
     val swipeViewModel: SwipeViewModel = viewModel()
@@ -77,7 +74,6 @@ fun NavGraph(navController: NavHostController) {
         authViewModel.logout(homeViewModel)
         profileViewModel.clearUserData()
         homeViewModel.clearData()
-        trackListViewModel.clearData()
 
         navController.navigate(Screen.Login.route) {
             popUpTo(0) { inclusive = true }
@@ -116,7 +112,6 @@ fun NavGraph(navController: NavHostController) {
         composable(Screen.Home.route) {
             HomeScreen(
                 onNavigateToProfile = { navController.navigate(Screen.Profile.route) },
-                onNavigateToTrackList = { navController.navigate(Screen.TrackList.route) },
                 onNavigateToChooseWorkout = { navController.navigate(Screen.ChooseYourWorkout.route) },
                 onNavigateToDiscovery = { navController.navigate(Screen.Discovery.route) },
                 onLogout = handleLogout,
@@ -130,16 +125,6 @@ fun NavGraph(navController: NavHostController) {
                     navController.navigate("${Screen.ArtistSelection.route}/$workout/$mood")
                 },
                 onBack = { navController.popBackStack() }
-            )
-        }
-
-        composable(Screen.TrackList.route) {
-            TrackListScreen(
-                onNavigateToHome = { navController.navigate(Screen.Home.route) },
-                onNavigateToProfile = { navController.navigate(Screen.Profile.route) },
-                onLogout = handleLogout,
-                onTrackSelected = { trackId -> },
-                viewModel = trackListViewModel
             )
         }
 
