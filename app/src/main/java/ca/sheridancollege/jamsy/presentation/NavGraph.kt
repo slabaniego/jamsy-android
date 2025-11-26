@@ -19,7 +19,6 @@ import ca.sheridancollege.jamsy.presentation.screens.LikedTracksScreen
 import ca.sheridancollege.jamsy.presentation.screens.LoginScreen
 import ca.sheridancollege.jamsy.presentation.screens.PlaylistCreationScreen
 import ca.sheridancollege.jamsy.presentation.screens.PlaylistPreviewScreen
-import ca.sheridancollege.jamsy.presentation.screens.PlaylistTemplateScreen
 import ca.sheridancollege.jamsy.presentation.screens.ProfileScreen
 import ca.sheridancollege.jamsy.presentation.screens.SearchScreen
 import ca.sheridancollege.jamsy.presentation.screens.SignupScreen
@@ -31,7 +30,6 @@ import ca.sheridancollege.jamsy.presentation.viewmodels.DiscoveryViewModel
 import ca.sheridancollege.jamsy.presentation.viewmodels.GeneratedPlaylistViewModel
 import ca.sheridancollege.jamsy.presentation.viewmodels.HomeViewModel
 import ca.sheridancollege.jamsy.presentation.viewmodels.LikedTracksViewModel
-import ca.sheridancollege.jamsy.presentation.viewmodels.PlaylistTemplateViewModel
 import ca.sheridancollege.jamsy.presentation.viewmodels.ProfileViewModel
 import ca.sheridancollege.jamsy.presentation.viewmodels.SearchViewModel
 import ca.sheridancollege.jamsy.presentation.viewmodels.SwipeViewModel
@@ -45,7 +43,6 @@ fun NavGraph(navController: NavHostController) {
     val profileViewModel: ProfileViewModel = viewModel()
     val homeViewModel: HomeViewModel = viewModel()
     val trackListViewModel: TrackListViewModel = viewModel()
-    val playlistTemplateViewModel: PlaylistTemplateViewModel = viewModel()
     val artistSelectionViewModel: ArtistSelectionViewModel = viewModel()
     val discoveryViewModel: DiscoveryViewModel = viewModel()
     val swipeViewModel: SwipeViewModel = viewModel()
@@ -147,21 +144,6 @@ fun NavGraph(navController: NavHostController) {
                 onLogout = handleLogout,
                 onTrackSelected = { trackId -> },
                 viewModel = trackListViewModel
-            )
-        }
-
-        composable("${Screen.PlaylistTemplates.route}/{workout}") { backStackEntry ->
-            val workout = backStackEntry.arguments?.getString("workout") ?: ""
-            
-            PlaylistTemplateScreen(
-                workout = workout,
-                onNavigateToHome = { navController.navigate(Screen.Home.route) },
-                onNavigateToArtistSelection = { selectedWorkout, mood -> 
-                    navController.navigate("${Screen.ArtistSelection.route}/$selectedWorkout/$mood")
-                },
-                onLogout = handleLogout,
-                viewModel = playlistTemplateViewModel,
-                authToken = authViewModel.getSpotifyAccessToken()?.takeIf { it.isNotBlank() }
             )
         }
 

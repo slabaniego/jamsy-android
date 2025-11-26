@@ -7,7 +7,6 @@ sealed class Screen(val route: String) {
     object Home : Screen("home")
     object TrackList : Screen("tracklist")
     object ChooseYourWorkout : Screen("choose_workout")
-    object PlaylistTemplates : Screen("playlist_templates")
     object ArtistSelection : Screen("artist_selection")
     object Discovery : Screen("discovery")
     object SwipeTrack : Screen("swipe_track")

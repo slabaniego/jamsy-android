@@ -12,7 +12,6 @@ import retrofit2.http.Query
 
 import ca.sheridancollege.jamsy.data.datasource.remote.dto.ArtistsResponseDto
 import ca.sheridancollege.jamsy.data.datasource.remote.dto.TracksResponseDto
-import ca.sheridancollege.jamsy.domain.models.PlaylistTemplate
 import ca.sheridancollege.jamsy.domain.models.PreviewPlaylistRequest
 import ca.sheridancollege.jamsy.domain.models.Track
 import ca.sheridancollege.jamsy.domain.models.TrackActionRequest
@@ -31,19 +30,6 @@ interface JamsyApiService {
     suspend fun refreshToken(
         @Query("refresh_token") refreshToken: String
     ): Response<SpotifyAuthResponse>
-
-    // Playlist Templates - FIXED: Match backend endpoints
-    @GET("api/spotify/templates")
-    suspend fun getPlaylistTemplates(
-        @Header("Authorization") authHeader: String
-    ): Response<List<PlaylistTemplate>>
-
-    // Get recommended tracks based on a specific template - FIXED: Match backend
-    @GET("api/spotify/recommend/template/{name}")
-    suspend fun getPlaylistByTemplate(
-        @Path("name") name: String,
-        @Query("accessToken") accessToken: String
-    ): Response<List<Track>>
 
     // Artists by workout and mood - FIXED: Match backend endpoints
     @GET("api/spotify/artists/workout/{workout}/mood/{mood}")
