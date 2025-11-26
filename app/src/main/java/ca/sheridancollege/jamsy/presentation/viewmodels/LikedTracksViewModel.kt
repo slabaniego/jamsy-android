@@ -27,9 +27,6 @@ class LikedTracksViewModel @Inject constructor(
     private val _likedTracksState = MutableStateFlow<Resource<List<Track>>>(Resource.Loading)
     val likedTracksState: StateFlow<Resource<List<Track>>> = _likedTracksState.asStateFlow()
 
-    private val _playlistPreviewState = MutableStateFlow<Resource<List<Track>>>(Resource.Loading)
-    val playlistPreviewState: StateFlow<Resource<List<Track>>> = _playlistPreviewState.asStateFlow()
-    
     private val _playlistCreationState = MutableStateFlow<Resource<String>>(Resource.Loading)
     val playlistCreationState: StateFlow<Resource<String>> = _playlistCreationState.asStateFlow()
 
@@ -40,29 +37,6 @@ class LikedTracksViewModel @Inject constructor(
         }
     }
 
-    fun previewPlaylist(authToken: String) {
-        viewModelScope.launch {
-            _playlistPreviewState.value = Resource.Loading
-            
-            // Get liked tracks from current state
-            val likedTracks = when (val state = _likedTracksState.value) {
-                is Resource.Success -> state.data
-                else -> emptyList()
-            }
-            
-            if (likedTracks.isEmpty()) {
-                _playlistPreviewState.value = Resource.Error("No liked tracks available")
-                return@launch
-            }
-            
-            val result = playlistRepository.getPreviewPlaylist(authToken, likedTracks)
-            _playlistPreviewState.value = when {
-                result.isSuccess -> Resource.Success(result.getOrNull() ?: emptyList())
-                else -> Resource.Error(result.exceptionOrNull()?.message ?: "Failed to preview playlist")
-            }
-        }
-    }
-    
     fun createPlaylist(authToken: String, tracks: List<Track>) {
         viewModelScope.launch {
             _playlistCreationState.value = Resource.Loading
@@ -79,6 +53,5 @@ class LikedTracksViewModel @Inject constructor(
         println("LikedTracksViewModel: Restarting discovery flow - clearing all data")
         DiscoveryDataStore.clear()
         _likedTracksState.value = Resource.Loading
-        _playlistPreviewState.value = Resource.Loading
     }
 }

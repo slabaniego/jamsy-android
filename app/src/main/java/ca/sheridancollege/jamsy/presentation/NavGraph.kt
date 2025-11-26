@@ -17,7 +17,6 @@ import ca.sheridancollege.jamsy.presentation.screens.GeneratedPlaylistScreen
 import ca.sheridancollege.jamsy.presentation.screens.HomeScreen
 import ca.sheridancollege.jamsy.presentation.screens.LoginScreen
 import ca.sheridancollege.jamsy.presentation.screens.PlaylistCreationScreen
-import ca.sheridancollege.jamsy.presentation.screens.PlaylistPreviewScreen
 import ca.sheridancollege.jamsy.presentation.screens.ProfileScreen
 import ca.sheridancollege.jamsy.presentation.screens.SignupScreen
 import ca.sheridancollege.jamsy.presentation.viewmodels.ArtistSelectionViewModel
@@ -149,20 +148,6 @@ fun NavGraph(navController: NavHostController) {
             )
         }
         
-        composable(Screen.PlaylistPreview.route) {
-            PlaylistPreviewScreen(
-                onNavigateToPlaylistCreation = { navController.navigate(Screen.PlaylistCreation.route) },
-                onBack = { navController.popBackStack() },
-                onRestartFlow = {
-                    // Navigate back to home and clear the back stack
-                    navController.navigate(Screen.Home.route) {
-                        popUpTo(Screen.Home.route) { inclusive = true }
-                    }
-                },
-                viewModel = likedTracksViewModel
-            )
-        }
-
         composable(Screen.PlaylistCreation.route) {
             PlaylistCreationScreen(
                 onBack = { navController.popBackStack() },
