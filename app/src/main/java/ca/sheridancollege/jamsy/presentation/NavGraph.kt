@@ -16,7 +16,6 @@ import ca.sheridancollege.jamsy.presentation.screens.DiscoveryScreen
 import ca.sheridancollege.jamsy.presentation.screens.GeneratedPlaylistScreen
 import ca.sheridancollege.jamsy.presentation.screens.HomeScreen
 import ca.sheridancollege.jamsy.presentation.screens.LoginScreen
-import ca.sheridancollege.jamsy.presentation.screens.PlaylistCreationScreen
 import ca.sheridancollege.jamsy.presentation.screens.ProfileScreen
 import ca.sheridancollege.jamsy.presentation.screens.SignupScreen
 import ca.sheridancollege.jamsy.presentation.viewmodels.ArtistSelectionViewModel
@@ -148,14 +147,6 @@ fun NavGraph(navController: NavHostController) {
             )
         }
         
-        composable(Screen.PlaylistCreation.route) {
-            PlaylistCreationScreen(
-                onBack = { navController.popBackStack() },
-                viewModel = likedTracksViewModel,
-                authToken = authViewModel.getSpotifyAccessToken()?.takeIf { it.isNotBlank() }
-            )
-        }
-
         composable(Screen.GeneratedPlaylist.route) {
             val authToken = authViewModel.getSpotifyAccessToken()?.takeIf { it.isNotBlank() } ?: ""
             GeneratedPlaylistScreen(

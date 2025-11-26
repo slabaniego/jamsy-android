@@ -27,25 +27,10 @@ class LikedTracksViewModel @Inject constructor(
     private val _likedTracksState = MutableStateFlow<Resource<List<Track>>>(Resource.Loading)
     val likedTracksState: StateFlow<Resource<List<Track>>> = _likedTracksState.asStateFlow()
 
-    private val _playlistCreationState = MutableStateFlow<Resource<String>>(Resource.Loading)
-    val playlistCreationState: StateFlow<Resource<String>> = _playlistCreationState.asStateFlow()
-
     fun loadLikedTracks(authToken: String) {
         viewModelScope.launch {
             _likedTracksState.value = Resource.Loading
             _likedTracksState.value = trackRepository.getLikedTracks(authToken)
-        }
-    }
-
-    fun createPlaylist(authToken: String, tracks: List<Track>) {
-        viewModelScope.launch {
-            _playlistCreationState.value = Resource.Loading
-            
-            val result = playlistRepository.createPlaylist(authToken, tracks)
-            _playlistCreationState.value = when {
-                result.isSuccess -> Resource.Success(result.getOrNull() ?: "")
-                else -> Resource.Error(result.exceptionOrNull()?.message ?: "Failed to create playlist")
-            }
         }
     }
 
