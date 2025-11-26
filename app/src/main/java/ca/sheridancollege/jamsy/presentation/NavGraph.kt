@@ -20,7 +20,6 @@ import ca.sheridancollege.jamsy.presentation.screens.LoginScreen
 import ca.sheridancollege.jamsy.presentation.screens.PlaylistCreationScreen
 import ca.sheridancollege.jamsy.presentation.screens.PlaylistPreviewScreen
 import ca.sheridancollege.jamsy.presentation.screens.ProfileScreen
-import ca.sheridancollege.jamsy.presentation.screens.SearchScreen
 import ca.sheridancollege.jamsy.presentation.screens.SignupScreen
 import ca.sheridancollege.jamsy.presentation.screens.SwipeTrackScreen
 import ca.sheridancollege.jamsy.presentation.screens.TrackListScreen
@@ -31,7 +30,6 @@ import ca.sheridancollege.jamsy.presentation.viewmodels.GeneratedPlaylistViewMod
 import ca.sheridancollege.jamsy.presentation.viewmodels.HomeViewModel
 import ca.sheridancollege.jamsy.presentation.viewmodels.LikedTracksViewModel
 import ca.sheridancollege.jamsy.presentation.viewmodels.ProfileViewModel
-import ca.sheridancollege.jamsy.presentation.viewmodels.SearchViewModel
 import ca.sheridancollege.jamsy.presentation.viewmodels.SwipeViewModel
 import ca.sheridancollege.jamsy.presentation.viewmodels.TrackListViewModel
 import ca.sheridancollege.jamsy.util.Resource
@@ -47,7 +45,6 @@ fun NavGraph(navController: NavHostController) {
     val discoveryViewModel: DiscoveryViewModel = viewModel()
     val swipeViewModel: SwipeViewModel = viewModel()
     val likedTracksViewModel: LikedTracksViewModel = viewModel()
-    val searchViewModel: SearchViewModel = viewModel()
     val generatedPlaylistViewModel: GeneratedPlaylistViewModel = viewModel()
 
     val authState by authViewModel.authState.collectAsState()
@@ -120,7 +117,6 @@ fun NavGraph(navController: NavHostController) {
             HomeScreen(
                 onNavigateToProfile = { navController.navigate(Screen.Profile.route) },
                 onNavigateToTrackList = { navController.navigate(Screen.TrackList.route) },
-                onNavigateToSearch = { navController.navigate(Screen.Search.route) },
                 onNavigateToChooseWorkout = { navController.navigate(Screen.ChooseYourWorkout.route) },
                 onNavigateToDiscovery = { navController.navigate(Screen.Discovery.route) },
                 onLogout = handleLogout,
@@ -235,15 +231,6 @@ fun NavGraph(navController: NavHostController) {
                 },
                 viewModel = generatedPlaylistViewModel,
                 authToken = authToken
-            )
-        }
-
-        composable(Screen.Search.route) {
-            SearchScreen(
-                onNavigateToHome = { navController.navigate(Screen.Home.route) },
-                onNavigateToProfile = { navController.navigate(Screen.Profile.route) },
-                onLogout = handleLogout,
-                viewModel = searchViewModel
             )
         }
     }

@@ -66,16 +66,6 @@ interface JamsyApiService {
         @Header("Authorization") authHeader: String
     ): Response<TracksResponseDto>
 
-    // Search tracks - FIXED: Match backend endpoints
-    @GET("api/search")
-    suspend fun searchTracks(
-        @Query("query") query: String,
-        @Query("excludeExplicit") excludeExplicit: Boolean = true,
-        @Query("excludeLoveSongs") excludeLoveSongs: Boolean = false,
-        @Query("excludeFolk") excludeFolk: Boolean = false,
-        @Header("Authorization") authHeader: String
-    ): Response<TracksResponseDto>
-
     // Preview playlist - FIXED: Match backend endpoints (POST with liked tracks)
     @POST("api/spotify/preview-playlist")
     suspend fun getPreviewPlaylist(

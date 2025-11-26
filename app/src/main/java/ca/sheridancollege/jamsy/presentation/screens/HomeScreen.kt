@@ -48,7 +48,6 @@ import ca.sheridancollege.jamsy.util.Resource
 fun HomeScreen(
     onNavigateToProfile: () -> Unit,
     onNavigateToTrackList: () -> Unit,
-    onNavigateToSearch: () -> Unit,
     onNavigateToChooseWorkout: () -> Unit,
     onNavigateToDiscovery: () -> Unit,
     onLogout: () -> Unit,
@@ -67,7 +66,7 @@ fun HomeScreen(
                 onHomeSelected = { /* Already on home */ },
                 onProfileSelected = onNavigateToProfile,
                 onTrackListSelected = onNavigateToTrackList,
-                onSearchSelected = onNavigateToSearch,
+                onSearchSelected = { /* Search disabled */ },
                 onLogoutSelected = onLogout
             )
         }
@@ -76,8 +75,7 @@ fun HomeScreen(
             paddingValues = paddingValues,
             userProfileState = userProfileState,
             onNavigateToChooseWorkout = onNavigateToChooseWorkout,
-            onNavigateToDiscovery = onNavigateToDiscovery,
-            onNavigateToSearch = onNavigateToSearch
+            onNavigateToDiscovery = onNavigateToDiscovery
         )
     }
 }
@@ -87,14 +85,12 @@ private fun HomeScreenContent(
     paddingValues: androidx.compose.foundation.layout.PaddingValues,
     userProfileState: Resource<User>,
     onNavigateToChooseWorkout: () -> Unit,
-    onNavigateToDiscovery: () -> Unit,
-    onNavigateToSearch: () -> Unit
+    onNavigateToDiscovery: () -> Unit
 ) {
     // Animation states for entrance effects
     var welcomeAlpha by remember { mutableStateOf(0f) }
     var mainButtonAlpha by remember { mutableStateOf(0f) }
     var actionCard1Alpha by remember { mutableStateOf(0f) }
-    var actionCard2Alpha by remember { mutableStateOf(0f) }
 
     // Animated alpha values
     val animatedWelcomeAlpha by animateFloatAsState(
@@ -112,17 +108,11 @@ private fun HomeScreenContent(
         animationSpec = tween(durationMillis = 800, delayMillis = 700),
         label = "action_card1_alpha"
     )
-    val animatedActionCard2Alpha by animateFloatAsState(
-        targetValue = actionCard2Alpha,
-        animationSpec = tween(durationMillis = 800, delayMillis = 900),
-        label = "action_card2_alpha"
-    )
 
     LaunchedEffect(Unit) {
         welcomeAlpha = 1f
         mainButtonAlpha = 1f
         actionCard1Alpha = 1f
-        actionCard2Alpha = 1f
     }
 
     Box(
@@ -241,17 +231,6 @@ private fun HomeScreenContent(
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
-
-                // Search Music button
-                PremiumButton(
-                    text = "Search Music",
-                    onClick = onNavigateToSearch,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .alpha(animatedActionCard2Alpha),
-                    enabled = true,
-                    fontSize = 14
-                )
             }
         }
     }
@@ -264,7 +243,6 @@ fun HomeScreenPreview() {
         paddingValues = androidx.compose.foundation.layout.PaddingValues(0.dp),
         userProfileState = Resource.Loading,
         onNavigateToChooseWorkout = {},
-        onNavigateToDiscovery = {},
-        onNavigateToSearch = {}
+        onNavigateToDiscovery = {}
     )
 }

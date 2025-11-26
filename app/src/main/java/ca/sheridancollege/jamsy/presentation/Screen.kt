@@ -14,5 +14,4 @@ sealed class Screen(val route: String) {
     object PlaylistPreview : Screen("playlist_preview")
     object PlaylistCreation : Screen("playlist_creation")
     object GeneratedPlaylist : Screen("generated_playlist")
-    object Search : Screen("search")
 }
