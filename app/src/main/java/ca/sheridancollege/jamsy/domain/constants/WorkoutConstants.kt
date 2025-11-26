@@ -15,17 +15,7 @@ object WorkoutConstants {
         "Yoga",
         "HIIT"
     )
-    
-    /**
-     * Available mood types
-     */
-    val MOOD_TYPES = listOf(
-        "Energetic",
-        "Powerful",
-        "Calm",
-        "Intense"
-    )
-    
+
     /**
      * Default mood mapping for each workout type
      */

@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
@@ -26,6 +25,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -41,7 +41,6 @@ import androidx.compose.ui.unit.dp
 import ca.sheridancollege.jamsy.presentation.Screen
 import ca.sheridancollege.jamsy.presentation.components.BottomBar
 import ca.sheridancollege.jamsy.presentation.components.GlassCard
-import ca.sheridancollege.jamsy.presentation.components.PremiumGradientButton
 import ca.sheridancollege.jamsy.presentation.components.PremiumProfileImage
 import ca.sheridancollege.jamsy.presentation.components.ProfileInfoCard
 import ca.sheridancollege.jamsy.presentation.components.PremiumHeader
@@ -175,9 +174,9 @@ private fun ProfileScreenContent(
     paddingValues: androidx.compose.foundation.layout.PaddingValues
 ) {
     // Animation states for entrance effects
-    var imageAlpha by remember { mutableStateOf(0f) }
-    var infoAlpha by remember { mutableStateOf(0f) }
-    var buttonAlpha by remember { mutableStateOf(0f) }
+    var imageAlpha by remember { mutableFloatStateOf(0f) }
+    var infoAlpha by remember { mutableFloatStateOf(0f) }
+    var buttonAlpha by remember { mutableFloatStateOf(0f) }
 
     // Animated alpha values
     val animatedImageAlpha by animateFloatAsState(

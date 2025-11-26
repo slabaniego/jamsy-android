@@ -9,6 +9,8 @@ import java.security.SecureRandom
 import java.util.Base64
 
 import ca.sheridancollege.jamsy.BuildConfig
+import androidx.core.content.edit
+import androidx.core.net.toUri
 
 /**
  * Helper class for Spotify OAuth authentication
@@ -52,7 +54,7 @@ class SpotifyOAuthHelper(private val context: Context) {
         val authUrl = generateAuthUrl()
         Log.d(TAG, "Launching Spotify OAuth: $authUrl")
         
-        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(authUrl)).apply {
+        val intent = Intent(Intent.ACTION_VIEW, authUrl.toUri()).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK
         }
         
@@ -106,10 +108,10 @@ class SpotifyOAuthHelper(private val context: Context) {
      */
     private fun saveState(state: String) {
         val prefs = context.getSharedPreferences("spotify_oauth", Context.MODE_PRIVATE)
-        prefs.edit()
-            .putString("oauth_state", state)
-            .putLong("oauth_state_time", System.currentTimeMillis())
-            .apply()
+        prefs.edit {
+            putString("oauth_state", state)
+                .putLong("oauth_state_time", System.currentTimeMillis())
+        }
     }
     
     /**
@@ -128,7 +130,7 @@ class SpotifyOAuthHelper(private val context: Context) {
         
         if (isValid) {
             // Clear the state after successful validation
-            prefs.edit().remove("oauth_state").remove("oauth_state_time").apply()
+            prefs.edit { remove("oauth_state").remove("oauth_state_time") }
         }
         
         return isValid

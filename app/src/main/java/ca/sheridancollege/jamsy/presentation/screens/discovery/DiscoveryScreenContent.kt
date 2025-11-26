@@ -63,8 +63,6 @@ fun DiscoveryContent(
                         onProcessingDislikeChange = onProcessingDislikeChange,
                         onDragEnd = onDragEnd,
                         onNavigateToGeneratedPlaylist = onNavigateToGeneratedPlaylist,
-                        //viewModel = viewModel,
-                        //authToken = authToken
                     )
                 }
             }

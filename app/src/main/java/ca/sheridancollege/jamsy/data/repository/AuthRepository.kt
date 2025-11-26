@@ -9,14 +9,8 @@ import androidx.core.content.edit
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-
 import kotlinx.coroutines.tasks.await
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-
 import java.io.IOException
-
 import ca.sheridancollege.jamsy.data.datasource.remote.SpotifyAuthResponse
 import ca.sheridancollege.jamsy.domain.repository.AuthRepository as AuthRepositoryInterface
 import ca.sheridancollege.jamsy.util.Resource

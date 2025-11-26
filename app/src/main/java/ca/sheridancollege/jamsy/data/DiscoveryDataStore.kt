@@ -14,13 +14,13 @@ object DiscoveryDataStore {
     private val _discoveryTracks = MutableStateFlow<List<Track>>(emptyList())
     val discoveryTracks: StateFlow<List<Track>> = _discoveryTracks.asStateFlow()
     
-    private val _workout = MutableStateFlow<String>("")
+    private val _workout = MutableStateFlow("")
     val workout: StateFlow<String> = _workout.asStateFlow()
     
-    private val _mood = MutableStateFlow<String>("")
+    private val _mood = MutableStateFlow("")
     val mood: StateFlow<String> = _mood.asStateFlow()
     
-    private val _isNewSession = MutableStateFlow<Boolean>(false)
+    private val _isNewSession = MutableStateFlow(false)
     val isNewSession: StateFlow<Boolean> = _isNewSession.asStateFlow()
     
     private val _likedTracks = MutableStateFlow<List<Track>>(emptyList())

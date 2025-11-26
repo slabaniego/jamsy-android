@@ -8,6 +8,7 @@ import com.google.firebase.auth.FirebaseUser
 
 import javax.inject.Inject
 import javax.inject.Singleton
+import androidx.core.content.edit
 
 /**
  * AuthManager handles authentication state and token management.
@@ -35,6 +36,6 @@ class AuthManager @Inject constructor(
     }
 
     private fun clearStoredTokens() {
-        prefs.edit().clear().apply()
+        prefs.edit { clear() }
     }
 }
