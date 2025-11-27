@@ -6,9 +6,9 @@ package ca.sheridancollege.jamsy.data.datasource.remote
  */
 data class SpotifyUserResponse(
     val id: String = "",
-    val display_name: String = "",
+    val displayName: String = "",
     val email: String = "",
-    val external_urls: Map<String, String> = emptyMap(),
+    val externalUrls: Map<String, String> = emptyMap(),
     val followers: Followers = Followers(),
     val href: String = "",
     val images: List<SpotifyImage> = emptyList(),

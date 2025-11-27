@@ -27,16 +27,11 @@ fun DiscoveryContent(
     currentTrackIndex: Int,
     likedTracks: List<Track>,
     dragOffset: Float,
-    isProcessingLike: Boolean,
-    isProcessingDislike: Boolean,
     onDragOffsetChange: (Float) -> Unit,
-    onProcessingLikeChange: (Boolean) -> Unit,
-    onProcessingDislikeChange: (Boolean) -> Unit,
     onDragEnd: (Float) -> Unit,
     onNavigateToGeneratedPlaylist: () -> Unit,
     onBack: () -> Unit,
     viewModel: DiscoveryViewModel,
-    authToken: String
 ) {
     when (tracksState) {
         is Resource.Loading -> DiscoveryPremiumLoadingState()
@@ -56,15 +51,9 @@ fun DiscoveryContent(
                         currentTrackIndex = currentTrackIndex,
                         likedTracksCount = likedTracks.size,
                         dragOffset = dragOffset,
-                        isProcessingLike = isProcessingLike,
-                        isProcessingDislike = isProcessingDislike,
                         onDragOffsetChange = onDragOffsetChange,
-                        onProcessingLikeChange = onProcessingLikeChange,
-                        onProcessingDislikeChange = onProcessingDislikeChange,
                         onDragEnd = onDragEnd,
                         onNavigateToGeneratedPlaylist = onNavigateToGeneratedPlaylist,
-                        //viewModel = viewModel,
-                        //authToken = authToken
                     )
                 }
             }
@@ -83,15 +72,9 @@ fun DiscoverySuccessContent(
     currentTrackIndex: Int,
     likedTracksCount: Int,
     dragOffset: Float,
-    isProcessingLike: Boolean,
-    isProcessingDislike: Boolean,
     onDragOffsetChange: (Float) -> Unit,
-    onProcessingLikeChange: (Boolean) -> Unit,
-    onProcessingDislikeChange: (Boolean) -> Unit,
     onDragEnd: (Float) -> Unit,
     onNavigateToGeneratedPlaylist: () -> Unit,
-    //viewModel: DiscoveryViewModel,
-    //authToken: String
 ) {
     Column(
         modifier = Modifier

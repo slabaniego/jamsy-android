@@ -1,7 +1,7 @@
 package ca.sheridancollege.jamsy.presentation.components
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -38,6 +38,7 @@ import coil.compose.AsyncImage
 import ca.sheridancollege.jamsy.domain.models.Track
 import ca.sheridancollege.jamsy.presentation.theme.SpotifyMediumGray
 
+@SuppressLint("DefaultLocale")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TrackItem(
@@ -45,8 +46,6 @@ fun TrackItem(
     onTrackSelected: (Track) -> Unit,
     onTrackAction: (Track) -> Unit,
     modifier: Modifier = Modifier,
-    showIndex: Boolean = false,
-    index: Int? = null
 ) {
     var isLiked by remember { mutableStateOf(false) }
     
@@ -103,7 +102,7 @@ fun TrackItem(
                 modifier = Modifier.weight(1f)
             ) {
                 Text(
-                    text = track.name ?: "Unknown Track",
+                    text = track.name,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Medium,
                     maxLines = 1,
@@ -112,7 +111,7 @@ fun TrackItem(
                 
                 if (track.artists.isNotEmpty()) {
                     Text(
-                        text = track.artists.joinToString(", ") ?: track.artistName ?: "Unknown Artist",
+                        text = track.artists.joinToString(", "),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         maxLines = 1,
@@ -129,7 +128,7 @@ fun TrackItem(
                 }
                 
                 // Duration
-                track.durationMs?.let { duration ->
+                track.durationMs.let { duration ->
                     val minutes = duration / 60000
                     val seconds = (duration % 60000) / 1000
                     Text(

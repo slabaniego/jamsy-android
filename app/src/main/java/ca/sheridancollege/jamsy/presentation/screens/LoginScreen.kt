@@ -22,6 +22,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -43,7 +44,6 @@ import ca.sheridancollege.jamsy.presentation.theme.LightGray
 import ca.sheridancollege.jamsy.presentation.theme.SpotifyBlack
 import ca.sheridancollege.jamsy.presentation.theme.SpotifyDarkGray
 import ca.sheridancollege.jamsy.presentation.theme.SpotifyGreen
-import ca.sheridancollege.jamsy.presentation.theme.SpotifyMediumGray
 import ca.sheridancollege.jamsy.presentation.theme.White
 import ca.sheridancollege.jamsy.util.Resource
 
@@ -116,11 +116,11 @@ private fun LoginScreenContent(
     isLoading: Boolean = false
 ) {
     // Animation states for entrance effects
-    var titleAlpha by remember { mutableStateOf(0f) }
-    var subtitleAlpha by remember { mutableStateOf(0f) }
-    var cardAlpha by remember { mutableStateOf(0f) }
-    var buttonAlpha by remember { mutableStateOf(0f) }
-    var footerAlpha by remember { mutableStateOf(0f) }
+    var titleAlpha by remember { mutableFloatStateOf(0f) }
+    var subtitleAlpha by remember { mutableFloatStateOf(0f) }
+    var cardAlpha by remember { mutableFloatStateOf(0f) }
+    var buttonAlpha by remember { mutableFloatStateOf(0f) }
+    var footerAlpha by remember { mutableFloatStateOf(0f) }
 
     // Animated alpha values
     val animatedTitleAlpha by animateFloatAsState(
@@ -222,7 +222,7 @@ private fun LoginScreenContent(
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // Premium glassmorphism feature card
+            // Premium glass morphism feature card
             GlassCard(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -252,7 +252,7 @@ private fun LoginScreenContent(
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // Feature highlights in glassmorphism cards
+                    // Feature highlights in glass morphism cards
                     Column(
                         modifier = Modifier.fillMaxWidth(),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -275,7 +275,7 @@ private fun LoginScreenContent(
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // Error message with glassmorphism
+            // Error message with glass morphism
             if (errorMessage.isNotEmpty()) {
                 GlassCard(
                     modifier = Modifier
@@ -328,7 +328,7 @@ private fun LoginScreenContent(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Footer text with glassmorphism
+            // Footer text with glass morphism
             GlassCard(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -348,7 +348,7 @@ private fun LoginScreenContent(
 }
 
 /**
- * Reusable feature item component for glassmorphism cards.
+ * Reusable feature item component for glass morphism cards.
  */
 @Composable
 private fun FeatureItem(

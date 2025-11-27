@@ -15,42 +15,26 @@ import ca.sheridancollege.jamsy.presentation.screens.ChooseYourWorkoutScreen
 import ca.sheridancollege.jamsy.presentation.screens.DiscoveryScreen
 import ca.sheridancollege.jamsy.presentation.screens.GeneratedPlaylistScreen
 import ca.sheridancollege.jamsy.presentation.screens.HomeScreen
-import ca.sheridancollege.jamsy.presentation.screens.LikedTracksScreen
 import ca.sheridancollege.jamsy.presentation.screens.LoginScreen
-import ca.sheridancollege.jamsy.presentation.screens.PlaylistCreationScreen
-import ca.sheridancollege.jamsy.presentation.screens.PlaylistPreviewScreen
-import ca.sheridancollege.jamsy.presentation.screens.PlaylistTemplateScreen
 import ca.sheridancollege.jamsy.presentation.screens.ProfileScreen
-import ca.sheridancollege.jamsy.presentation.screens.SearchScreen
 import ca.sheridancollege.jamsy.presentation.screens.SignupScreen
-import ca.sheridancollege.jamsy.presentation.screens.SwipeTrackScreen
-import ca.sheridancollege.jamsy.presentation.screens.TrackListScreen
 import ca.sheridancollege.jamsy.presentation.viewmodels.ArtistSelectionViewModel
 import ca.sheridancollege.jamsy.presentation.viewmodels.AuthViewModel
 import ca.sheridancollege.jamsy.presentation.viewmodels.DiscoveryViewModel
 import ca.sheridancollege.jamsy.presentation.viewmodels.GeneratedPlaylistViewModel
 import ca.sheridancollege.jamsy.presentation.viewmodels.HomeViewModel
 import ca.sheridancollege.jamsy.presentation.viewmodels.LikedTracksViewModel
-import ca.sheridancollege.jamsy.presentation.viewmodels.PlaylistTemplateViewModel
 import ca.sheridancollege.jamsy.presentation.viewmodels.ProfileViewModel
-import ca.sheridancollege.jamsy.presentation.viewmodels.SearchViewModel
-import ca.sheridancollege.jamsy.presentation.viewmodels.SwipeViewModel
-import ca.sheridancollege.jamsy.presentation.viewmodels.TrackListViewModel
 import ca.sheridancollege.jamsy.util.Resource
-
 
 @Composable
 fun NavGraph(navController: NavHostController) {
     val authViewModel: AuthViewModel = viewModel()
     val profileViewModel: ProfileViewModel = viewModel()
     val homeViewModel: HomeViewModel = viewModel()
-    val trackListViewModel: TrackListViewModel = viewModel()
-    val playlistTemplateViewModel: PlaylistTemplateViewModel = viewModel()
     val artistSelectionViewModel: ArtistSelectionViewModel = viewModel()
     val discoveryViewModel: DiscoveryViewModel = viewModel()
-    val swipeViewModel: SwipeViewModel = viewModel()
     val likedTracksViewModel: LikedTracksViewModel = viewModel()
-    val searchViewModel: SearchViewModel = viewModel()
     val generatedPlaylistViewModel: GeneratedPlaylistViewModel = viewModel()
 
     val authState by authViewModel.authState.collectAsState()
@@ -83,7 +67,6 @@ fun NavGraph(navController: NavHostController) {
         authViewModel.logout(homeViewModel)
         profileViewModel.clearUserData()
         homeViewModel.clearData()
-        trackListViewModel.clearData()
 
         navController.navigate(Screen.Login.route) {
             popUpTo(0) { inclusive = true }
@@ -122,8 +105,6 @@ fun NavGraph(navController: NavHostController) {
         composable(Screen.Home.route) {
             HomeScreen(
                 onNavigateToProfile = { navController.navigate(Screen.Profile.route) },
-                onNavigateToTrackList = { navController.navigate(Screen.TrackList.route) },
-                onNavigateToSearch = { navController.navigate(Screen.Search.route) },
                 onNavigateToChooseWorkout = { navController.navigate(Screen.ChooseYourWorkout.route) },
                 onNavigateToDiscovery = { navController.navigate(Screen.Discovery.route) },
                 onLogout = handleLogout,
@@ -137,31 +118,6 @@ fun NavGraph(navController: NavHostController) {
                     navController.navigate("${Screen.ArtistSelection.route}/$workout/$mood")
                 },
                 onBack = { navController.popBackStack() }
-            )
-        }
-
-        composable(Screen.TrackList.route) {
-            TrackListScreen(
-                onNavigateToHome = { navController.navigate(Screen.Home.route) },
-                onNavigateToProfile = { navController.navigate(Screen.Profile.route) },
-                onLogout = handleLogout,
-                onTrackSelected = { trackId -> },
-                viewModel = trackListViewModel
-            )
-        }
-
-        composable("${Screen.PlaylistTemplates.route}/{workout}") { backStackEntry ->
-            val workout = backStackEntry.arguments?.getString("workout") ?: ""
-            
-            PlaylistTemplateScreen(
-                workout = workout,
-                onNavigateToHome = { navController.navigate(Screen.Home.route) },
-                onNavigateToArtistSelection = { selectedWorkout, mood -> 
-                    navController.navigate("${Screen.ArtistSelection.route}/$selectedWorkout/$mood")
-                },
-                onLogout = handleLogout,
-                viewModel = playlistTemplateViewModel,
-                authToken = authViewModel.getSpotifyAccessToken()?.takeIf { it.isNotBlank() }
             )
         }
 
@@ -189,52 +145,7 @@ fun NavGraph(navController: NavHostController) {
                 authToken = authToken
             )
         }
-
-        composable(Screen.SwipeTrack.route) {
-            val authToken = authViewModel.getSpotifyAccessToken()?.takeIf { it.isNotBlank() } ?: ""
-            SwipeTrackScreen(
-                viewModel = swipeViewModel,
-                authToken = authToken,
-                onNavigateToResults = { likedTracks ->
-                    // Pass liked tracks to the next screen if needed
-                    navController.navigate(Screen.GeneratedPlaylist.route)
-                },
-                onBack = { navController.popBackStack() }
-            )
-        }
-
-        composable(Screen.LikedTracks.route) {
-            LikedTracksScreen(
-                onBack = { navController.popBackStack() },
-                onPlaylistPreview = { navController.navigate(Screen.PlaylistPreview.route) },
-                onExtendedPlaylistPreview = { navController.navigate(Screen.PlaylistCreation.route) },
-                viewModel = likedTracksViewModel,
-                authToken = authViewModel.getSpotifyAccessToken()?.takeIf { it.isNotBlank() }
-            )
-        }
-
-        composable(Screen.PlaylistPreview.route) {
-            PlaylistPreviewScreen(
-                onNavigateToPlaylistCreation = { navController.navigate(Screen.PlaylistCreation.route) },
-                onBack = { navController.popBackStack() },
-                onRestartFlow = {
-                    // Navigate back to home and clear the back stack
-                    navController.navigate(Screen.Home.route) {
-                        popUpTo(Screen.Home.route) { inclusive = true }
-                    }
-                },
-                viewModel = likedTracksViewModel
-            )
-        }
-
-        composable(Screen.PlaylistCreation.route) {
-            PlaylistCreationScreen(
-                onBack = { navController.popBackStack() },
-                viewModel = likedTracksViewModel,
-                authToken = authViewModel.getSpotifyAccessToken()?.takeIf { it.isNotBlank() }
-            )
-        }
-
+        
         composable(Screen.GeneratedPlaylist.route) {
             val authToken = authViewModel.getSpotifyAccessToken()?.takeIf { it.isNotBlank() } ?: ""
             GeneratedPlaylistScreen(
@@ -253,15 +164,6 @@ fun NavGraph(navController: NavHostController) {
                 },
                 viewModel = generatedPlaylistViewModel,
                 authToken = authToken
-            )
-        }
-
-        composable(Screen.Search.route) {
-            SearchScreen(
-                onNavigateToHome = { navController.navigate(Screen.Home.route) },
-                onNavigateToProfile = { navController.navigate(Screen.Profile.route) },
-                onLogout = handleLogout,
-                viewModel = searchViewModel
             )
         }
     }

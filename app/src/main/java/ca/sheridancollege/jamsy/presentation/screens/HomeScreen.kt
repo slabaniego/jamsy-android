@@ -19,7 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -47,8 +47,6 @@ import ca.sheridancollege.jamsy.util.Resource
 @Composable
 fun HomeScreen(
     onNavigateToProfile: () -> Unit,
-    onNavigateToTrackList: () -> Unit,
-    onNavigateToSearch: () -> Unit,
     onNavigateToChooseWorkout: () -> Unit,
     onNavigateToDiscovery: () -> Unit,
     onLogout: () -> Unit,
@@ -66,8 +64,8 @@ fun HomeScreen(
                 selectedRoute = Screen.Home.route,
                 onHomeSelected = { /* Already on home */ },
                 onProfileSelected = onNavigateToProfile,
-                onTrackListSelected = onNavigateToTrackList,
-                onSearchSelected = onNavigateToSearch,
+             //   onTrackListSelected = { /* Track list disabled */ },
+               // onSearchSelected = { /* Search disabled */ },
                 onLogoutSelected = onLogout
             )
         }
@@ -76,8 +74,7 @@ fun HomeScreen(
             paddingValues = paddingValues,
             userProfileState = userProfileState,
             onNavigateToChooseWorkout = onNavigateToChooseWorkout,
-            onNavigateToDiscovery = onNavigateToDiscovery,
-            onNavigateToSearch = onNavigateToSearch
+            onNavigateToDiscovery = onNavigateToDiscovery
         )
     }
 }
@@ -87,14 +84,12 @@ private fun HomeScreenContent(
     paddingValues: androidx.compose.foundation.layout.PaddingValues,
     userProfileState: Resource<User>,
     onNavigateToChooseWorkout: () -> Unit,
-    onNavigateToDiscovery: () -> Unit,
-    onNavigateToSearch: () -> Unit
+    onNavigateToDiscovery: () -> Unit
 ) {
     // Animation states for entrance effects
-    var welcomeAlpha by remember { mutableStateOf(0f) }
-    var mainButtonAlpha by remember { mutableStateOf(0f) }
-    var actionCard1Alpha by remember { mutableStateOf(0f) }
-    var actionCard2Alpha by remember { mutableStateOf(0f) }
+    var welcomeAlpha by remember { mutableFloatStateOf(0f) }
+    var mainButtonAlpha by remember { mutableFloatStateOf(0f) }
+    var actionCard1Alpha by remember { mutableFloatStateOf(0f) }
 
     // Animated alpha values
     val animatedWelcomeAlpha by animateFloatAsState(
@@ -112,17 +107,11 @@ private fun HomeScreenContent(
         animationSpec = tween(durationMillis = 800, delayMillis = 700),
         label = "action_card1_alpha"
     )
-    val animatedActionCard2Alpha by animateFloatAsState(
-        targetValue = actionCard2Alpha,
-        animationSpec = tween(durationMillis = 800, delayMillis = 900),
-        label = "action_card2_alpha"
-    )
 
     LaunchedEffect(Unit) {
         welcomeAlpha = 1f
         mainButtonAlpha = 1f
         actionCard1Alpha = 1f
-        actionCard2Alpha = 1f
     }
 
     Box(
@@ -185,7 +174,7 @@ private fun HomeScreenContent(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                // Welcome card with glassmorphism
+                // Welcome card with glass morphism
                 GlassCard(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -241,17 +230,6 @@ private fun HomeScreenContent(
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
-
-                // Search Music button
-                PremiumButton(
-                    text = "Search Music",
-                    onClick = onNavigateToSearch,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .alpha(animatedActionCard2Alpha),
-                    enabled = true,
-                    fontSize = 14
-                )
             }
         }
     }
@@ -264,7 +242,6 @@ fun HomeScreenPreview() {
         paddingValues = androidx.compose.foundation.layout.PaddingValues(0.dp),
         userProfileState = Resource.Loading,
         onNavigateToChooseWorkout = {},
-        onNavigateToDiscovery = {},
-        onNavigateToSearch = {}
+        onNavigateToDiscovery = {}
     )
 }

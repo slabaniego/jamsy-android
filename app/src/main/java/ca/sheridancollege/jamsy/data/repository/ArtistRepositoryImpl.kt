@@ -1,6 +1,5 @@
 package ca.sheridancollege.jamsy.data.repository
 
-import android.util.Log
 import ca.sheridancollege.jamsy.data.cache.ArtistCacheManager
 import ca.sheridancollege.jamsy.data.datasource.remote.ApiClient
 import ca.sheridancollege.jamsy.data.datasource.remote.DiscoveryRequest
@@ -11,7 +10,6 @@ import ca.sheridancollege.jamsy.domain.constants.WorkoutConstants
 import ca.sheridancollege.jamsy.domain.models.Artist
 import ca.sheridancollege.jamsy.domain.models.Track
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 
 /**
@@ -22,10 +20,6 @@ class ArtistRepositoryImpl {
     
     private val apiService: JamsyApiService = ApiClient.jamsyApiService
     private val cacheManager = ArtistCacheManager()
-    
-    companion object {
-        private const val TAG = "ArtistRepository"
-    }
     
     /**
      * Get artists by workout and mood with smart caching.
@@ -45,26 +39,24 @@ class ArtistRepositoryImpl {
             try {
                 // Check cache first
                 val cachedArtists = cacheManager.get(workout)
-                Log.d(TAG, "Cache check - valid: ${cacheManager.isCacheValid()}, cached artists: ${cachedArtists?.size ?: 0}")
                 
                 if (cachedArtists != null && cachedArtists.isNotEmpty()) {
-                    Log.d(TAG, "✅ Using cached data for $workout (${cachedArtists.size} artists)")
-                    val shuffledArtists = cachedArtists.shuffled().take(WorkoutConstants.Artist.SHUFFLED_RESULT_COUNT)
+                    val shuffledArtists = cachedArtists.shuffled()
+                        .take(WorkoutConstants.Artist.SHUFFLED_RESULT_COUNT)
                     return@withContext Result.success(shuffledArtists)
                 }
                 
                 // Cache miss - fetch from API
-                Log.d(TAG, "🔄 Cache miss - fetching artists for $workout from API")
                 val result = fetchArtistsFromApi(workout, mood, authToken)
                 
                 if (result.isSuccess) {
                     val artists = result.getOrNull() ?: emptyList()
                     // Cache the results for future requests
                     cacheManager.put(workout, artists)
-                    Log.d(TAG, "✅ Fetched and cached ${artists.size} artists for $workout")
-                    return@withContext Result.success(artists.shuffled().take(WorkoutConstants.Artist.SHUFFLED_RESULT_COUNT))
+                    val shuffledArtists = artists.shuffled()
+                        .take(WorkoutConstants.Artist.SHUFFLED_RESULT_COUNT)
+                    return@withContext Result.success(shuffledArtists)
                 } else {
-                    Log.e(TAG, "❌ Failed to fetch artists: ${result.exceptionOrNull()?.message}")
                     return@withContext result
                 }
             } catch (e: Exception) {
@@ -74,97 +66,16 @@ class ArtistRepositoryImpl {
     }
     
     /**
-     * Pre-load artists for all workout categories.
-     * Mirrors the web flow where artists are loaded during login.
-     * 
-     * @param authToken The authentication token
-     * @return Result indicating success or failure
-     */
-    suspend fun preloadArtistsForAllWorkouts(authToken: String): Result<Unit> {
-        return withContext(Dispatchers.IO) {
-            try {
-                Log.d(TAG, "Pre-loading artists for all workout categories")
-                
-                for (workout in WorkoutConstants.WORKOUT_TYPES) {
-                    val mood = WorkoutConstants.getMoodForWorkout(workout)
-                    
-                    try {
-                        val result = fetchArtistsFromApi(workout, mood, authToken)
-                        if (result.isSuccess) {
-                            val artists = result.getOrNull() ?: emptyList()
-                            cacheManager.put(workout, artists)
-                            Log.d(TAG, "Pre-loaded ${artists.size} artists for $workout")
-                        } else {
-                            Log.e(TAG, "Failed to pre-load artists for $workout: ${result.exceptionOrNull()?.message}")
-                        }
-                    } catch (e: Exception) {
-                        Log.e(TAG, "Error pre-loading artists for $workout: ${e.message}")
-                    }
-                    
-                    // Delay between requests to avoid rate limiting
-                    delay(WorkoutConstants.Cache.PRELOAD_REQUEST_DELAY_MS)
-                }
-                
-                Log.d(TAG, "Pre-loading completed. Cached artists for: ${cacheManager.getCachedWorkouts()}")
-                Result.success(Unit)
-            } catch (e: Exception) {
-                Log.e(TAG, "Error in pre-loading: ${e.message}")
-                Result.failure(e)
-            }
-        }
-    }
-    
-    /**
-     * Populate artist cache during login.
-     * Similar to web version's session storage.
-     * 
-     * @param authToken The authentication token
-     * @return Result indicating success or failure
-     */
-    suspend fun populateArtistCache(authToken: String): Result<Unit> {
-        return withContext(Dispatchers.IO) {
-            try {
-                for (workout in WorkoutConstants.WORKOUT_TYPES) {
-                    val mood = WorkoutConstants.getMoodForWorkout(workout)
-                    
-                    try {
-                        val result = fetchArtistsFromApi(workout, mood, authToken)
-                        if (result.isSuccess) {
-                            val artists = result.getOrNull() ?: emptyList()
-                            cacheManager.put(workout, artists)
-                        }
-                        
-                        // Add delay between requests to avoid rate limiting
-                        delay(WorkoutConstants.Cache.API_REQUEST_DELAY_MS)
-                    } catch (e: Exception) {
-                        Log.e(TAG, "Failed to cache artists for $workout: ${e.message}")
-                    }
-                }
-                
-                Result.success(Unit)
-            } catch (e: Exception) {
-                Result.failure(e)
-            }
-        }
-    }
-    
-    /**
      * Submit artist selection and get discovery tracks.
      * 
-     * @param selectedArtistIds List of selected artist IDs
      * @param artistNamesJson Comma-separated artist names
      * @param workout The workout type
-     * @param mood The mood type
-     * @param action The action type
      * @param authToken The authentication token
      * @return Result containing list of tracks or failure
      */
     suspend fun submitArtistSelection(
-        selectedArtistIds: List<String>,
         artistNamesJson: String,
         workout: String,
-        mood: String,
-        action: String,
         authToken: String
     ): Result<List<Track>> {
         return withContext(Dispatchers.IO) {
@@ -230,13 +141,6 @@ class ArtistRepositoryImpl {
                 Result.failure(e)
             }
         }
-    }
-    
-    /**
-     * Clear the artist cache.
-     */
-    fun clearCache() {
-        cacheManager.clear()
     }
 }
 

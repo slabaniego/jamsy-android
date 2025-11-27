@@ -9,14 +9,8 @@ import androidx.core.content.edit
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-
 import kotlinx.coroutines.tasks.await
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-
 import java.io.IOException
-
 import ca.sheridancollege.jamsy.data.datasource.remote.SpotifyAuthResponse
 import ca.sheridancollege.jamsy.domain.repository.AuthRepository as AuthRepositoryInterface
 import ca.sheridancollege.jamsy.util.Resource
@@ -44,11 +38,8 @@ class AuthRepository(context: Context) : AuthRepositoryInterface {
     init {
         loadSavedSpotifyToken()
     }
-
     override val currentUser: FirebaseUser?
         get() = firebaseAuth.currentUser
-
-    // Public Authentication Methods
 
     /**
      * Authenticates a user with email and password.
@@ -105,7 +96,6 @@ class AuthRepository(context: Context) : AuthRepositoryInterface {
             firebaseAuth.createUserWithEmailAndPassword(email, password).await()
         }
     }
-
     /**
      * Signs out the current user and clears stored tokens.
      */
@@ -113,8 +103,6 @@ class AuthRepository(context: Context) : AuthRepositoryInterface {
         firebaseAuth.signOut()
         clearSpotifyToken()
     }
-
-
     /**
      * Retrieves the current Spotify access token.
      *
@@ -124,15 +112,10 @@ class AuthRepository(context: Context) : AuthRepositoryInterface {
         if (spotifyAccessToken == null) {
             loadSavedSpotifyToken()
         }
-        logTokenStatus()
         return spotifyAccessToken
     }
-
-    // Private Helper Methods
-
     private fun loadSavedSpotifyToken() {
         spotifyAccessToken = prefs.getString(SPOTIFY_TOKEN_KEY, null)
-        Log.d(TAG, "Loaded saved token: ${spotifyAccessToken?.take(TOKEN_PREVIEW_LENGTH)}...")
     }
 
     private suspend fun exchangeCodeForSpotifyToken(code: String): Result<SpotifyAuthResponse> {
@@ -158,7 +141,6 @@ class AuthRepository(context: Context) : AuthRepositoryInterface {
     private fun saveSpotifyToken(token: String) {
         spotifyAccessToken = token
         prefs.edit { putString(SPOTIFY_TOKEN_KEY, token) }
-        Log.d(TAG, "Saved Spotify access token: ${token.take(TOKEN_PREVIEW_LENGTH)}... (length: ${token.length})")
     }
 
     private suspend fun signInWithFirebaseToken(firebaseToken: String): Resource<FirebaseUser> {
@@ -169,12 +151,6 @@ class AuthRepository(context: Context) : AuthRepositoryInterface {
     private fun clearSpotifyToken() {
         spotifyAccessToken = null
         prefs.edit { remove(SPOTIFY_TOKEN_KEY) }
-        Log.d(TAG, "Cleared Spotify access token")
-    }
-
-    private fun logTokenStatus() {
-        Log.d(TAG, "getSpotifyAccessToken() called, spotifyAccessToken = ${spotifyAccessToken?.take(TOKEN_PREVIEW_LENGTH)}...")
-        Log.d(TAG, "spotifyAccessToken is null: ${spotifyAccessToken == null}")
     }
 
     private suspend fun executeAuthOperation(

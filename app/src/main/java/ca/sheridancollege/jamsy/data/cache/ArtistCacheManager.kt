@@ -74,15 +74,5 @@ class ArtistCacheManager {
             emptySet()
         }
     }
-    
-    /**
-     * Check if a specific workout has cached data.
-     * 
-     * @param workout The workout type
-     * @return true if workout has valid cached data
-     */
-    fun hasCachedData(workout: String): Boolean {
-        return isCacheValid() && cache.containsKey(workout)
-    }
 }
 

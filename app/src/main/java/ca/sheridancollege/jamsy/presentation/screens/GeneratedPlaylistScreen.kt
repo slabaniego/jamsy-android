@@ -14,8 +14,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -25,6 +23,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -34,7 +33,6 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 
 import ca.sheridancollege.jamsy.domain.models.Track
@@ -66,7 +64,6 @@ fun GeneratedPlaylistScreen(
     var isExporting by remember { mutableStateOf(false) }
     var showSuccessDialog by remember { mutableStateOf(false) }
     var showErrorDialog by remember { mutableStateOf(false) }
-    var playlistUrl by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf("") }
 
     // Load the generated playlist when the screen is composed
@@ -82,7 +79,7 @@ fun GeneratedPlaylistScreen(
 
     // Store tracks count for header
     val tracksCount = when (val state = playlistState) {
-        is Resource.Success<List<Track>> -> state.data.size ?: 0
+        is Resource.Success<List<Track>> -> state.data.size
         else -> 0
     }
 
@@ -151,7 +148,7 @@ fun GeneratedPlaylistScreen(
                             modifier = Modifier.fillMaxSize()
                         ) {
                             // Header with premium glass effect
-                            var headerAlpha by remember { mutableStateOf(0f) }
+                            var headerAlpha by remember { mutableFloatStateOf(0f) }
                             val animatedHeaderAlpha by animateFloatAsState(
                                 targetValue = headerAlpha,
                                 animationSpec = tween(durationMillis = 800, delayMillis = 300),
@@ -219,7 +216,6 @@ fun GeneratedPlaylistScreen(
                                                 authToken = authToken,
                                                 onSuccess = { url ->
                                                     isExporting = false
-                                                    playlistUrl = url
                                                     showSuccessDialog = true
                                                 },
                                                 onError = { error ->

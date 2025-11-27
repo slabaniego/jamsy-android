@@ -33,7 +33,6 @@ import ca.sheridancollege.jamsy.presentation.theme.LightGray
 import ca.sheridancollege.jamsy.presentation.theme.SpotifyBlack
 import ca.sheridancollege.jamsy.presentation.theme.SpotifyDarkGray
 import ca.sheridancollege.jamsy.presentation.theme.SpotifyGreen
-import ca.sheridancollege.jamsy.presentation.theme.SpotifyMediumGray
 import ca.sheridancollege.jamsy.presentation.theme.White
 
 @Composable

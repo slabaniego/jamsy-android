@@ -3,7 +3,6 @@ package ca.sheridancollege.jamsy
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -27,8 +26,6 @@ import ca.sheridancollege.jamsy.util.Resource
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    private val TAG = "MainActivity"
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -45,18 +42,11 @@ class MainActivity : ComponentActivity() {
                     val authState by authViewModel.authState.collectAsState()
 
                     LaunchedEffect(authState) {
+                        // Side-effect hook retained; logging removed
                         when (authState) {
-                            is Resource.Success -> {
-                                val user = (authState as Resource.Success).data
-                                Log.d(TAG, "Auth state changed: user=${user?.email ?: "null"}")
-                            }
-                            is Resource.Loading -> {
-                                Log.d(TAG, "Auth state is loading...")
-                            }
-                            is Resource.Error -> {
-                                val error = (authState as Resource.Error).message
-                                Log.e(TAG, "Auth state error: $error")
-                            }
+                            is Resource.Success -> Unit
+                            is Resource.Loading -> Unit
+                            is Resource.Error -> Unit
                         }
                     }
 
@@ -73,17 +63,11 @@ class MainActivity : ComponentActivity() {
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
-        intent?.let { newIntent ->
-            // Get the current authViewModel from the composition
-            // This is a workaround since we can't access the ViewModel directly
-            Log.d(TAG, "Received new intent with data: ${newIntent.data}")
-        }
     }
 
     private fun handleIntent(intent: Intent, authViewModel: AuthViewModel) {
         val data: Uri? = intent.data
         if (data != null && data.toString().startsWith("jamsy://callback")) {
-            Log.d(TAG, "Received intent with data: $data")
             authViewModel.handleOAuthRedirect(data)
         }
     }

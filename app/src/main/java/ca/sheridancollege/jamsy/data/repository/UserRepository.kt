@@ -111,7 +111,6 @@ class UserRepository(
                 Resource.Success(newUser)
             }
         } catch (e: Exception) {
-            Log.e(TAG, "Error getting user profile", e)
             Resource.Error(e.message ?: "An unknown error occurred")
         }
     }
@@ -143,13 +142,11 @@ class UserRepository(
                 
                 val subscriptionType = spotifyProfile.product
                 
-                Triple(spotifyProfile.display_name, imageUrl, subscriptionType)
+                Triple(spotifyProfile.displayName, imageUrl, subscriptionType)
             } else {
-                Log.e(TAG, "Spotify API error: ${response.code()}")
                 Triple(null, null, null)
             }
         } catch (e: Exception) {
-            Log.e(TAG, "Error fetching Spotify user data", e)
             Triple(null, null, null)
         }
     }
@@ -163,26 +160,21 @@ class UserRepository(
      */
     override suspend fun uploadProfileImage(context: Context, imageUri: Uri): Resource<String> {
         return try {
-            Log.d(TAG, "Starting profile image encoding")
             val currentUser = auth.currentUser ?: return Resource.Error("User not logged in")
 
             try {
                 // Convert image to Base64
                 val base64Image = convertImageToBase64(context, imageUri)
-                Log.d(TAG, "Image encoded to Base64 successfully")
 
                 // Update user profile with Base64 image
                 firestore.collection("users").document(currentUser.uid)
                     .update("profileImageBase64", base64Image).await()
-                Log.d(TAG, "Updated user profile with Base64 image")
 
                 Resource.Success(base64Image)
             } catch (e: Exception) {
-                Log.e(TAG, "Error processing image", e)
                 Resource.Error("Image processing failed: ${e.message}")
             }
         } catch (e: Exception) {
-            Log.e(TAG, "Unexpected error in uploadProfileImage", e)
             Resource.Error("An unexpected error occurred: ${e.message}")
         }
     }
@@ -242,7 +234,6 @@ class UserRepository(
             
             Resource.Success(Unit)
         } catch (e: Exception) {
-            Log.e(TAG, "Error updating user profile", e)
             Resource.Error("Failed to update profile: ${e.message}")
         }
     }

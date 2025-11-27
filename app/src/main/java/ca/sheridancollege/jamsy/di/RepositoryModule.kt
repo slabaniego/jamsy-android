@@ -11,8 +11,6 @@ import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
 import ca.sheridancollege.jamsy.data.AuthManager
-import ca.sheridancollege.jamsy.data.DiscoveryService
-import ca.sheridancollege.jamsy.data.PlaylistTemplateService
 import ca.sheridancollege.jamsy.data.repository.AuthRepository
 import ca.sheridancollege.jamsy.data.repository.ArtistRepositoryImpl
 import ca.sheridancollege.jamsy.data.repository.PlaylistRepositoryImpl
@@ -90,21 +88,5 @@ object RepositoryModule {
         return AuthManager(context)
     }
 
-    @Provides
-    @Singleton
-    fun providePlaylistTemplateService(
-        playlistRepository: PlaylistRepositoryImpl
-    ): PlaylistTemplateService {
-        return PlaylistTemplateService(playlistRepository)
-    }
-
-    @Provides
-    @Singleton
-    fun provideDiscoveryService(
-        trackRepository: TrackRepositoryImpl,
-        playlistRepository: PlaylistRepositoryImpl
-    ): DiscoveryService {
-        return DiscoveryService(trackRepository, playlistRepository)
-    }
 }
 

@@ -1,7 +1,6 @@
 package ca.sheridancollege.jamsy.presentation.viewmodels
 
 import android.content.Context
-import android.util.Log
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -53,23 +52,8 @@ class AuthViewModel @Inject constructor(
     }
 
     private fun updateAuthState(user: FirebaseUser? = authRepository.currentUser) {
-        if (user != null) {
-            _authState.value = Resource.Success(user)
-            Log.d("AuthViewModel", "Auth state updated: User logged in ${user.email}")
-        } else {
-            _authState.value = Resource.Success(null)
-            Log.d("AuthViewModel", "Auth state updated: User logged out")
-        }
+        _authState.value = Resource.Success(user)
     }
-
-    fun login(email: String, password: String) {
-        viewModelScope.launch {
-            _loginState.value = Resource.Loading
-            val result = authRepository.login(email, password)
-            _loginState.value = result
-        }
-    }
-
     fun signup(email: String, password: String) {
         viewModelScope.launch {
             _signupState.value = Resource.Loading
@@ -77,19 +61,12 @@ class AuthViewModel @Inject constructor(
             _signupState.value = result
         }
     }
-
     fun logout(homeViewModel: HomeViewModel) {
         authRepository.logout()
         _loginState.value = null
         _signupState.value = null
         homeViewModel.clearUserProfile()
     }
-
-    fun resetState() {
-        _loginState.value = null
-        _signupState.value = null
-    }
-
     fun handleSpotifyRedirect(code: String) {
         viewModelScope.launch {
             _loginState.value = Resource.Loading
@@ -98,7 +75,6 @@ class AuthViewModel @Inject constructor(
                 _loginState.value = result
             } catch (e: Exception) {
                 _loginState.value = Resource.Error("Spotify authentication failed: ${e.message}")
-                Log.e("AuthViewModel", "Spotify auth error", e)
             }
         }
     }
@@ -110,7 +86,6 @@ class AuthViewModel @Inject constructor(
         try {
             spotifyOAuthHelper.launchSpotifyAuth()
         } catch (e: Exception) {
-            Log.e("AuthViewModel", "Failed to launch Spotify OAuth", e)
             _loginState.value = Resource.Error("Failed to launch Spotify authentication: ${e.message}")
         }
     }
