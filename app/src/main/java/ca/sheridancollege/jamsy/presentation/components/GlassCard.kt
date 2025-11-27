@@ -1,3 +1,9 @@
+/*
+ * GlassCard.kt
+ * Reusable glassmorphism-style card container for premium UI content.
+ *
+ * Author: Iurii Manastyrskyi
+ */
 package ca.sheridancollege.jamsy.presentation.components
 
 import androidx.compose.foundation.background
@@ -15,9 +21,6 @@ import ca.sheridancollege.jamsy.presentation.theme.SpotifyMediumGray
 import ca.sheridancollege.jamsy.presentation.theme.SpotifyGreen
 import ca.sheridancollege.jamsy.presentation.theme.White
 
-/**
- * Reusable glassmorphism card component with backdrop blur effect.
- */
 @Composable
 fun GlassCard(
     modifier: Modifier = Modifier,

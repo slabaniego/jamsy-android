@@ -1,13 +1,15 @@
+/*
+ * ArtistCacheManager.kt
+ * Manages in-memory cached artists with expiration for workout recommendations.
+ *
+ * Author: Iurii Manastyrskyi
+ */
 package ca.sheridancollege.jamsy.data.cache
 
 import ca.sheridancollege.jamsy.domain.constants.WorkoutConstants
 import ca.sheridancollege.jamsy.domain.models.Artist
 import java.util.concurrent.ConcurrentHashMap
 
-/**
- * Manages caching of artists by workout type.
- * Thread-safe cache implementation with expiration support.
- */
 class ArtistCacheManager {
     
     private val cache = ConcurrentHashMap<String, List<Artist>>()
@@ -46,33 +48,12 @@ class ArtistCacheManager {
         cache[workout] = artists
         updateTimestamp()
     }
-    
-    /**
-     * Clear the entire cache.
-     */
-    fun clear() {
-        cache.clear()
-        cacheTimestamp = 0
-    }
-    
+
     /**
      * Update the cache timestamp to current time.
      */
     private fun updateTimestamp() {
         cacheTimestamp = System.currentTimeMillis()
-    }
-    
-    /**
-     * Get all cached workout types.
-     * 
-     * @return Set of workout type keys
-     */
-    fun getCachedWorkouts(): Set<String> {
-        return if (isCacheValid()) {
-            cache.keys
-        } else {
-            emptySet()
-        }
     }
 }
 

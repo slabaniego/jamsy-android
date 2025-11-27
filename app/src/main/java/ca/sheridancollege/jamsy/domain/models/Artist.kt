@@ -1,3 +1,9 @@
+/*
+ * Artist.kt
+ * Domain model representing an artist and associated workout categories.
+ *
+ * Author: Iurii Manastyrskyi
+ */
 package ca.sheridancollege.jamsy.domain.models
 
 import com.squareup.moshi.Json

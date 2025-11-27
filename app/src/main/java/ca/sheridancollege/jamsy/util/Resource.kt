@@ -1,3 +1,9 @@
+/*
+ * Resource.kt
+ * Simple sealed class wrapper for representing loading, success, and error states.
+ *
+ * Author: Iurii Manastyrskyi
+ */
 package ca.sheridancollege.jamsy.util
 
 sealed class Resource<out T> {

@@ -1,3 +1,9 @@
+/*
+ * JamsyApplication.kt
+ * Hilt-enabled Application class configuring Firebase and Coil image loading.
+ *
+ * Author: Iurii Manastyrskyi
+ */
 package ca.sheridancollege.jamsy
 
 import android.app.Application

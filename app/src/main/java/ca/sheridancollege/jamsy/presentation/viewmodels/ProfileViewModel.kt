@@ -1,3 +1,9 @@
+/*
+ * ProfileViewModel.kt
+ * ViewModel for loading and updating user profile and profile image.
+ *
+ * Author: Iurii Manastyrskyi
+ */
 package ca.sheridancollege.jamsy.presentation.viewmodels
 
 import android.content.Context

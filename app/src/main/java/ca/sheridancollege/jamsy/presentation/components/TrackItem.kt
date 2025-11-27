@@ -1,3 +1,9 @@
+/*
+ * TrackItem.kt
+ * Reusable composable for displaying a track row with like action.
+ *
+ * Author: Iurii Manastyrskyi
+ */
 package ca.sheridancollege.jamsy.presentation.components
 
 import android.annotation.SuppressLint

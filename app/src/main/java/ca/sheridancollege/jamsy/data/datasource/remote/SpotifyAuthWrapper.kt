@@ -1,3 +1,9 @@
+/*
+ * SpotifyAuthWrapper.kt
+ * Wrapper model containing Spotify auth response and optional refresh token.
+ *
+ * Author: Iurii Manastyrskyi
+ */
 package ca.sheridancollege.jamsy.data.datasource.remote
 
 import com.squareup.moshi.Json

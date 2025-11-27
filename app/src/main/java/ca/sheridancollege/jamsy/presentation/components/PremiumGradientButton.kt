@@ -1,3 +1,9 @@
+/*
+ * PremiumGradientButton.kt
+ * Premium call-to-action button with animated green gradient background.
+ *
+ * Author: Iurii Manastyrskyi
+ */
 package ca.sheridancollege.jamsy.presentation.components
 
 import androidx.compose.animation.core.animateFloatAsState
@@ -23,9 +29,6 @@ import androidx.compose.ui.unit.sp
 import ca.sheridancollege.jamsy.presentation.theme.SpotifyGreen
 import ca.sheridancollege.jamsy.presentation.theme.White
 
-/**
- * Premium gradient button with smooth animations.
- */
 @Composable
 fun PremiumGradientButton(
     text: String,

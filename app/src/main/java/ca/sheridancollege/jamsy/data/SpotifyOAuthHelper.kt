@@ -1,3 +1,9 @@
+/*
+ * SpotifyOAuthHelper.kt
+ * Helper for building and handling Spotify OAuth authorization flows.
+ *
+ * Author: Iurii Manastyrskyi
+ */
 package ca.sheridancollege.jamsy.data
 
 import android.content.Context
@@ -11,9 +17,6 @@ import ca.sheridancollege.jamsy.BuildConfig
 import androidx.core.content.edit
 import androidx.core.net.toUri
 
-/**
- * Helper class for Spotify OAuth authentication
- */
 class SpotifyOAuthHelper(private val context: Context) {
     
     companion object {

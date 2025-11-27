@@ -1,3 +1,9 @@
+/*
+ * Screen.kt
+ * Sealed class defining all navigation routes used by the app.
+ *
+ * Author: Iurii Manastyrskyi
+ */
 package ca.sheridancollege.jamsy.presentation
 
 sealed class Screen(val route: String) {

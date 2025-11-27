@@ -1,3 +1,9 @@
+/*
+ * ArtistSelectionScreen.kt
+ * Composable screen for choosing seed artists for personalized discovery.
+ *
+ * Author: Iurii Manastyrskyi
+ */
 package ca.sheridancollege.jamsy.presentation.screens
 
 import androidx.compose.foundation.background
@@ -105,7 +111,6 @@ fun ArtistSelectionScreen(
                             viewModel.submitSelection(
                                 workout = workout,
                                 mood = mood,
-                                action = "discover",
                                 authToken = authToken,
                                 onSuccess = onNavigateToDiscovery,
                                 onError = { error ->

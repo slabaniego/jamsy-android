@@ -1,3 +1,9 @@
+/*
+ * GeneratedPlaylistViewModel.kt
+ * ViewModel for loading preview playlists and exporting to Spotify.
+ *
+ * Author: Iurii Manastyrskyi
+ */
 package ca.sheridancollege.jamsy.presentation.viewmodels
 
 import androidx.lifecycle.ViewModel
@@ -54,30 +60,50 @@ class GeneratedPlaylistViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Exports the current generated playlist to Spotify.
+     *
+     * This function takes the tracks from the current playlist state and creates a new
+     * playlist on the user's Spotify account through the Jamsy API.
+     *
+     * @param authToken The Spotify access token for API authentication
+     * @param onSuccess Callback invoked with the created playlist's Spotify URL when successful
+     * @param onError Callback invoked with an error message if the export fails
+     */
     fun exportToSpotify(authToken: String, onSuccess: (String) -> Unit, onError: (String) -> Unit) {
+        // Launch the export operation in a coroutine to avoid blocking the UI thread
         viewModelScope.launch {
             try {
-                // Get the current playlist tracks
+                // Retrieve the current playlist state from the ViewModel
                 val currentState = _playlistState.value
+
+                // Extract tracks from the state - only proceed if we have successful data
                 val tracks = when (currentState) {
                     is Resource.Success -> currentState.data
-                    else -> emptyList()
+                    else -> emptyList() // Return empty list for loading/error states
                 }
-                
+
+                // Validate that we have tracks to export
                 if (tracks.isEmpty()) {
                     onError("No tracks available to export")
-                    return@launch
+                    return@launch // Exit early if no tracks
                 }
-                
+
+                // Call the repository to create the playlist on Spotify via our API
                 val result = playlistRepository.createPlaylist(authToken, tracks)
+
+                // Handle the result of the playlist creation
                 if (result.isSuccess) {
+                    // Extract the playlist URL from the successful result
                     val playlistUrl = result.getOrNull() ?: ""
-                    onSuccess(playlistUrl)
+                    onSuccess(playlistUrl) // Notify caller of success with the URL
                 } else {
+                    // Extract error message from the failed result
                     val error = result.exceptionOrNull()?.message ?: "Unknown error"
                     onError("Failed to create playlist: $error")
                 }
             } catch (e: Exception) {
+                // Catch any unexpected exceptions during the export process
                 onError("Failed to create playlist: ${e.message}")
             }
         }

@@ -1,3 +1,9 @@
+/*
+ * BottomBar.kt
+ * Bottom navigation bar for Home, Profile, and Logout actions.
+ *
+ * Author: Iurii Manastyrskyi
+ */
 package ca.sheridancollege.jamsy.presentation.components
 
 import androidx.compose.material.icons.Icons

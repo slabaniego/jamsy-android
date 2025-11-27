@@ -1,3 +1,9 @@
+/*
+ * GeneratedPlaylistStateComponents.kt
+ * Composable UI states for generated playlist loading, empty, and error views.
+ *
+ * Author: Iurii Manastyrskyi
+ */
 package ca.sheridancollege.jamsy.presentation.screens.generated_playlist
 
 import androidx.compose.animation.core.animateFloatAsState
@@ -33,9 +39,6 @@ import ca.sheridancollege.jamsy.presentation.theme.LightGray
 import ca.sheridancollege.jamsy.presentation.theme.SpotifyGreen
 import ca.sheridancollege.jamsy.presentation.theme.White
 
-/**
- * Premium loading state for generated playlist.
- */
 @Composable
 fun GeneratedPlaylistLoadingState(animationDelay: Int = 300) {
     var contentAlpha by remember { mutableStateOf(0f) }

@@ -1,3 +1,9 @@
+/*
+ * Theme.kt
+ * Application-wide Material 3 color scheme and Jamsy theme setup.
+ *
+ * Author: Iurii Manastyrskyi
+ */
 package ca.sheridancollege.jamsy.presentation.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme

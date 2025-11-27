@@ -1,3 +1,9 @@
+/*
+ * AuthViewModel.kt
+ * ViewModel for handling email/password and Spotify authentication flows.
+ *
+ * Author: Iurii Manastyrskyi
+ */
 package ca.sheridancollege.jamsy.presentation.viewmodels
 
 import android.content.Context

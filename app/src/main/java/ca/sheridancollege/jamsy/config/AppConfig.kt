@@ -1,3 +1,9 @@
+/*
+ * AppConfig.kt
+ * Central configuration object for API base URL and network timeouts.
+ *
+ * Author: Iurii Manastyrskyi
+ */
 package ca.sheridancollege.jamsy.config
 
 object AppConfig {

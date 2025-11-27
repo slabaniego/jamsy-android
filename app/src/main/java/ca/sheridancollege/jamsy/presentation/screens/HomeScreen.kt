@@ -1,3 +1,9 @@
+/*
+ * HomeScreen.kt
+ * Main home screen for starting discovery flows and navigating the app.
+ *
+ * Author: Iurii Manastyrskyi
+ */
 package ca.sheridancollege.jamsy.presentation.screens
 
 import androidx.compose.animation.core.animateFloatAsState

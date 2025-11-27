@@ -1,3 +1,9 @@
+/*
+ * NavGraph.kt
+ * Sets up the app's navigation graph and wires screens to shared ViewModels.
+ *
+ * Author: Iurii Manastyrskyi
+ */
 package ca.sheridancollege.jamsy.presentation
 
 import androidx.compose.runtime.Composable

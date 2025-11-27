@@ -1,3 +1,9 @@
+/*
+ * Color.kt
+ * Color palette and Spotify-inspired brand colors for the UI.
+ *
+ * Author: Iurii Manastyrskyi
+ */
 package ca.sheridancollege.jamsy.presentation.theme
 
 import androidx.compose.ui.graphics.Color

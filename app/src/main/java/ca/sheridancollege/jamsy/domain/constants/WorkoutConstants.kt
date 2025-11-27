@@ -1,9 +1,10 @@
-package ca.sheridancollege.jamsy.domain.constants
-
-/**
+/*
+ * WorkoutConstants.kt
  * Constants for workout and music discovery configuration.
- * Centralizes all hardcoded values used throughout the application.
+ *
+ * Author: Iurii Manastyrskyi
  */
+package ca.sheridancollege.jamsy.domain.constants
 object WorkoutConstants {
     /**
      * Cache configuration

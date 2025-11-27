@@ -1,3 +1,9 @@
+/*
+ * GeneratedPlaylistScreen.kt
+ * Composable screen for displaying and exporting the generated playlist.
+ *
+ * Author: Iurii Manastyrskyi
+ */
 package ca.sheridancollege.jamsy.presentation.screens
 
 import androidx.compose.animation.core.animateFloatAsState

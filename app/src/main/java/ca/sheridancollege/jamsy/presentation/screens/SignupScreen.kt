@@ -1,3 +1,9 @@
+/*
+ * SignupScreen.kt
+ * Composable screen for creating a Jamsy account with premium signup UI.
+ *
+ * Author: Iurii Manastyrskyi
+ */
 package ca.sheridancollege.jamsy.presentation.screens
 
 import androidx.compose.animation.core.animateFloatAsState

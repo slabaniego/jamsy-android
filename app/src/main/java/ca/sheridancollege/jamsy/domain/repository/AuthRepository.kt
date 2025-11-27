@@ -1,12 +1,13 @@
+/*
+ * AuthRepository.kt
+ * Domain repository interface for authentication and Spotify token access.
+ *
+ * Author: Iurii Manastyrskyi
+ */
 package ca.sheridancollege.jamsy.domain.repository
 
 import ca.sheridancollege.jamsy.util.Resource
 import com.google.firebase.auth.FirebaseUser
-
-/**
- * Repository interface for authentication operations.
- * Defines the contract for authentication-related data operations.
- */
 interface AuthRepository {
     
     /**

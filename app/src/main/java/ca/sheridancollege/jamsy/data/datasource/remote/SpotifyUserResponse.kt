@@ -1,9 +1,11 @@
+/*
+ * SpotifyUserResponse.kt
+ * Models Spotify user profile API response for the /v1/me endpoint.
+ *
+ * Author: Iurii Manastyrskyi
+ */
 package ca.sheridancollege.jamsy.data.datasource.remote
 
-/**
- * Response model for Spotify User Profile API endpoint
- * GET https://api.spotify.com/v1/me
- */
 data class SpotifyUserResponse(
     val id: String = "",
     val displayName: String = "",

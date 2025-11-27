@@ -1,14 +1,15 @@
+/*
+ * HandleTrackActionUseCase.kt
+ * Use case for handling track like/dislike actions in the domain layer.
+ *
+ * Author: Iurii Manastyrskyi
+ */
 package ca.sheridancollege.jamsy.domain.usecases
 
 import ca.sheridancollege.jamsy.domain.models.Track
 import ca.sheridancollege.jamsy.domain.repository.TrackRepository
 import ca.sheridancollege.jamsy.util.Resource
 import javax.inject.Inject
-
-/**
- * Use case for handling track actions (like/dislike).
- * Contains the business logic for processing user interactions with tracks.
- */
 class HandleTrackActionUseCase @Inject constructor(
     private val trackRepository: TrackRepository
 ) {

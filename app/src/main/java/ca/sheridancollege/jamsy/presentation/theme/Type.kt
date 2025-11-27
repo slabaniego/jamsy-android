@@ -1,3 +1,9 @@
+/*
+ * Type.kt
+ * Typography definitions for the Jamsy Compose theme.
+ *
+ * Author: Iurii Manastyrskyi
+ */
 package ca.sheridancollege.jamsy.presentation.theme
 
 import androidx.compose.material3.Typography

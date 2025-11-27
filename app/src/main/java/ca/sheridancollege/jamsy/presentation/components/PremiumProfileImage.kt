@@ -1,3 +1,9 @@
+/*
+ * PremiumProfileImage.kt
+ * Premium profile avatar with Spotify/local image support and loading state.
+ *
+ * Author: Iurii Manastyrskyi
+ */
 package ca.sheridancollege.jamsy.presentation.components
 
 import android.graphics.BitmapFactory
@@ -27,9 +33,6 @@ import coil.compose.rememberAsyncImagePainter
 import ca.sheridancollege.jamsy.presentation.theme.SpotifyGreen
 import ca.sheridancollege.jamsy.presentation.theme.White
 
-/**
- * Premium profile image component with glassmorphism border.
- */
 @Composable
 fun PremiumProfileImage(
     spotifyImageUrl: String,

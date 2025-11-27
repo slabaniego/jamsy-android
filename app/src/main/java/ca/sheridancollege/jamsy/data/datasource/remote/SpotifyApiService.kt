@@ -1,3 +1,9 @@
+/*
+ * SpotifyApiService.kt
+ * Retrofit service for direct Spotify Web API calls.
+ *
+ * Author: Iurii Manastyrskyi
+ */
 package ca.sheridancollege.jamsy.data.datasource.remote
 
 import retrofit2.Response

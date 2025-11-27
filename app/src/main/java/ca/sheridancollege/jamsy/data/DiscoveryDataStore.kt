@@ -1,3 +1,9 @@
+/*
+ * DiscoveryDataStore.kt
+ * Shared in-memory store for discovery tracks, workout, mood, and liked tracks.
+ *
+ * Author: Iurii Manastyrskyi
+ */
 package ca.sheridancollege.jamsy.data
 
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -6,9 +12,6 @@ import kotlinx.coroutines.flow.asStateFlow
 
 import ca.sheridancollege.jamsy.domain.models.Track
 
-/**
- * Simple data store for sharing discovery tracks between ViewModels
- */
 object DiscoveryDataStore {
     private val _discoveryTracks = MutableStateFlow<List<Track>>(emptyList())
     val discoveryTracks: StateFlow<List<Track>> = _discoveryTracks.asStateFlow()
