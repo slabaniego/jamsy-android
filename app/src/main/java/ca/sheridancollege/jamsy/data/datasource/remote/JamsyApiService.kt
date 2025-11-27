@@ -15,8 +15,6 @@ import ca.sheridancollege.jamsy.domain.models.PreviewPlaylistRequest
 import ca.sheridancollege.jamsy.domain.models.TrackActionRequest
 
 interface JamsyApiService {
-    
-    // Authentication - FIXED: Match backend endpoints
     @POST("api/auth/token")
     @FormUrlEncoded
     suspend fun exchangeCodeForToken(
@@ -29,7 +27,6 @@ interface JamsyApiService {
         @Query("refresh_token") refreshToken: String
     ): Response<SpotifyAuthResponse>
 
-    // Artists by workout and mood - FIXED: Match backend endpoints
     @GET("api/spotify/artists/workout/{workout}/mood/{mood}")
     suspend fun getArtistsByWorkout(
         @Path("workout") workout: String,
@@ -37,41 +34,35 @@ interface JamsyApiService {
         @Header("Authorization") authHeader: String
     ): Response<ArtistsResponseDto>
 
-    // Submit selected artists and get discovery tracks - FIXED: Use mobile API
     @POST("api/discover")
     suspend fun submitArtistSelection(
         @Body requestBody: DiscoveryRequest,
         @Header("Authorization") authHeader: String
     ): Response<TracksResponseDto>
 
-    // Get discovery tracks - FIXED: Match backend endpoints
     @POST("api/discover")
     suspend fun getDiscoveryTracks(
         @Body requestBody: DiscoveryRequest,
         @Header("Authorization") authHeader: String
     ): Response<TracksResponseDto>
 
-    // Handle track actions (like/dislike) - FIXED: Match backend endpoints
     @POST("api/track/action")
     suspend fun handleTrackAction(
         @Body songAction: TrackActionRequest,
         @Header("Authorization") authHeader: String
     ): Response<Map<String, String>>
 
-    // Get liked tracks - FIXED: Match backend endpoints
     @GET("api/liked")
     suspend fun getLikedTracks(
         @Header("Authorization") authHeader: String
     ): Response<TracksResponseDto>
 
-    // Preview playlist - FIXED: Match backend endpoints (POST with liked tracks)
     @POST("api/spotify/preview-playlist")
     suspend fun getPreviewPlaylist(
         @Header("Authorization") authHeader: String,
         @Body requestBody: PreviewPlaylistRequest
     ): Response<TracksResponseDto>
 
-    // Create playlist - FIXED: Match backend endpoints (PR #39)
     @POST("api/spotify/create-playlist")
     suspend fun createPlaylist(
         @Header("Authorization") authHeader: String,

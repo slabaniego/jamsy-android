@@ -20,6 +20,7 @@ import ca.sheridancollege.jamsy.domain.models.User
 import ca.sheridancollege.jamsy.domain.repository.UserRepository as UserRepositoryInterface
 import ca.sheridancollege.jamsy.util.Resource
 import ca.sheridancollege.jamsy.data.datasource.remote.ApiClient
+import androidx.core.graphics.scale
 
 class UserRepository(
     private val authRepository: AuthRepository
@@ -147,6 +148,7 @@ class UserRepository(
                 Triple(null, null, null)
             }
         } catch (e: Exception) {
+            Log.e(TAG, "Failed to fetch Spotify user data", e)
             Triple(null, null, null)
         }
     }
@@ -190,8 +192,7 @@ class UserRepository(
                 val originalBitmap = BitmapFactory.decodeStream(inputStream)
 
                 // Resize the bitmap to a manageable size (Firestore document limit is 1MB)
-                val maxDimension = 500 // Limit to 500px max dimension
-                val scaledBitmap = resizeBitmap(originalBitmap, maxDimension)
+                val scaledBitmap = resizeBitmap(originalBitmap)
 
                 // Convert to byte array with compression
                 val outputStream = ByteArrayOutputStream()
@@ -238,7 +239,7 @@ class UserRepository(
         }
     }
 
-    private fun resizeBitmap(bitmap: Bitmap, maxDimension: Int): Bitmap {
+    private fun resizeBitmap(bitmap: Bitmap, maxDimension: Int = 500): Bitmap {
         val width = bitmap.width
         val height = bitmap.height
 
@@ -259,6 +260,6 @@ class UserRepository(
             newWidth = (maxDimension * ratio).toInt()
         }
 
-        return Bitmap.createScaledBitmap(bitmap, newWidth, newHeight, true)
+        return bitmap.scale(newWidth, newHeight)
     }
 }

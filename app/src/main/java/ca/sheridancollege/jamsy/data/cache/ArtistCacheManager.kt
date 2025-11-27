@@ -46,33 +46,12 @@ class ArtistCacheManager {
         cache[workout] = artists
         updateTimestamp()
     }
-    
-    /**
-     * Clear the entire cache.
-     */
-    fun clear() {
-        cache.clear()
-        cacheTimestamp = 0
-    }
-    
+
     /**
      * Update the cache timestamp to current time.
      */
     private fun updateTimestamp() {
         cacheTimestamp = System.currentTimeMillis()
-    }
-    
-    /**
-     * Get all cached workout types.
-     * 
-     * @return Set of workout type keys
-     */
-    fun getCachedWorkouts(): Set<String> {
-        return if (isCacheValid()) {
-            cache.keys
-        } else {
-            emptySet()
-        }
     }
 }
 
