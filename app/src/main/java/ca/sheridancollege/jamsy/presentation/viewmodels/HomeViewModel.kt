@@ -1,3 +1,9 @@
+/*
+ * HomeViewModel.kt
+ * ViewModel for home screen tracks and user profile state.
+ *
+ * Author: Iurii Manastyrskyi
+ */
 package ca.sheridancollege.jamsy.presentation.viewmodels
 
 import androidx.lifecycle.viewModelScope

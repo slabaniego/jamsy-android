@@ -1,3 +1,9 @@
+/*
+ * TrackRepository.kt
+ * Repository for track discovery, likes, and liked tracks via the Jamsy API.
+ *
+ * Author: Iurii Manastyrskyi
+ */
 package ca.sheridancollege.jamsy.data.repository
 
 import ca.sheridancollege.jamsy.data.datasource.remote.ApiClient

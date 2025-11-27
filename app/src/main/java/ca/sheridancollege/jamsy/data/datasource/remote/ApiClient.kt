@@ -1,3 +1,9 @@
+/*
+ * ApiClient.kt
+ * Configures Retrofit and provides Jamsy and Spotify API service instances.
+ *
+ * Author: Iurii Manastyrskyi
+ */
 package ca.sheridancollege.jamsy.data.datasource.remote
 
 import com.squareup.moshi.Moshi

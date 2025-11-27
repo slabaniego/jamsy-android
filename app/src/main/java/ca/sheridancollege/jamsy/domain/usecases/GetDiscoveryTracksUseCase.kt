@@ -1,14 +1,15 @@
+/*
+ * GetDiscoveryTracksUseCase.kt
+ * Use case for retrieving discovery tracks from the domain repository.
+ *
+ * Author: Iurii Manastyrskyi
+ */
 package ca.sheridancollege.jamsy.domain.usecases
 
 import ca.sheridancollege.jamsy.domain.models.Track
 import ca.sheridancollege.jamsy.domain.repository.TrackRepository
 import ca.sheridancollege.jamsy.util.Resource
 import javax.inject.Inject
-
-/**
- * Use case for getting discovery tracks.
- * Contains the business logic for retrieving tracks for music discovery.
- */
 class GetDiscoveryTracksUseCase @Inject constructor(
     private val trackRepository: TrackRepository
 ) {

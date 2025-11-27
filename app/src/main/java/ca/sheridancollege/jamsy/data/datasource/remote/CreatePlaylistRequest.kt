@@ -1,3 +1,9 @@
+/*
+ * CreatePlaylistRequest.kt
+ * Request model for creating playlists via the Jamsy backend.
+ *
+ * Author: Iurii Manastyrskyi
+ */
 package ca.sheridancollege.jamsy.data.datasource.remote
 
 import com.squareup.moshi.Json

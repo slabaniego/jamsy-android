@@ -1,3 +1,9 @@
+/*
+ * TrackActionRequest.kt
+ * Domain DTO representing a track action request sent to the backend.
+ *
+ * Author: Iurii Manastyrskyi
+ */
 package ca.sheridancollege.jamsy.domain.models
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass

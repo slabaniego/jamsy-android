@@ -1,3 +1,9 @@
+/*
+ * ProfileScreen.kt
+ * Composable screen for viewing and editing the user's Jamsy profile.
+ *
+ * Author: Iurii Manastyrskyi
+ */
 package ca.sheridancollege.jamsy.presentation.screens
 
 import android.net.Uri
@@ -51,10 +57,6 @@ import ca.sheridancollege.jamsy.presentation.theme.SpotifyGreen
 import ca.sheridancollege.jamsy.presentation.viewmodels.ProfileViewModel
 import ca.sheridancollege.jamsy.util.PermissionHandler
 import ca.sheridancollege.jamsy.util.Resource
-
-
-private const val TAG = "ProfileScreen"
-
 @Composable
 fun ProfileScreen(
     onNavigateToHome: () -> Unit,

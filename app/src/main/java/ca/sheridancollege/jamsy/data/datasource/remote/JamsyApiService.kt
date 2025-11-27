@@ -1,3 +1,9 @@
+/*
+ * JamsyApiService.kt
+ * Retrofit service definition for Jamsy backend API endpoints.
+ *
+ * Author: Iurii Manastyrskyi
+ */
 package ca.sheridancollege.jamsy.data.datasource.remote
 
 import retrofit2.Response

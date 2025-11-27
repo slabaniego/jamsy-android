@@ -1,12 +1,14 @@
+/*
+ * TrackDto.kt
+ * DTOs for track data and track list responses from the Jamsy backend.
+ *
+ * Author: Iurii Manastyrskyi
+ */
 package ca.sheridancollege.jamsy.data.datasource.remote.dto
 
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
-/**
- * Data Transfer Object for Track API responses.
- * Maps directly to the JSON structure returned by the backend.
- */
 @JsonClass(generateAdapter = true)
 data class TrackDto(
     @Json(name = "id")

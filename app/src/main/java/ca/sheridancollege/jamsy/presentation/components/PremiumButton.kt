@@ -1,3 +1,9 @@
+/*
+ * PremiumButton.kt
+ * Reusable green gradient button used across premium UI screens.
+ *
+ * Author: Iurii Manastyrskyi
+ */
 package ca.sheridancollege.jamsy.presentation.components
 
 import androidx.compose.foundation.background
@@ -14,16 +20,6 @@ import androidx.compose.ui.unit.sp
 import ca.sheridancollege.jamsy.presentation.theme.LightGray
 import ca.sheridancollege.jamsy.presentation.theme.SpotifyGreen
 
-/**
- * Reusable premium button with green gradient background.
- * Used across multiple screens for consistent styling.
- *
- * @param text Button text to display
- * @param onClick Callback when button is clicked
- * @param modifier Optional modifier for customization
- * @param enabled Whether button is enabled (affects color)
- * @param fontSize Font size for text
- */
 @Composable
 fun PremiumButton(
     text: String,

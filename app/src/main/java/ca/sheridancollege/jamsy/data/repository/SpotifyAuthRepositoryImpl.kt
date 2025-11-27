@@ -1,3 +1,9 @@
+/*
+ * SpotifyAuthRepositoryImpl.kt
+ * Repository for exchanging and refreshing Spotify auth tokens via the backend.
+ *
+ * Author: Iurii Manastyrskyi
+ */
 package ca.sheridancollege.jamsy.data.repository
 
 import ca.sheridancollege.jamsy.data.datasource.remote.ApiClient

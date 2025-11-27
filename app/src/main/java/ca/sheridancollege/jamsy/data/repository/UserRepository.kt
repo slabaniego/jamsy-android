@@ -1,3 +1,9 @@
+/*
+ * UserRepository.kt
+ * Handles user profile data, Firestore storage, and Spotify user integration.
+ *
+ * Author: Iurii Manastyrskyi
+ */
 package ca.sheridancollege.jamsy.data.repository
 
 import android.content.Context

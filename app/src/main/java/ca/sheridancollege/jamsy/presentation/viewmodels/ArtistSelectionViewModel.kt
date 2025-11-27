@@ -1,3 +1,9 @@
+/*
+ * ArtistSelectionViewModel.kt
+ * ViewModel for loading workout artists and managing artist selection state.
+ *
+ * Author: Iurii Manastyrskyi
+ */
 package ca.sheridancollege.jamsy.presentation.viewmodels
 
 import androidx.lifecycle.ViewModel
@@ -22,7 +28,6 @@ class ArtistSelectionViewModel @Inject constructor(
 
     private val _artistsState = MutableStateFlow<Resource<List<Artist>>>(Resource.Loading)
     val artistsState: StateFlow<Resource<List<Artist>>> = _artistsState.asStateFlow()
-
     private val _selectedArtists = MutableStateFlow<List<Artist>>(emptyList())
     val selectedArtists: StateFlow<List<Artist>> = _selectedArtists.asStateFlow()
 
@@ -74,7 +79,6 @@ class ArtistSelectionViewModel @Inject constructor(
     fun submitSelection(
         workout: String,
         mood: String,
-        action: String,
         authToken: String,
         onSuccess: () -> Unit,
         onError: (String) -> Unit
@@ -90,19 +94,12 @@ class ArtistSelectionViewModel @Inject constructor(
                 )
                 
                 result.onSuccess { tracks ->
-                    println("ArtistSelectionViewModel: Successfully received ${tracks.size} tracks from API")
-                    println("ArtistSelectionViewModel: Tracks: ${tracks.map { "${it.name} by ${it.artists.firstOrNull()}" }}")
-                    
-                    // Store the discovery tracks in the data store
+
                     DiscoveryDataStore.setDiscoveryTracks(tracks)
                     DiscoveryDataStore.setWorkoutAndMood(workout, mood)
-                    
-                    println("ArtistSelectionViewModel: Stored tracks in DiscoveryDataStore")
-                    println("ArtistSelectionViewModel: Data store now contains: ${DiscoveryDataStore.discoveryTracks.value.size} tracks")
-                    
+
                     onSuccess()
                 }.onFailure { exception ->
-                    println("ArtistSelectionViewModel: Error submitting selection: ${exception.message}")
                     onError(exception.message ?: "Failed to submit selection")
                 }
             } catch (e: Exception) {

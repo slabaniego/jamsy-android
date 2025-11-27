@@ -1,3 +1,9 @@
+/*
+ * Track.kt
+ * Domain model representing a music track and its metadata.
+ *
+ * Author: Iurii Manastyrskyi
+ */
 package ca.sheridancollege.jamsy.domain.models
 
 import com.squareup.moshi.Json

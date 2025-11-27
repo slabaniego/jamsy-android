@@ -1,3 +1,9 @@
+/*
+ * LikedTracksViewModel.kt
+ * ViewModel for loading and exposing the user's liked tracks.
+ *
+ * Author: Iurii Manastyrskyi
+ */
 package ca.sheridancollege.jamsy.presentation.viewmodels
 
 import androidx.lifecycle.ViewModel

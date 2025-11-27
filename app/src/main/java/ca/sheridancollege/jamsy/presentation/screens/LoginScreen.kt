@@ -1,3 +1,9 @@
+/*
+ * LoginScreen.kt
+ * Composable screen for logging in and connecting with Spotify.
+ *
+ * Author: Iurii Manastyrskyi
+ */
 package ca.sheridancollege.jamsy.presentation.screens
 
 import android.widget.Toast

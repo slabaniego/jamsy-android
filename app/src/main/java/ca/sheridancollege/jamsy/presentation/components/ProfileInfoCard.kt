@@ -1,3 +1,9 @@
+/*
+ * ProfileInfoCard.kt
+ * Card displaying the user's Spotify display name and subscription tier.
+ *
+ * Author: Iurii Manastyrskyi
+ */
 package ca.sheridancollege.jamsy.presentation.components
 
 import androidx.compose.foundation.layout.Column
@@ -15,9 +21,6 @@ import androidx.compose.ui.unit.sp
 import ca.sheridancollege.jamsy.presentation.theme.SpotifyGreen
 import ca.sheridancollege.jamsy.presentation.theme.White
 
-/**
- * Reusable profile information card component.
- */
 @Composable
 fun ProfileInfoCard(
     displayName: String,

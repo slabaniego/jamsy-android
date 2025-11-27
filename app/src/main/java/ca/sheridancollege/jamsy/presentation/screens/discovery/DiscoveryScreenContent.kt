@@ -1,3 +1,9 @@
+/*
+ * DiscoveryScreenContent.kt
+ * Composable helpers for rendering discovery screen content by state.
+ *
+ * Author: Iurii Manastyrskyi
+ */
 package ca.sheridancollege.jamsy.presentation.screens.discovery
 
 import androidx.compose.foundation.layout.Box
@@ -17,10 +23,6 @@ import ca.sheridancollege.jamsy.presentation.components.PremiumButton
 import ca.sheridancollege.jamsy.presentation.viewmodels.DiscoveryViewModel
 import ca.sheridancollege.jamsy.util.Resource
 
-/**
- * Displays the appropriate content based on track loading state.
- * Orchestrates premium UI components based on resource state.
- */
 @Composable
 fun DiscoveryContent(
     tracksState: Resource<List<Track>>,

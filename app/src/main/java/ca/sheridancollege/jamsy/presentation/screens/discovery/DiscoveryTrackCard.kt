@@ -1,3 +1,9 @@
+/*
+ * DiscoveryTrackCard.kt
+ * Swipeable track card with album art, metadata, and audio preview controls.
+ *
+ * Author: Iurii Manastyrskyi
+ */
 package ca.sheridancollege.jamsy.presentation.screens.discovery
 
 import androidx.compose.foundation.background
@@ -55,8 +61,6 @@ private const val TRACK_CARD_WIDTH = 300
 private const val TRACK_CARD_HEIGHT = 500
 
 /**
- * Track card displaying album art, title, artist, and genres with drag interactions
- *
  * @param track Track to display
  * @param dragOffset Current drag offset for visual feedback
  * @param onDragEnd Callback when drag ends

@@ -1,3 +1,9 @@
+/*
+ * User.kt
+ * Domain model representing a Jamsy user and basic Spotify profile info.
+ *
+ * Author: Iurii Manastyrskyi
+ */
 package ca.sheridancollege.jamsy.domain.models
 
 data class User(

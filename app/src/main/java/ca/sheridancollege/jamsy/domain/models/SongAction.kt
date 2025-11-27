@@ -1,3 +1,9 @@
+/*
+ * SongAction.kt
+ * Domain model representing a user's like/dislike action on a track.
+ *
+ * Author: Iurii Manastyrskyi
+ */
 package ca.sheridancollege.jamsy.domain.models
 
 import com.squareup.moshi.Json

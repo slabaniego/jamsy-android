@@ -1,12 +1,14 @@
+/*
+ * TrackMapper.kt
+ * Maps track DTOs from API responses to domain Track models.
+ *
+ * Author: Iurii Manastyrskyi
+ */
 package ca.sheridancollege.jamsy.data.mappers
 
 import ca.sheridancollege.jamsy.data.datasource.remote.dto.TrackDto
 import ca.sheridancollege.jamsy.domain.models.Track
 
-/**
- * Mapper utility for converting Track DTOs to domain models.
- * Type-safe conversion from data layer to domain layer.
- */
 object TrackMapper {
     
     /**

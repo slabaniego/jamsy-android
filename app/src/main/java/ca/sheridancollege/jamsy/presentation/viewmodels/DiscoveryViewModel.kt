@@ -1,3 +1,9 @@
+/*
+ * DiscoveryViewModel.kt
+ * ViewModel for discovery tracks, swipe actions, and liked track state.
+ *
+ * Author: Iurii Manastyrskyi
+ */
 package ca.sheridancollege.jamsy.presentation.viewmodels
 
 import androidx.lifecycle.ViewModel

@@ -1,3 +1,9 @@
+/*
+ * PremiumHeader.kt
+ * Reusable premium header component with glassmorphic design and avatar support.
+ *
+ * Author: Iurii Manastyrskyi
+ */
 package ca.sheridancollege.jamsy.presentation.components
 
 import androidx.compose.animation.core.animateFloatAsState
@@ -32,19 +38,6 @@ import androidx.compose.ui.unit.sp
 import ca.sheridancollege.jamsy.presentation.theme.LightGray
 import ca.sheridancollege.jamsy.presentation.theme.SpotifyGreen
 import ca.sheridancollege.jamsy.presentation.theme.White
-
-/**
- * Premium reusable header component with glassmorphic design.
- * Can be used across multiple screens with customizable title and subtitle.
- * Displays navigation controls and customizable trailing content.
- *
- * @param title Header title text
- * @param subtitle Header subtitle text
- * @param onBack Callback when back button is clicked
- * @param animationDelay Delay for entrance animation in milliseconds
- * @param showBackButton Whether to show the back button
- * @param trailingContent Optional composable for custom content on the right side (avatar, buttons, etc)
- */
 @Composable
 fun PremiumHeader(
     title: String,

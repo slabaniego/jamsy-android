@@ -1,3 +1,9 @@
+/*
+ * SwipeableCard.kt
+ * Generic composable for swipeable cards with drag gestures and animations.
+ *
+ * Author: Iurii Manastyrskyi
+ */
 package ca.sheridancollege.jamsy.presentation.swipe
 
 import androidx.compose.animation.core.animateFloatAsState
@@ -25,8 +31,6 @@ data class SwipeCardConfig(
 )
 
 /**
- * Works with any card content through composition
- *
  * @param modifier Modifier for styling
  * @param dragOffset Current horizontal drag offset
  * @param onDragUpdate Called when drag updates

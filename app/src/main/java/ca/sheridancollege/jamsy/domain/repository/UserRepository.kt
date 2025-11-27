@@ -1,14 +1,15 @@
+/*
+ * UserRepository.kt
+ * Domain repository interface for user-related operations.
+ *
+ * Author: Iurii Manastyrskyi
+ */
 package ca.sheridancollege.jamsy.domain.repository
 
 import ca.sheridancollege.jamsy.domain.models.User
 import ca.sheridancollege.jamsy.util.Resource
 import android.content.Context
 import android.net.Uri
-
-/**
- * Repository interface for user operations.
- * Defines the contract for user-related data operations.
- */
 interface UserRepository {
     
     /**

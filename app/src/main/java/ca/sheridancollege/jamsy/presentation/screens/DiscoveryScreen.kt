@@ -1,11 +1,17 @@
+/*
+ * DiscoveryScreen.kt
+ * Composable screen for swiping through discovery tracks and liking music.
+ *
+ * Author: Iurii Manastyrskyi
+ */
 package ca.sheridancollege.jamsy.presentation.screens
 
-import android.annotation.SuppressLint
+//import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.ExperimentalMaterial3Api
+//import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -39,8 +45,8 @@ private const val SWIPE_THRESHOLD_DISLIKE = -60
  * @param likedTracksViewModel Optional ViewModel for liked tracks
  * @param authToken Authentication token for API calls
  */
-@SuppressLint("AutoboxingStateCreation")
-@OptIn(ExperimentalMaterial3Api::class)
+//@SuppressLint("AutoboxingStateCreation")
+//@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DiscoveryScreen(
     onNavigateToGeneratedPlaylist: () -> Unit,
@@ -74,7 +80,6 @@ fun DiscoveryScreen(
 
     Scaffold(
         topBar = {
-            // Premium header removed - integrated into main content for better animations
         }
     ) { paddingValues ->
         Box(
@@ -87,7 +92,6 @@ fun DiscoveryScreen(
                     )
                 )
         ) {
-            // Decorative gradient orbs for premium feel (similar to Login screen)
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -105,7 +109,6 @@ fun DiscoveryScreen(
             androidx.compose.foundation.layout.Column(
                 modifier = Modifier.fillMaxSize()
             ) {
-                // Premium header at the top with animations
                 PremiumHeader(
                     title = "Discover Music",
                     subtitle = "${likedTracks.size} tracks liked",

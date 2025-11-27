@@ -1,3 +1,9 @@
+/*
+ * DiscoveryStateComponents.kt
+ * Composable UI states and stats card for the discovery flow.
+ *
+ * Author: Iurii Manastyrskyi
+ */
 package ca.sheridancollege.jamsy.presentation.screens.discovery
 
 import androidx.compose.animation.core.animateFloatAsState
@@ -38,10 +44,6 @@ import ca.sheridancollege.jamsy.presentation.theme.LightGray
 import ca.sheridancollege.jamsy.presentation.theme.SpotifyGreen
 import ca.sheridancollege.jamsy.presentation.theme.White
 
-/**
- * Premium loading state with glassmorphic design and animations.
- * Single Responsibility: Display premium loading UI
- */
 @Composable
 fun DiscoveryPremiumLoadingState(animationDelay: Int = 300) {
     var contentAlpha by remember { mutableFloatStateOf(0f) }

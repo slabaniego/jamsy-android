@@ -1,3 +1,9 @@
+/*
+ * NetworkModule.kt
+ * Hilt module providing network and Jamsy API service dependencies.
+ *
+ * Author: Iurii Manastyrskyi
+ */
 package ca.sheridancollege.jamsy.di
 
 import dagger.Module

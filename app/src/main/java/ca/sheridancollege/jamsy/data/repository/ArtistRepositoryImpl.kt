@@ -1,3 +1,9 @@
+/*
+ * ArtistRepositoryImpl.kt
+ * Repository for artist discovery, caching, and workout-based recommendations.
+ *
+ * Author: Iurii Manastyrskyi
+ */
 package ca.sheridancollege.jamsy.data.repository
 
 import ca.sheridancollege.jamsy.data.cache.ArtistCacheManager

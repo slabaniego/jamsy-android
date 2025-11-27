@@ -1,12 +1,14 @@
+/*
+ * ArtistMapper.kt
+ * Maps artist DTOs from API responses to domain Artist models.
+ *
+ * Author: Iurii Manastyrskyi
+ */
 package ca.sheridancollege.jamsy.data.mappers
 
 import ca.sheridancollege.jamsy.data.datasource.remote.dto.ArtistDto
 import ca.sheridancollege.jamsy.domain.models.Artist
 
-/**
- * Mapper utility for converting Artist DTOs to domain models.
- * Type-safe conversion from data layer to domain layer.
- */
 object ArtistMapper {
     
     /**

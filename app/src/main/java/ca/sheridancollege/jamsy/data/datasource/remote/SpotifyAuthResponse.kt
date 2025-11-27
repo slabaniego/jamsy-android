@@ -1,3 +1,9 @@
+/*
+ * SpotifyAuthResponse.kt
+ * Model for Spotify authentication response returned by the backend.
+ *
+ * Author: Iurii Manastyrskyi
+ */
 package ca.sheridancollege.jamsy.data.datasource.remote
 
 import com.squareup.moshi.Json

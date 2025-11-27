@@ -1,3 +1,9 @@
+/*
+ * PremiumTextField.kt
+ * Premium text field with glassmorphism styling and Spotify-branded colors.
+ *
+ * Author: Iurii Manastyrskyi
+ */
 package ca.sheridancollege.jamsy.presentation.components
 
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,9 +20,6 @@ import ca.sheridancollege.jamsy.presentation.theme.LightGray
 import ca.sheridancollege.jamsy.presentation.theme.SpotifyGreen
 import ca.sheridancollege.jamsy.presentation.theme.White
 
-/**
- * Premium text field component with glassmorphism styling.
- */
 @Composable
 fun PremiumTextField(
     value: String,

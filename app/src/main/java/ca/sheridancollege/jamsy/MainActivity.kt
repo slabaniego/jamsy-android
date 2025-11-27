@@ -1,3 +1,9 @@
+/*
+ * MainActivity.kt
+ * Hilt entry activity hosting the Compose UI and app navigation graph.
+ *
+ * Author: Iurii Manastyrskyi
+ */
 package ca.sheridancollege.jamsy
 
 import android.content.Intent

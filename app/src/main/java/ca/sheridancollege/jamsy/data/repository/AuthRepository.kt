@@ -1,3 +1,9 @@
+/*
+ * AuthRepository.kt
+ * Repository for Firebase authentication and Spotify OAuth token management.
+ *
+ * Author: Iurii Manastyrskyi
+ */
 package ca.sheridancollege.jamsy.data.repository
 
 import android.content.Context

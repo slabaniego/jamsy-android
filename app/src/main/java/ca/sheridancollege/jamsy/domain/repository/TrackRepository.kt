@@ -1,12 +1,13 @@
+/*
+ * TrackRepository.kt
+ * Domain repository interface for track retrieval, likes, and liked tracks.
+ *
+ * Author: Iurii Manastyrskyi
+ */
 package ca.sheridancollege.jamsy.domain.repository
 
 import ca.sheridancollege.jamsy.domain.models.Track
 import ca.sheridancollege.jamsy.util.Resource
-
-/**
- * Repository interface for track operations.
- * Defines the contract for track-related data operations.
- */
 interface TrackRepository {
     
     /**

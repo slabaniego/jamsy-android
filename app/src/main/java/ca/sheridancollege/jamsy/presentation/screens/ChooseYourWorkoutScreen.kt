@@ -1,3 +1,9 @@
+/*
+ * ChooseYourWorkoutScreen.kt
+ * Composable screen for selecting workout type before artist selection.
+ *
+ * Author: Iurii Manastyrskyi
+ */
 package ca.sheridancollege.jamsy.presentation.screens
 
 import androidx.compose.foundation.background

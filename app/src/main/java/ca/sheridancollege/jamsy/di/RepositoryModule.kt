@@ -1,3 +1,9 @@
+/*
+ * RepositoryModule.kt
+ * Hilt module providing repository and auth-related dependencies.
+ *
+ * Author: Iurii Manastyrskyi
+ */
 package ca.sheridancollege.jamsy.di
 
 import android.content.Context

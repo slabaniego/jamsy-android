@@ -1,3 +1,9 @@
+/*
+ * PremiumArtistCard.kt
+ * Premium glassmorphic artist card with selection state and animations.
+ *
+ * Author: Iurii Manastyrskyi
+ */
 package ca.sheridancollege.jamsy.presentation.components
 
 import androidx.compose.animation.core.animateFloatAsState
@@ -37,11 +43,6 @@ import ca.sheridancollege.jamsy.presentation.theme.SpotifyGreen
 import ca.sheridancollege.jamsy.presentation.theme.White
 import ca.sheridancollege.jamsy.presentation.theme.LightGray
 
-/**
- * Premium artist card with glassmorphism and smooth animations.
- * Single Responsibility: Render artist card with selection state.
- * Open/Closed: Reusable across screens.
- */
 @Composable
 fun PremiumArtistCard(
     artist: Artist,
