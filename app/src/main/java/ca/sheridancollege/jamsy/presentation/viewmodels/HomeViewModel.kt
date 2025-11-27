@@ -25,13 +25,9 @@ class HomeViewModel @Inject constructor(
 ) : BaseViewModel(authManager) {
 
     private val _tracksState = MutableStateFlow<Resource<List<Track>>>(Resource.Loading)
-    val tracksState: StateFlow<Resource<List<Track>>> = _tracksState
-
     private val _userProfileState = MutableStateFlow<Resource<User>>(Resource.Loading)
     val userProfileState: StateFlow<Resource<User>> = _userProfileState
-
     private val _currentTrackIndex = MutableStateFlow(0)
-    val currentTrackIndex: StateFlow<Int> = _currentTrackIndex
 
     init {
         fetchTracksFromBackend()
@@ -49,40 +45,6 @@ class HomeViewModel @Inject constructor(
     fun loadUserProfile() {
         viewModelScope.launch {
             _userProfileState.value = userRepository.getUserProfile()
-        }
-    }
-
-    fun likeCurrentTrack() {
-        val currentTracks = (_tracksState.value as? Resource.Success)?.data ?: return
-        val currentIndex = _currentTrackIndex.value
-        if (currentIndex < currentTracks.size) {
-            viewModelScope.launch {
-                val track = currentTracks[currentIndex]
-                val authToken = getAuthToken() ?: return@launch
-                trackRepository.likeTrack(track, authToken)
-                moveToNextTrack()
-            }
-        }
-    }
-
-    fun unlikeCurrentTrack() {
-        val currentTracks = (_tracksState.value as? Resource.Success)?.data ?: return
-        val currentIndex = _currentTrackIndex.value
-        if (currentIndex < currentTracks.size) {
-            viewModelScope.launch {
-                val track = currentTracks[currentIndex]
-                val authToken = getAuthToken() ?: return@launch
-                trackRepository.unlikeTrack(track, authToken)
-                moveToNextTrack()
-            }
-        }
-    }
-
-    fun moveToNextTrack() {
-        val currentTracks = (_tracksState.value as? Resource.Success)?.data ?: return
-        val newIndex = _currentTrackIndex.value + 1
-        if (newIndex < currentTracks.size) {
-            _currentTrackIndex.value = newIndex
         }
     }
 

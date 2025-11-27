@@ -27,7 +27,6 @@ import ca.sheridancollege.jamsy.presentation.viewmodels.LikedTracksViewModel
 import ca.sheridancollege.jamsy.presentation.viewmodels.ProfileViewModel
 import ca.sheridancollege.jamsy.util.Resource
 
-
 @Composable
 fun NavGraph(navController: NavHostController) {
     val authViewModel: AuthViewModel = viewModel()

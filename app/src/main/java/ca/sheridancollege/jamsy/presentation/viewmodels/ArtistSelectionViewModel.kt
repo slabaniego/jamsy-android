@@ -9,13 +9,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-
 import javax.inject.Inject
-
 import ca.sheridancollege.jamsy.data.DiscoveryDataStore
 import ca.sheridancollege.jamsy.data.repository.ArtistRepositoryImpl
 import ca.sheridancollege.jamsy.domain.models.Artist
-import ca.sheridancollege.jamsy.domain.models.Track
 import ca.sheridancollege.jamsy.util.Resource
 
 @HiltViewModel
@@ -28,11 +25,8 @@ class ArtistSelectionViewModel @Inject constructor(
 
     private val _selectedArtists = MutableStateFlow<List<Artist>>(emptyList())
     val selectedArtists: StateFlow<List<Artist>> = _selectedArtists.asStateFlow()
-    
-    // Store discovery tracks from artist selection
-    private val _discoveryTracks = MutableStateFlow<List<Track>>(emptyList())
-    val discoveryTracks: StateFlow<List<Track>> = _discoveryTracks.asStateFlow()
-    
+
+
     // Store workout and mood for discovery
     private val _workout = MutableStateFlow("")
     private val _mood = MutableStateFlow("")
@@ -87,15 +81,11 @@ class ArtistSelectionViewModel @Inject constructor(
     ) {
         viewModelScope.launch {
             try {
-                val selectedArtistIds = _selectedArtists.value.mapNotNull { it.id }
                 val artistNamesJson = _selectedArtists.value.joinToString(",") { it.name }
 
                 val result = artistRepository.submitArtistSelection(
-                    selectedArtistIds = selectedArtistIds,
                     artistNamesJson = artistNamesJson,
                     workout = workout,
-                    mood = mood,
-                    action = action,
                     authToken = authToken
                 )
                 
@@ -120,13 +110,4 @@ class ArtistSelectionViewModel @Inject constructor(
             }
         }
     }
-    
-    // Get discovery tracks for the discovery screen
-    fun getDiscoveryTracks(): List<Track> {
-        return _discoveryTracks.value
-    }
-    
-    // Get workout and mood for discovery context
-    fun getWorkout(): String = _workout.value
-    fun getMood(): String = _mood.value
 }

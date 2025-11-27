@@ -46,8 +46,6 @@ fun TrackItem(
     onTrackSelected: (Track) -> Unit,
     onTrackAction: (Track) -> Unit,
     modifier: Modifier = Modifier,
-    showIndex: Boolean = false,
-    index: Int? = null
 ) {
     var isLiked by remember { mutableStateOf(false) }
     

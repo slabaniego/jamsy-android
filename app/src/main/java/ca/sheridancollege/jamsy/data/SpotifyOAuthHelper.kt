@@ -3,7 +3,6 @@ package ca.sheridancollege.jamsy.data
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.util.Log
 
 import java.security.SecureRandom
 import java.util.Base64
@@ -18,9 +17,7 @@ import androidx.core.net.toUri
 class SpotifyOAuthHelper(private val context: Context) {
     
     companion object {
-        private const val TAG = "SpotifyOAuthHelper"
         private const val REDIRECT_URI = "jamsy://callback"
-        private const val SPOTIFY_AUTH_URL = "https://accounts.spotify.com/authorize"
         private const val SCOPES = "user-read-private user-read-email user-top-read user-read-recently-played playlist-modify-public playlist-modify-private"
     }
     
@@ -52,17 +49,12 @@ class SpotifyOAuthHelper(private val context: Context) {
      */
     fun launchSpotifyAuth() {
         val authUrl = generateAuthUrl()
-        Log.d(TAG, "Launching Spotify OAuth: $authUrl")
         
         val intent = Intent(Intent.ACTION_VIEW, authUrl.toUri()).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK
         }
         
-        try {
-            context.startActivity(intent)
-        } catch (e: Exception) {
-            Log.e(TAG, "Failed to launch Spotify OAuth", e)
-        }
+        context.startActivity(intent)
     }
     
     /**
@@ -73,24 +65,15 @@ class SpotifyOAuthHelper(private val context: Context) {
         val state = uri.getQueryParameter("state")
         val error = uri.getQueryParameter("error")
         
-        Log.d(TAG, "Handling redirect - Code: ${code?.take(10)}..., State: $state, Error: $error")
-        
-        if (error != null) {
-            Log.e(TAG, "OAuth error: $error")
+        if (error != null || code == null) {
             return null
         }
         
-        if (code == null) {
-            Log.e(TAG, "No authorization code received")
-            return null
+        return if (isValidState(state)) {
+            code
+        } else {
+            null
         }
-        
-        if (!isValidState(state)) {
-            Log.e(TAG, "Invalid state parameter")
-            return null
-        }
-        
-        return code
     }
     
     /**

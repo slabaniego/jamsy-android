@@ -19,7 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -64,8 +64,8 @@ fun HomeScreen(
                 selectedRoute = Screen.Home.route,
                 onHomeSelected = { /* Already on home */ },
                 onProfileSelected = onNavigateToProfile,
-                onTrackListSelected = { /* Track list disabled */ },
-                onSearchSelected = { /* Search disabled */ },
+             //   onTrackListSelected = { /* Track list disabled */ },
+               // onSearchSelected = { /* Search disabled */ },
                 onLogoutSelected = onLogout
             )
         }
@@ -87,9 +87,9 @@ private fun HomeScreenContent(
     onNavigateToDiscovery: () -> Unit
 ) {
     // Animation states for entrance effects
-    var welcomeAlpha by remember { mutableStateOf(0f) }
-    var mainButtonAlpha by remember { mutableStateOf(0f) }
-    var actionCard1Alpha by remember { mutableStateOf(0f) }
+    var welcomeAlpha by remember { mutableFloatStateOf(0f) }
+    var mainButtonAlpha by remember { mutableFloatStateOf(0f) }
+    var actionCard1Alpha by remember { mutableFloatStateOf(0f) }
 
     // Animated alpha values
     val animatedWelcomeAlpha by animateFloatAsState(
@@ -174,7 +174,7 @@ private fun HomeScreenContent(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                // Welcome card with glassmorphism
+                // Welcome card with glass morphism
                 GlassCard(
                     modifier = Modifier
                         .fillMaxWidth()

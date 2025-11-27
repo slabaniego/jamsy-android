@@ -132,37 +132,6 @@ class TrackRepository : TrackRepositoryInterface {
     }
     
     /**
-     * Get discovery tracks with authentication.
-     * 
-     * @param authToken The authentication token
-     * @return Result containing list of tracks or failure
-     */
-    suspend fun getDiscoveryTracks(authToken: String): Result<List<Track>> {
-        return withContext(Dispatchers.IO) {
-            try {
-                val authHeader = "Bearer $authToken"
-                
-                val requestBody = DiscoveryRequest(
-                    seedArtists = emptyList(),
-                    workout = "general"
-                )
-                
-                val response = apiService.getDiscoveryTracks(requestBody, authHeader)
-                if (response.isSuccessful && response.body() != null) {
-                    val tracksDto = response.body()!!
-                    // Use type-safe mapper to convert DTOs to domain models
-                    val tracks = TrackMapper.toDomainModelList(tracksDto.tracks)
-                    Result.success(tracks)
-                } else {
-                    Result.failure(Exception("Failed to get discovery tracks: ${response.errorBody()?.string()}"))
-                }
-            } catch (e: Exception) {
-                Result.failure(e)
-            }
-        }
-    }
-    
-    /**
      * Handle track action (like/dislike).
      * 
      * @param songAction The song action details

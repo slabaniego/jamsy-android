@@ -64,7 +64,6 @@ fun GeneratedPlaylistScreen(
     var isExporting by remember { mutableStateOf(false) }
     var showSuccessDialog by remember { mutableStateOf(false) }
     var showErrorDialog by remember { mutableStateOf(false) }
-    var playlistUrl by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf("") }
 
     // Load the generated playlist when the screen is composed
@@ -217,7 +216,6 @@ fun GeneratedPlaylistScreen(
                                                 authToken = authToken,
                                                 onSuccess = { url ->
                                                     isExporting = false
-                                                    playlistUrl = url
                                                     showSuccessDialog = true
                                                 },
                                                 onError = { error ->

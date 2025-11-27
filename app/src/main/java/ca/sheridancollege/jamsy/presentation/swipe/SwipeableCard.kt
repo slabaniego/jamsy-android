@@ -15,24 +15,17 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import kotlin.math.abs
 
-/**
- * Configuration for SwipeableCard behavior
- * Encapsulates all swipe parameters for reusability and testability
- */
 data class SwipeCardConfig(
     val rotationDegrees: Float = 15f,
     val alphaThreshold: Float = 800f,
-    val swipeThreshold: Float = 150f, // Increased threshold for better mouse support
-    val animationDurationMs: Int = 200, // Slightly longer animation for smoother feel
+    val swipeThreshold: Float = 150f,
+    val animationDurationMs: Int = 200,
     val enableVerticalSwipe: Boolean = false,
-    val enableMouseSupport: Boolean = true // Explicit mouse support flag
+    val enableMouseSupport: Boolean = true
 )
 
 /**
- * Generic SwipeableCard composable
- * Follows Open/Closed Principle - open for extension, closed for modification
  * Works with any card content through composition
- * Improved mouse support for virtual device testing
  *
  * @param modifier Modifier for styling
  * @param dragOffset Current horizontal drag offset
@@ -108,21 +101,6 @@ fun SwipeableCard(
         content()
     }
 }
-
-/**
- * SwipeDirection enum for swipe classification
- */
 enum class SwipeDirection {
     LEFT, RIGHT
-}
-
-/**
- * Extension function for visual feedback during swipe
- * Returns a pair of (hasLeftSwipeIndicator, hasRightSwipeIndicator)
- */
-fun Float.getSwipeIndicators(threshold: Float = 50f): Pair<Boolean, Boolean> {
-    return Pair(
-        this < -threshold,  // Left swipe
-        this > threshold    // Right swipe
-    )
 }

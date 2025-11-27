@@ -9,11 +9,9 @@ import retrofit2.http.Header
 import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
-
 import ca.sheridancollege.jamsy.data.datasource.remote.dto.ArtistsResponseDto
 import ca.sheridancollege.jamsy.data.datasource.remote.dto.TracksResponseDto
 import ca.sheridancollege.jamsy.domain.models.PreviewPlaylistRequest
-import ca.sheridancollege.jamsy.domain.models.Track
 import ca.sheridancollege.jamsy.domain.models.TrackActionRequest
 
 interface JamsyApiService {
@@ -78,19 +76,5 @@ interface JamsyApiService {
     suspend fun createPlaylist(
         @Header("Authorization") authHeader: String,
         @Body requestBody: CreatePlaylistRequest
-    ): Response<Map<String, String>>
-
-    // Get recommendations - FIXED: Match backend endpoints
-    @GET("api/spotify/recommend/template/{name}")
-    suspend fun getRecommendations(
-        @Path("name") templateName: String,
-        @Query("accessToken") accessToken: String,
-        @Header("Authorization") authHeader: String
-    ): Response<List<Track>>
-    
-    // Restart flow - Clear discovery session
-    @POST("api/restart")
-    suspend fun restartFlow(
-        @Header("Authorization") authHeader: String
     ): Response<Map<String, String>>
 }

@@ -64,25 +64,18 @@ fun ArtistSelectionScreen(
     // Load artists when screen is shown
     LaunchedEffect(workout, mood) {
         val currentUser = authViewModel.currentUser
-        println("ArtistSelectionScreen: currentUser = ${currentUser?.uid}")
-        println("ArtistSelectionScreen: currentUser is null = ${currentUser == null}")
 
-        // Check if user is authenticated with Firebase first
         if (currentUser == null) {
-            println("ArtistSelectionScreen: No Firebase user, showing error")
             viewModel.setErrorState("Please log in first")
             return@LaunchedEffect
         }
 
         val authToken = authViewModel.getSpotifyAccessToken()?.takeIf { it.isNotBlank() }
         if (authToken == null) {
-            println("ArtistSelectionScreen: No valid Spotify token available, showing error")
             viewModel.setErrorState("Please log in with Spotify first")
             return@LaunchedEffect
         }
 
-        println("ArtistSelectionScreen: authToken = real token: ${authToken.take(10)}...")
-        println("ArtistSelectionScreen: authToken length = ${authToken.length}")
         viewModel.loadArtists(workout, mood, authToken)
     }
 
@@ -160,7 +153,6 @@ fun ArtistSelectionScreen(
             Column(
                 modifier = Modifier.fillMaxSize()
             ) {
-                // Premium header at the top with animations
                 PremiumHeader(
                     title = "Select Artists",
                     subtitle = "$workout • $mood",

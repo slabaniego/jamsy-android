@@ -1,7 +1,6 @@
 package ca.sheridancollege.jamsy.presentation.screens
 
 import android.net.Uri
-import android.util.Log
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -83,7 +82,6 @@ fun ProfileScreen(
                 viewModel.resetUploadState()
             }
             is Resource.Error -> {
-                Log.e(TAG, "Upload error: ${(uploadState as Resource.Error).message}")
                 snackbarMessage = (uploadState as Resource.Error).message
                 showSnackbar = true
             }
@@ -96,10 +94,7 @@ fun ProfileScreen(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         if (uri != null) {
-            Log.d(TAG, "Selected image URI: $uri")
             viewModel.uploadProfileImage(context, uri)
-        } else {
-            Log.d(TAG, "No image selected")
         }
     }
 
@@ -108,10 +103,8 @@ fun ProfileScreen(
         contract = ActivityResultContracts.RequestPermission()
     ) { isGranted ->
         if (isGranted) {
-            Log.d(TAG, "Storage permission granted")
             imagePickerLauncher.launch("image/*")
         } else {
-            Log.e(TAG, "Storage permission denied")
             snackbarMessage = "Storage permission denied. Cannot access gallery."
             showSnackbar = true
         }
@@ -120,10 +113,8 @@ fun ProfileScreen(
     // Function to handle image selection with permission check
     val selectImage = {
         if (PermissionHandler.hasStoragePermission(context)) {
-            Log.d(TAG, "Already has storage permission, launching picker")
             imagePickerLauncher.launch("image/*")
         } else {
-            Log.d(TAG, "Requesting storage permission")
             permissionLauncher.launch(android.Manifest.permission.READ_MEDIA_IMAGES)
         }
     }
@@ -266,7 +257,7 @@ private fun ProfileScreenContent(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = androidx.compose.foundation.layout.Arrangement.Center
                     ) {
-                    // Premium profile image with glassmorphism border
+                    // Premium profile image with glass morphism border
                     PremiumProfileImage(
                         spotifyImageUrl = user.spotifyProfileImageUrl,
                         localImageBase64 = user.profileImageBase64,
@@ -277,7 +268,7 @@ private fun ProfileScreenContent(
 
                     Spacer(modifier = Modifier.height(24.dp))
 
-                    // Profile info card with glassmorphism
+                    // Profile info card with glass morphism
                     ProfileInfoCard(
                         displayName = user.displayName,
                         subscriptionType = user.spotifySubscriptionType,

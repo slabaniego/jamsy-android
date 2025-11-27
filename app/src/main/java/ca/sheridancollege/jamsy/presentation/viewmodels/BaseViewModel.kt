@@ -18,11 +18,4 @@ abstract class BaseViewModel(
     protected fun getAuthToken(): String? {
         return authManager.currentUser?.uid
     }
-    
-    /**
-     * Check if user is authenticated
-     */
-    protected fun isAuthenticated(): Boolean {
-        return authManager.isLoggedIn()
-    }
 }

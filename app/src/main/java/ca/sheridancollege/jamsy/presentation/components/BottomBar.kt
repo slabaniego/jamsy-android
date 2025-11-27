@@ -21,8 +21,6 @@ fun BottomBar(
     selectedRoute: String = "",
     onHomeSelected: () -> Unit,
     onProfileSelected: () -> Unit = {},
-    onTrackListSelected: () -> Unit = {},
-    onSearchSelected: () -> Unit = {},
     onLogoutSelected: () -> Unit,
 ) {
     NavigationBar(
