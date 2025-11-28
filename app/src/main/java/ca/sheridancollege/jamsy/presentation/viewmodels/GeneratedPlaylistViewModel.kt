@@ -71,41 +71,53 @@ class GeneratedPlaylistViewModel @Inject constructor(
      * @param onError Callback invoked with an error message if the export fails
      */
     fun exportToSpotify(authToken: String, onSuccess: (String) -> Unit, onError: (String) -> Unit) {
-        // Launch the export operation in a coroutine to avoid blocking the UI thread
         viewModelScope.launch {
             try {
-                // Retrieve the current playlist state from the ViewModel
-                val currentState = _playlistState.value
+                val tracks = extractTracksFromState()
 
-                // Extract tracks from the state - only proceed if we have successful data
-                val tracks = when (currentState) {
-                    is Resource.Success -> currentState.data
-                    else -> emptyList() // Return empty list for loading/error states
+                if (!validateTracksForExport(tracks, onError)) {
+                    return@launch
                 }
 
-                // Validate that we have tracks to export
-                if (tracks.isEmpty()) {
-                    onError("No tracks available to export")
-                    return@launch // Exit early if no tracks
-                }
-
-                // Call the repository to create the playlist on Spotify via our API
-                val result = playlistRepository.createPlaylist(authToken, tracks)
-
-                // Handle the result of the playlist creation
-                if (result.isSuccess) {
-                    // Extract the playlist URL from the successful result
-                    val playlistUrl = result.getOrNull() ?: ""
-                    onSuccess(playlistUrl) // Notify caller of success with the URL
-                } else {
-                    // Extract error message from the failed result
-                    val error = result.exceptionOrNull()?.message ?: "Unknown error"
-                    onError("Failed to create playlist: $error")
-                }
+                val result = createPlaylistOnSpotify(authToken, tracks)
+                handlePlaylistCreationResult(result, onSuccess, onError)
             } catch (e: Exception) {
-                // Catch any unexpected exceptions during the export process
                 onError("Failed to create playlist: ${e.message}")
             }
+        }
+    }
+
+    private fun validateTracksForExport(tracks: List<Track>, onError: (String) -> Unit): Boolean {
+        if (tracks.isEmpty()) {
+            onError("No tracks available to export")
+            return false
+        }
+        return true
+    }
+
+    private fun extractTracksFromState(): List<Track> {
+        val currentState = _playlistState.value
+        return when (currentState) {
+            is Resource.Success -> currentState.data
+            else -> emptyList() // Return empty list for loading/error states
+        }
+    }
+
+    private suspend fun createPlaylistOnSpotify(authToken: String, tracks: List<Track>): Result<String> {
+        return playlistRepository.createPlaylist(authToken, tracks)
+    }
+
+    private fun handlePlaylistCreationResult(
+        result: Result<String>,
+        onSuccess: (String) -> Unit,
+        onError: (String) -> Unit
+    ) {
+        if (result.isSuccess) {
+            val playlistUrl = result.getOrNull() ?: ""
+            onSuccess(playlistUrl)
+        } else {
+            val error = result.exceptionOrNull()?.message ?: "Unknown error"
+            onError("Failed to create playlist: $error")
         }
     }
 

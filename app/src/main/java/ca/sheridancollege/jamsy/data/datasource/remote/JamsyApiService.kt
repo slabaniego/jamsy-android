@@ -16,6 +16,7 @@ import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
 import ca.sheridancollege.jamsy.data.datasource.remote.dto.ArtistsResponseDto
+import ca.sheridancollege.jamsy.data.datasource.remote.dto.CreatePlaylistResponseDto
 import ca.sheridancollege.jamsy.data.datasource.remote.dto.TracksResponseDto
 import ca.sheridancollege.jamsy.domain.models.PreviewPlaylistRequest
 import ca.sheridancollege.jamsy.domain.models.TrackActionRequest
@@ -73,5 +74,5 @@ interface JamsyApiService {
     suspend fun createPlaylist(
         @Header("Authorization") authHeader: String,
         @Body requestBody: CreatePlaylistRequest
-    ): Response<Map<String, String>>
+    ): Response<CreatePlaylistResponseDto>
 }

@@ -60,3 +60,16 @@ data class TracksResponseDto(
     val tracks: List<TrackDto>
 )
 
+/**
+ * Response model for playlist creation operations.
+ */
+@JsonClass(generateAdapter = true)
+data class CreatePlaylistResponseDto(
+    @Json(name = "status")
+    val status: String,
+    @Json(name = "playlistUrl")
+    val playlistUrl: String? = null,
+    @Json(name = "message")
+    val message: String? = null
+)
+
